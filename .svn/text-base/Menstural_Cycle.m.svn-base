@@ -1,0 +1,42 @@
+//
+//  Menstural_Cycle.m
+//  HealthTracker
+//
+//  Created by MAC02 on 3/16/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import "Menstural_Cycle.h"
+
+
+@implementation Menstural_Cycle
+@synthesize Cycle_ID,StartDate,EndDate,Daily_Date,User_ID;
+
+-(id)init
+{
+	StartDate=@"";
+	EndDate=@"";
+	Daily_Date=@"";
+	User_ID=0;
+	Cycle_ID=0;
+	return self;
+}
+
+-(void)ClearData
+{
+	StartDate=@"";
+	EndDate=@"";
+	Daily_Date=@"";
+	User_ID=0;
+	Cycle_ID=0;
+}
+
+- (void)dealloc {
+	
+	[StartDate release];
+	[EndDate release];
+	[Daily_Date release];
+	[super dealloc];
+}
+
+@end

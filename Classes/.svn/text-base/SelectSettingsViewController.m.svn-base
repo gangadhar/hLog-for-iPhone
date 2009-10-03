@@ -1,0 +1,182 @@
+//
+//  SelectSettingsViewController.m
+//  HealthTracker
+//
+//  Created by MAC02 on 3/30/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import "SelectSettingsViewController.h"
+
+#import "UnitsViewController.h"
+
+@implementation SelectSettingsViewController
+
+
+ // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+  self.navigationItem.title=@"Settings";
+	if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+		
+    }
+    return self;
+}
+
+
+/*
+// Implement loadView to create a view hierarchy programmatically, without using a nib.
+- (void)loadView {
+}
+*/
+-(IBAction)btnSave_Clicked:(id)sender
+{
+	
+}
+
+// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+- (void)viewDidLoad {
+	self.navigationItem.title=@"Settings";
+	tblView.delegate=self;
+	tblView.dataSource=self;
+//	self.navigationItem.rightBarButtonItem=btnSave;
+	tblView.rowHeight=50;//50
+	
+	appDelegate=[[UIApplication sharedApplication]delegate];
+	UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
+	temporaryBarButtonItem.title = @"Back";
+	self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
+	[temporaryBarButtonItem release];
+	
+    [super viewDidLoad];
+}
+
+
+- (void)viewWillAppear:(BOOL)animated
+{
+	if([appDelegate.UserArray count]>0)
+	{
+		self.navigationItem.hidesBackButton=FALSE;
+	}
+	else
+	{
+		self.navigationItem.hidesBackButton=TRUE;
+	}
+}
+#pragma mark Table view methods
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+
+// Customize the number of rows in the table view.
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return 3;
+}
+
+
+// Customize the appearance of table view cells.
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+
+
+	static NSString *CellIdentifier = @"Cell";
+	UITableViewCell *cell =(UITableViewCell *) [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+	if (cell == nil) {
+		cell = [[[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier] autorelease];
+	}	
+	cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
+	cell.indentationLevel = 1;
+    cell.textColor= [UIColor colorWithRed:0.317 green:0.4 blue:0.56 alpha:1.0];
+	if(indexPath.row==0)
+	{
+		cell.text=@"Users";
+		//		cell.img.image=[UIImage imageNamed:@"User.png"];
+	}
+	if(indexPath.row==1)
+	{
+		cell.text=@"Units";
+		//		cell.img.image=[UIImage imageNamed:@"User_Menu.jpg"];
+	}
+	if(indexPath.row==2)
+	{
+		cell.text=@"Passcode";
+		//	cell.img.image=[UIImage imageNamed:@"setting1.png"];
+	}	
+	
+	cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
+	return cell;
+
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+
+	[tblView deselectRowAtIndexPath:indexPath animated:YES];
+	
+	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	if(indexPath.row==0)
+	{
+		//appDelegate.SelectedStatus=@"Add User";
+		
+		appDelegate.iSfromAddUser=TRUE; 
+		appDelegate.ISfromSettings=0;
+		if(!objAddUserRoot)
+			objAddUserRoot=[[RootViewController alloc]initWithNibName:@"RootViewController" bundle:nil];
+		[self.navigationController pushViewController:objAddUserRoot animated:YES];
+		
+	}
+	if(indexPath.row==2)
+	{
+		appDelegate.iSfromAddUser=FALSE; 
+		if(!PasscodeSettingsView)
+		{
+			PasscodeSettingsView=[[PasscodeSettingsViewController alloc]initWithNibName:@"PasscodeSettings" bundle:nil];
+		}
+		[self.navigationController pushViewController:PasscodeSettingsView animated:YES];
+	}
+	if(indexPath.row==1)
+	{
+		
+		
+		appDelegate.ISfromSettings=1;
+		if(!objAddUserUnits)
+		{
+			objAddUserUnits=[[UnitsViewController alloc]initWithNibName:@"UnitsView" bundle:nil];
+		}
+		[self.navigationController pushViewController:objAddUserUnits animated:YES];
+	}
+	[Pool release];
+}
+
+/*
+// Override to allow orientations other than the default portrait orientation.
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+    // Return YES for supported orientations
+    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+*/
+
+- (void)didReceiveMemoryWarning {
+	// Releases the view if it doesn't have a superview.
+    [super didReceiveMemoryWarning];
+	
+	// Release any cached data, images, etc that aren't in use.
+}
+
+- (void)viewDidUnload {
+	// Release any retained subviews of the main view.
+	// e.g. self.myOutlet = nil;
+}
+
+
+- (void)dealloc {
+	
+	[tblView release];
+	[btnSave release];
+	[PasscodeSettingsView release];
+	
+    [super dealloc];
+}
+
+
+@end

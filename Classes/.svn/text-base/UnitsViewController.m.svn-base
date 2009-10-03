@@ -1,0 +1,189 @@
+//
+//  UnitsViewController.m
+//  HealthTracker
+//
+//  Created by Bhoomi on 3/30/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import "UnitsViewController.h"
+#import "AddUserSegmentTableCell.h" 
+
+@implementation UnitsViewController
+
+/*
+ // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+        // Custom initialization
+    }
+    return self;
+}
+*/
+
+/*
+// Implement loadView to create a view hierarchy programmatically, without using a nib.
+- (void)loadView {
+}
+*/
+-(IBAction)btnSave_Clicked:(id)sender
+{
+	
+}
+
+// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+- (void)viewDidLoad {
+	
+	self.navigationItem.title=@"Units";
+	tblView.delegate=self;
+	tblView.dataSource=self;
+	tblView.rowHeight=40;
+    [super viewDidLoad];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{	
+	[tblView reloadData];
+}
+
+#pragma mark Table view methods
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+
+// Customize the number of rows in the table view.
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return 3;
+}
+
+
+// Customize the appearance of table view cells.
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    static NSString *CellIdentifier = @"Cell";
+    
+    AddUserSegmentTableCell *cell = (AddUserSegmentTableCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    if (cell == nil) {
+        cell = [[[AddUserSegmentTableCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier] autorelease];
+		cell.hidesAccessoryWhenEditing = NO;
+		[cell.BtnSelect  addTarget:self action:@selector(UnitCheck:) forControlEvents:UIControlEventValueChanged];
+    }
+    
+	switch (indexPath.row) {
+		 case 0:
+			cell.lblName.text=@"Weight";
+			[cell.BtnSelect setTitle:@"Lbs"  forSegmentAtIndex:0];
+			[cell.BtnSelect setTitle:@"Kgs"  forSegmentAtIndex:1];
+			cell.BtnSelect.tag=indexPath.row;
+			if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Weight"] isEqualToString:@"LBs"])
+			{
+				cell.BtnSelect.selectedSegmentIndex=0;
+			}
+			else
+			{
+				cell.BtnSelect.selectedSegmentIndex=1;
+			}
+			break;
+		case 1:
+			cell.lblName.text=@"Temperature";
+			[cell.BtnSelect setTitle:@"º F"  forSegmentAtIndex:0];
+			[cell.BtnSelect setTitle:@"º C"  forSegmentAtIndex:1];
+			cell.BtnSelect.tag=indexPath.row;
+			if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Temperature"] isEqualToString:@"F"])
+			{
+				cell.BtnSelect.selectedSegmentIndex=0;
+			}
+			else
+			{
+				cell.BtnSelect.selectedSegmentIndex=1;
+			}
+			break;
+		case 2:
+			cell.lblName.text=@"Height";
+			[cell.BtnSelect setTitle:@"Feet"  forSegmentAtIndex:0];
+			[cell.BtnSelect setTitle:@"Cms"  forSegmentAtIndex:1];
+			cell.BtnSelect.tag=indexPath.row;
+			if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Height"] isEqualToString:@"Inches"])
+			{
+				cell.BtnSelect.selectedSegmentIndex=0;
+			}
+			else
+			{
+				cell.BtnSelect.selectedSegmentIndex=1;
+			}
+			break;
+		default:
+			break;
+	}
+	cell.accessoryType=UITableViewCellAccessoryNone;
+	return cell;
+}
+
+-(IBAction)UnitCheck:(id)sender
+{
+	UISegmentedControl *SW=(UISegmentedControl*)sender;
+	int SelectedTag=SW.tag;
+	if(SelectedTag==0)
+	{
+		if(SW.selectedSegmentIndex==0)
+		{
+			[[NSUserDefaults standardUserDefaults] setObject:@"LBs" forKey:@"Weight"];
+			[[NSUserDefaults standardUserDefaults] synchronize];
+		}
+		else
+		{
+			[[NSUserDefaults standardUserDefaults] setObject:@"Kgs" forKey:@"Weight"];
+			[[NSUserDefaults standardUserDefaults] synchronize];
+		}
+	}
+	else if(SelectedTag==1)
+	{
+		if(SW.selectedSegmentIndex==0)
+		{
+			[[NSUserDefaults standardUserDefaults] setObject:@"F" forKey:@"Temperature"];
+			[[NSUserDefaults standardUserDefaults] synchronize];
+		}
+		else
+		{
+			[[NSUserDefaults standardUserDefaults] setObject:@"C" forKey:@"Temperature"];
+			[[NSUserDefaults standardUserDefaults] synchronize];
+		}
+	}
+	else if(SelectedTag==2)
+	{
+		if(SW.selectedSegmentIndex==0)
+		{
+			[[NSUserDefaults standardUserDefaults] setObject:@"Inches" forKey:@"Height"];
+			[[NSUserDefaults standardUserDefaults] synchronize];
+		}
+		else
+		{
+			[[NSUserDefaults standardUserDefaults] setObject:@"Cms" forKey:@"Height"];
+			[[NSUserDefaults standardUserDefaults] synchronize];
+		}
+	}
+}
+
+- (void)didReceiveMemoryWarning {
+	// Releases the view if it doesn't have a superview.
+    [super didReceiveMemoryWarning];
+	
+	// Release any cached data, images, etc that aren't in use.
+}
+
+- (void)viewDidUnload {
+	// Release any retained subviews of the main view.
+	// e.g. self.myOutlet = nil;
+}
+
+
+- (void)dealloc 
+{
+	[tblView release];
+    [super dealloc];
+}
+
+
+@end

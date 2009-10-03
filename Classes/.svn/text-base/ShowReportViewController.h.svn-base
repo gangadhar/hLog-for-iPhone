@@ -1,0 +1,58 @@
+//
+//  ShowReportViewController.h
+//  HealthTracker
+//
+//  Created by Bhoomi on 4/1/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+#import "HealthTrackerAppDelegate.h"
+#import "MedicineViewController.h"
+#import "DailyStatusViewController.h"
+#import "HourlyStatusViewController.h"
+
+@interface ShowReportViewController : UIViewController <UITableViewDelegate,UITableViewDataSource>{
+
+	HealthTrackerAppDelegate *appDelegate;
+	IBOutlet UITableView *tblView;
+	IBOutlet UIView *viewHeader;
+	IBOutlet UILabel *lblDate;
+	IBOutlet UILabel *lblField;
+	NSString *StringField;
+	int Index;
+	IBOutlet UIScrollView *ScrollView;
+	int Count;
+	NSString *FieldName;		
+	NSArray *arr3;
+	int TotlaDataCount;
+	int DisplanyCount;
+	BOOL ISFinish;
+	IBOutlet UIBarButtonItem *btnEdit;
+	BOOL ISEdit;
+	int Row;
+	//MedicineViewController *MedicineView;
+	//DailyStatusViewController *DailyStatusView;
+	//HourlyStatusViewController *HourlyStatusView;
+	//NSDateFormatter *DateFormatter;
+	int Width;
+	NSIndexPath *indexPathObj;
+	UILabel *lbl;
+//	BOOL isFromReport;
+	int height;
+	UIActivityIndicatorView *Activity;
+	NSString *Fields;
+	UILabel *lblHeader;
+	UILabel *lblFooter;
+	NSString *DateTime;
+	NSString *Date;
+	NSString *String;
+}
+@property(nonatomic,retain) NSString *Fields;
+@property(nonatomic,retain) NSString *StringField;
+@property(nonatomic,readwrite) int Index;
+//@property(nonatomic,readwrite) BOOL isFromReport;
+-(IBAction)btnEdit_Click:(id)sender;
+-(UILabel *)CellLable:(NSInteger)Label;
+-(void)LoadReport;
+@end

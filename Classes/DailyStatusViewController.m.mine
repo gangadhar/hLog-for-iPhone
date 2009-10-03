@@ -1,0 +1,1312 @@
+//
+//  DailyStatusViewController.m
+//  HealthTracker
+
+//  Created by Bhoomi on 3/2/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+#import "DailyStatusViewController.h"
+#import "DailyStatusTableViewCell.h"
+#import "User_Settings.h"
+#import "AddUserButtonTableViewCell.h"
+
+
+@implementation DailyStatusViewController
+
+@synthesize DailySettings,Mensturalref,Vitals_Detailref;
+
+
+//An event when user clicks on Save button.
+-(IBAction)btnSave_clicked:(id)sender
+{
+	int Result;
+	PickerView.hidden=TRUE;
+	DatePicker.hidden=TRUE;
+	ToolBar.hidden=TRUE;
+	appDeleagte.isDailyReport=TRUE;
+	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	if([self.Vitals_Detailref.BP length]>0 || [self.Vitals_Detailref.BloodSugar length]>0 || [self.Vitals_Detailref.HeightInch length]>0  || [self.Vitals_Detailref.TempC length]>0 ||[self.Vitals_Detailref.Fasting length]>0 || [self.Vitals_Detailref.WeightKgs length]>0 || [self.Vitals_Detailref.Pulse length]>0 || [self.Vitals_Detailref.Respiration length]>0 || [self.Vitals_Detailref.Other length]>0)
+	{
+		if([self.Vitals_Detailref.WeightLbs length]>0)
+		{
+			[[NSUserDefaults standardUserDefaults] setObject:self.Vitals_Detailref.WeightLbs forKey:[NSString stringWithFormat:@"%d_WeightLbs",appDeleagte.SelectedUserID]];
+			[[NSUserDefaults standardUserDefaults] synchronize];
+			
+			[[NSUserDefaults standardUserDefaults] setObject:self.Vitals_Detailref.WeightKgs forKey:[NSString stringWithFormat:@"%d_WeightKgs",appDeleagte.SelectedUserID]];
+			[[NSUserDefaults standardUserDefaults] synchronize];
+		}
+		if(self.Vitals_Detailref.Vitals_ID==0)
+		{
+			Result=[appDeleagte InsertVitalsDetail:self.Vitals_Detailref]; 
+		}
+		else
+		{
+			Result=[appDeleagte UpdateVitalsDetail:self.Vitals_Detailref];
+		}
+		if(Result>0)
+		{
+			appDeleagte.isDailyReport=TRUE;
+			[self.navigationController popViewControllerAnimated:YES];
+		}
+		
+	}
+	else
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Please enter the data in at least one field!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		alert.tag=10;
+		[alert show];
+		[alert release];
+	}
+	[Pool release];
+}
+
+//An event when user clicks on Settings button.
+-(IBAction)btnSettings_clicked:(id)sender
+{
+	appDeleagte.SelectedStatus=@"Daily";	
+	appDeleagte.objSettingsViewController=[[SettingsViewController alloc]initWithNibName:@"Settings" bundle:nil];		
+	if (SettingsCon == nil)
+	{
+		SettingsCon = [[UINavigationController alloc] initWithRootViewController:appDeleagte.objSettingsViewController];
+	}
+	User_Settings *Data=[appDeleagte.UserSettingsArray objectAtIndex:0];
+	
+	appDeleagte.SelectedItems = Data.DailyEntryDetail; 
+	[self.navigationController presentModalViewController:SettingsCon animated:YES];
+	[appDeleagte.objSettingsViewController release];
+}
+
+
+
+// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+- (void)viewDidLoad 
+{
+	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	tblDaily.delegate=self;
+	tblDaily.dataSource=self;
+	self.navigationItem.rightBarButtonItem=btnSave;
+	appDeleagte=[[UIApplication sharedApplication]delegate];
+	toolBar.tintColor=[UIColor blackColor];
+	tblDaily.sectionFooterHeight=2;
+	tblDaily.sectionHeaderHeight=10;
+	
+	[appDeleagte.DateFormatter setDateFormat:@"MM-dd-yyyy"];
+	[DatePicker setDate:[NSDate date] animated:YES];
+	PickerView.delegate=self;
+	ToolBar.tintColor=[UIColor blackColor];
+	lblData=[[UILabel alloc]init];
+	lblData.frame=CGRectMake(3,13 , 250, 20);
+	lblData.font=[UIFont systemFontOfSize:15];
+	lblData.textColor=[UIColor whiteColor];
+	lblData.backgroundColor=[UIColor clearColor];
+	viewFooter.backgroundColor=[UIColor groupTableViewBackgroundColor];
+	if(!data)
+	{
+		data=[[NSMutableDictionary alloc]init];
+	}
+	for(int i = 1; i <=15; i++)
+	{
+		NSMutableArray *fillPicker=[self FillArray:i];		
+		
+		[data setObject:fillPicker forKey:[NSString stringWithFormat:@"%d",i]];		
+	}
+	[ToolBar addSubview:lblData];
+	DatePicker.maximumDate=[NSDate date];
+	UIView *ViewHead=[[UIView alloc]init];
+	ViewHead.frame=CGRectMake(0, 0, 320, 50);
+	ViewHead.backgroundColor=[UIColor clearColor];
+	lblHeader=[[UILabel alloc]init];
+	lblHeader.frame=CGRectMake(10, 5, 300, 40);
+	lblHeader.text=@"Enter the data you want to log or browse to the data to be edited";
+	lblHeader.textAlignment=UITextAlignmentCenter;
+	lblHeader.textColor=[UIColor colorWithRed:0.3019 green:0.3450 blue:0.4274 alpha:1.0];
+	lblHeader.font=[UIFont systemFontOfSize:15];
+	lblHeader.numberOfLines=0;
+	lblHeader.backgroundColor=[UIColor clearColor ];
+	lblHeader.shadowColor = [UIColor whiteColor];
+	lblHeader.shadowOffset = CGSizeMake(0.0, 1.0);
+	[ViewHead addSubview:lblHeader];
+	tblDaily.tableHeaderView=ViewHead; 
+	tblDaily.sectionHeaderHeight=2;
+	[ViewHead release];
+	[lblHeader release];
+	[Pool release];
+    [super viewDidLoad];
+}
+
+-(NSMutableArray *)FillArray:(int)i
+{   
+	NSMutableArray *TypeArray;
+	TypeArray=[[[NSMutableArray alloc]init]autorelease];
+	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	switch (i)  {
+			
+		case 1:
+			for(int i=50;i<=200;i++)
+			{
+				[TypeArray addObject:[NSString stringWithFormat:@"%d",i]];
+			}
+			break;
+		case 3:
+			for(int i=32;i<=45;i++)
+			{
+				[TypeArray addObject:[NSString stringWithFormat:@"%d",i]];
+			}
+			break;
+		case 2:  
+			for(int i=1;i<=200;i++)
+			{
+				[TypeArray addObject:[NSString stringWithFormat:@"%d mg/dl",i]];
+			}
+			break;
+		case 4:
+			for(int i=90;i<=107;i++)
+			{
+				[TypeArray addObject:[NSString stringWithFormat:@"%d",i]];
+			}
+			break;
+		case 5: 
+			for(int i=40;i<=200;i++)
+			{
+				[TypeArray addObject:[NSString stringWithFormat:@"%d",i]];
+				
+			}
+			break;
+		case 6:
+			for(int i=20;i<=80;i++)
+			{
+				[TypeArray addObject:[NSString stringWithFormat:@"%d",i]];
+			}
+			break;
+		case 7:
+			for(int i=0;i<=334;i++)
+			{
+				[TypeArray addObject:[NSString stringWithFormat:@"%d",i]];
+			}
+			break;
+		case 8:
+			for(int i=0;i<=15;i++)
+			{
+				[TypeArray addObject:[NSString stringWithFormat:@"%d",i]];
+			}
+			break;
+		case 9:
+			for(int i=0;i<=151;i++)
+			{
+				[TypeArray addObject:[NSString stringWithFormat:@"%d",i]];
+			}
+			break;
+		case 10:
+			for(int i=0;i<100;i++)
+			{
+				[TypeArray addObject:[NSString stringWithFormat:@"%01d",i]];
+			}
+			break;
+		case 11:
+			for(int i=0;i<10;i++)
+			{
+				[TypeArray addObject:[NSString stringWithFormat:@"%d",i]];
+			}
+			break;
+		case 12:  
+			for(int i=1;i<=200;i++)
+			{
+				[TypeArray addObject:[NSString stringWithFormat:@"%d mg/dl",i]];
+			}
+			break;
+		case 13:
+			[TypeArray addObject:@"0"];
+			[TypeArray addObject:@"1"];	
+			[TypeArray addObject:@"2"];
+			[TypeArray addObject:@"3"];	
+			[TypeArray addObject:@"4"];
+			[TypeArray addObject:@"5"];	
+			[TypeArray addObject:@"6"];
+			[TypeArray addObject:@"7"];	
+			[TypeArray addObject:@"8"];
+			break;
+			
+		case 14:
+			for(int i=0;i<12;i++)
+			{
+				[TypeArray addObject:[NSString stringWithFormat:@"%d",i]];
+			}
+			break;
+			
+		case 15:
+			for(int i=1;i<=271;i++)
+			{
+				[TypeArray addObject:[NSString stringWithFormat:@"%d",i]];
+			}
+			break;
+			
+		default:
+			break;
+
+	}
+	[Pool release];
+	return TypeArray;
+}
+
+
+-(IBAction)btnCancel_Clicked:(id)sender
+{
+	tblDaily.userInteractionEnabled=TRUE;
+	PickerView.hidden=TRUE;
+	ToolBar.hidden=TRUE;
+	DatePicker.hidden=TRUE;
+	btnSave.enabled=TRUE;
+}
+
+-(void)viewDidAppear:(BOOL)animated
+{
+	self.view.frame=CGRectMake(0, 0, 320, 460);
+	ToolBar.frame=CGRectMake(0, 156, 320, 44);	
+	toolBar.hidden=TRUE;		
+	toolBar.hidden=FALSE;
+	toolBar.frame=CGRectMake(0, 372, 320, 44);
+	tblDaily.frame=CGRectMake(0, 0, 320, 376);		
+	DatePicker.frame=CGRectMake(0, 200, 320, 216);
+	PickerView.frame=CGRectMake(0, 200, 320, 216);
+	[self.view bringSubviewToFront:toolBar];
+	[self.view bringSubviewToFront:ToolBar];
+	[self.view bringSubviewToFront:DatePicker];
+	[self.view bringSubviewToFront:PickerView];	
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+	btnSave.enabled=TRUE;
+	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	self.navigationItem.title=@"Vitals";
+	tblDaily.contentSize=CGSizeMake( 320, 300);
+	if(appDeleagte.isfromRoot==TRUE)
+	{
+		[tblDaily scrollRectToVisible:CGRectMake(0, 0, 320, 50)  animated:NO];
+		appDeleagte.isfromRoot=FALSE;
+	}
+	DatePicker.hidden=TRUE;
+	ToolBar.hidden=TRUE;
+	PickerView.hidden=TRUE;
+	[appDeleagte SelectUserSettings:appDeleagte.SelectedUserID];//appDeleagte.SelectedUserID
+	if(self.Vitals_Detailref.Vitals_ID!=0)
+	{
+		tblDaily.tableFooterView=viewFooter;
+	}
+	else
+	{
+		tblDaily.tableFooterView=nil;
+	}
+	toolBar.frame=CGRectMake(0, 372, 320, 44);
+
+	[tblDaily reloadData];
+	[Pool release];
+}
+
+//- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+//	if(interfaceOrientation==UIInterfaceOrientationPortrait)
+//		self.view.frame=CGRectMake(0, 0, 320, 416);
+//	return (interfaceOrientation == UIInterfaceOrientationPortrait);
+//}
+
+#pragma mark pickerView
+
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pV
+{
+	if(SelectedTag==1 || SelectedTag==7 || SelectedTag==9 || SelectedTag==3 || SelectedTag==4 || SelectedTag==13)
+	{
+		return 2;
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+- (NSInteger)pickerView:(UIPickerView *)pV numberOfRowsInComponent:(NSInteger)component
+{	
+	if(SelectedTag==1 || SelectedTag==18)
+	{
+		if(component==1)
+		{
+			return [[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] count];
+		}
+		else
+		{
+			return [[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] count];
+		}
+		
+	}
+	else if(SelectedTag==13)
+	{
+		if(component==0)
+		{
+			return [[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] count];
+		}
+		else
+		{
+			return [[data objectForKey:[NSString stringWithFormat:@"%d",14]] count];
+		}		
+	}
+	else if(SelectedTag==7 || SelectedTag==9)
+	{
+		if(component==1)
+		{
+			return [[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag+1]] count];
+		}
+		else
+		{
+			return [[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] count];
+		}
+		
+	}
+	else if(SelectedTag==3 || SelectedTag==4)
+	{
+		if(component==1)
+		{
+			return [[data objectForKey:[NSString stringWithFormat:@"%d",11]] count];
+		}
+		else
+		{
+			return [[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] count];
+		}
+		
+	}
+	else
+	{
+		return [[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] count];
+	}
+}
+
+- (NSString *)pickerView:(UIPickerView *)pV titleForRow:(NSInteger)row forComponent:(NSInteger)component
+{
+	if(SelectedTag==1 )
+	{
+		if(component==1)
+		{
+			if([[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] count]>row)
+			{
+				NSString *strRestaurantType=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:row];
+				return [NSString stringWithFormat:@"%@ mmHg",strRestaurantType];
+			}
+			else
+				return @"";		}
+		else
+		{
+			if([[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] count]>row)
+			{
+				NSString *strRestaurantType=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:row];
+				return [NSString stringWithFormat:@"%@ mmHg",strRestaurantType];
+			}
+			else
+				return @"";
+		}
+	}
+	else if(SelectedTag==9)
+	{
+		if(component==1)
+		{
+			if([[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag+1]] count]>row)
+			{
+				NSString *strRestaurantType=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag+1]] objectAtIndex:row];
+				return [NSString stringWithFormat:@"%@ G",strRestaurantType];
+			}
+			else
+				return @"";
+		}
+		else
+		{
+			if([[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] count]>row)
+			{
+				NSString *strRestaurantType=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:row];
+				return [NSString stringWithFormat:@"%@ KG",strRestaurantType];
+			}
+			else
+				return @"";
+		}
+	}
+	else if(SelectedTag==7)
+	{
+		if(component==1)
+		{
+			if([[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag+1]] count]>row)
+			{
+				NSString *strRestaurantType=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag+1]] objectAtIndex:row];
+				return [NSString stringWithFormat:@"%@ ounces",strRestaurantType];
+			}
+			else
+				return @"";
+		}
+		else
+		{
+			if([[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] count]>row)
+			{
+				NSString *strRestaurantType=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:row];
+				return [NSString stringWithFormat:@"%@ Lbs",strRestaurantType];
+			}
+			else
+				return @"";		}
+	}
+	if(SelectedTag==3 || SelectedTag==4)
+	{
+		if(component==1)
+		{
+			if([[data objectForKey:[NSString stringWithFormat:@"%d",11]] count]>row)
+			{
+				NSString *strRestaurantType=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",11]] objectAtIndex:row];
+				return [NSString stringWithFormat:@".%@",strRestaurantType];
+			}
+			else
+				return @"";
+		}
+		else
+		{
+			if([[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]]  count]>row)
+			{
+				NSString *strRestaurantType=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]]  objectAtIndex:row];
+				return [NSString stringWithFormat:@"%@",strRestaurantType];
+			}
+			else
+				return @"0";		
+		}
+		
+	}
+	else if(SelectedTag==13)
+	{
+		if(component==1)
+		{
+			NSString *strRestaurantType1=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",14]] objectAtIndex:row];
+			if(row==0 || row==1)
+			{
+				return  [NSString stringWithFormat:@"%@ Inch" ,strRestaurantType1];
+			}
+			return [NSString stringWithFormat:@"%@ Inches",strRestaurantType1];
+		}
+		else
+		{
+			NSString *strRestaurantType1=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",13]] objectAtIndex:row];
+			return  [NSString stringWithFormat:@"%@ Feet" ,strRestaurantType1];
+		}
+	}
+	else
+	{
+		if([[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] count]>row)
+		{
+			NSString *strRestaurantType=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:row];
+			return [NSString stringWithFormat:@"%@",strRestaurantType];
+		}
+		else
+			return @"";
+	}	
+}
+
+-(int)GetPickerRow:(NSString *)String component:(NSInteger)Tag
+{
+	NSString *str2;
+	
+	str2=String;
+	NSMutableArray *abc=[data objectForKey:[NSString stringWithFormat:@"%d",Tag]];
+	int Row=0;
+	for(Row=0; Row<[abc count];Row++)
+	{
+		NSString *str1=[abc objectAtIndex:Row];
+		
+		if([str1 isEqualToString:str2])
+		{
+			
+			return Row;
+		}
+	}
+	return 0;
+}
+#pragma mark Table view methods
+
+
+-(CGFloat)findHeightForCell:(NSString *)text
+{
+	CGFloat		result = 40.0f;
+	CGFloat		width = 0;
+
+	width = 132;
+	// fudge factor
+	if (text)
+	{
+		CGSize		textSize = { width, 20000.0f };		// width and height of text area
+		CGSize		size = [text sizeWithFont:[UIFont boldSystemFontOfSize:14.0f] constrainedToSize:textSize lineBreakMode:UILineBreakModeCharacterWrap];
+		
+		size.height += 25.0f;			// top and bottom margin
+		result = MAX(size.height, 40.0f);	// at least one row		
+	}
+	else
+		
+	{
+		return 40;
+	}
+	return result;	
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	if(indexPath.section==0)
+	{
+		return 40;
+	}
+	else
+	{
+		if(indexPath.row==1)
+		{
+			return ([self findHeightForCell:self.Vitals_Detailref.BloodSugar]);
+		}
+		if(indexPath.row==3)
+		{
+			return ([self findHeightForCell:self.Vitals_Detailref.Fasting]);
+		}
+		if(indexPath.row==5)
+		{
+			return ([self findHeightForCell:self.Vitals_Detailref.Respiration]);
+		}
+		if(indexPath.row==8)
+		{
+			return ([self findHeightForCell:self.Vitals_Detailref.Other]);
+		}
+		return 40;
+	}
+}
+
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 2;
+}
+
+
+// Customize the number of rows in the table view.
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+	
+	if(section==0)
+	{
+		return 1;
+	}
+	else
+	{
+		return 9;
+	}
+}
+
+-(IBAction)ClickButton:(id)sender
+{
+	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	DatePicker.hidden=FALSE;
+	[appDeleagte.DateFormatter setDateFormat:@"MM-dd-yyyy HH:mm"];
+	if([self.Vitals_Detailref.EntryDate length]==0)
+	{
+		[DatePicker setDate:[NSDate date] animated:YES];
+	}
+	else
+	{
+		[DatePicker setDate:[appDeleagte.DateFormatter dateFromString: [NSString stringWithFormat:@"%@ %@",self.Vitals_Detailref.EntryDate,self.Vitals_Detailref.EntryTime]]];
+	}
+	
+	ToolBar.hidden=FALSE;
+	lblData.text=@"Select Date and Time";
+	PickerView.hidden=TRUE;
+	SelectedTag=0; 
+	[Pool release];
+}
+
+// Customize the appearance of table view cells.
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{    
+	if(indexPath.section==0)
+	{
+	//	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+		static NSString *CellIdentifier1 = @"Cell1";
+		
+		AddUserButtonTableViewCell  *cell1 = (AddUserButtonTableViewCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier1];
+		if (cell1 == nil) {
+			cell1 = [[[AddUserButtonTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier1] autorelease];
+		}
+		[cell1.BtnSelect addTarget:self action:@selector(ClickButton:) forControlEvents:UIControlEventTouchUpInside];
+		cell1.lblName.frame =  CGRectMake(2, 5, 140, 30);
+		cell1.BtnSelect.frame =  CGRectMake(150, 5, 140, 30 );
+		cell1.lblName.text=@"Date & Time";
+
+		[cell1.BtnSelect setTitle:[NSString stringWithFormat:@"  %@ %@",self.Vitals_Detailref.EntryDate,self.Vitals_Detailref.EntryTime] forState:UIControlStateNormal];
+	//	[Pool release];
+		return cell1;
+	}
+	else
+	{
+		static NSString *CellIdentifier = @"Cell";
+	//	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+		DailyStatusTableViewCell *cell = (DailyStatusTableViewCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+		if (cell == nil) {
+			cell = [[[DailyStatusTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier] autorelease];
+		}
+		
+		switch (indexPath.row) {
+			case 0:
+				cell.lblName.text=@"BP";
+				cell.lblNameTwo.text=self.Vitals_Detailref.BP; 
+				cell.lblNameTwo.tag=indexPath.row+1;
+				break;
+			case 1:
+				cell.lblName.text=@"Blood Sugar";
+				cell.lblNameTwo.text=self.Vitals_Detailref.BloodSugar;
+				cell.lblNameTwo.tag=indexPath.row+1;
+				break;
+			case 2:
+				
+				if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Temperature"] isEqualToString:@"F"])
+				{
+					cell.lblNameTwo.text=self.Vitals_Detailref.TempF;
+				}
+				else
+				{
+					cell.lblNameTwo.text=self.Vitals_Detailref.TempC;
+				}
+				cell.lblName.text=@"Temperature";
+				cell.lblNameTwo.tag=indexPath.row+1;
+				break;
+			case 3:
+				cell.lblName.text=@"Fasting Blood Sugar";
+				cell.lblNameTwo.text=self.Vitals_Detailref.Fasting;
+				cell.lblNameTwo.tag=indexPath.row+1;
+				break;
+			case 4:
+				cell.lblName.text=@"Pulse";
+				cell.lblNameTwo.text=self.Vitals_Detailref.Pulse;
+				cell.lblNameTwo.tag=indexPath.row+1;
+				break;
+			case 5:
+				cell.lblName.text=@"Respiration";
+				cell.lblNameTwo.text=self.Vitals_Detailref.Respiration;
+				cell.lblNameTwo.tag=indexPath.row+1;
+				break;
+			case 8:
+				cell.lblName.text=@"Other";
+				cell.lblNameTwo.text=self.Vitals_Detailref.Other;
+				cell.lblNameTwo.tag=indexPath.row+1;
+				break;
+			case 6:
+				if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Weight"] isEqualToString:@"LBs"])
+				{
+					cell.lblName.text=@"Weight (Lbs)";
+					cell.lblNameTwo.text=self.Vitals_Detailref.WeightLbs;
+				}
+				else
+				{
+					cell.lblName.text=@"Weight (Kgs)";
+					cell.lblNameTwo.text=self.Vitals_Detailref.WeightKgs;
+				}
+				cell.lblName.text=@"Weight";
+				cell.lblNameTwo.tag=indexPath.row+1;
+				break;
+			case 7:
+				cell.lblName.text=@"Height";
+				if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Height"] isEqualToString:@"Inches"])
+				{
+					cell.lblNameTwo.text=self.Vitals_Detailref.HeightInch;
+					
+				}
+				else
+				{
+					cell.lblNameTwo.text=self.Vitals_Detailref.HeightCms;
+					
+				}
+				cell.lblNameTwo.tag=indexPath.row+1;
+				break;
+	
+			default:
+				break;
+		}
+		cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
+	//	[Pool release];
+		return cell;
+	}	
+}
+
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{
+	PickerView.hidden=TRUE;
+	ToolBar.hidden=TRUE;
+	DatePicker.hidden=TRUE;
+	btnSave.enabled=TRUE;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	[tblDaily deselectRowAtIndexPath:indexPath animated:YES];
+	
+	if(ToolBar.hidden==TRUE)
+	{
+		if(indexPath.section==0)
+		{
+			DatePicker.hidden=FALSE;
+			NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+			[appDeleagte.DateFormatter setDateFormat:@"MM-dd-yyyy HH:mm"];
+			[Pool release];
+			if([self.Vitals_Detailref.EntryDate length]==0)
+			{
+				[DatePicker setDate:[NSDate date] animated:YES];
+			}
+			else
+			{
+				NSAutoreleasePool* pool=[[NSAutoreleasePool alloc]init];
+				
+				[DatePicker setDate:[appDeleagte.DateFormatter dateFromString: [NSString stringWithFormat:@"%@ %@",self.Vitals_Detailref.EntryDate,self.Vitals_Detailref.EntryTime]]];
+				
+				[pool release];
+			}			
+			ToolBar.hidden=FALSE;
+			lblData.text=@"Select Date and Time";
+			PickerView.hidden=TRUE;
+			SelectedTag=0; 
+		}
+		else
+		{
+			DailyStatusTableViewCell *cell=(DailyStatusTableViewCell *)[tableView cellForRowAtIndexPath:indexPath];
+			if(cell.lblNameTwo.tag==1 || cell.lblNameTwo.tag==3 || cell.lblNameTwo.tag==5 || cell.lblNameTwo.tag==7 || cell.lblNameTwo.tag==6 || cell.lblNameTwo.tag==2 || cell.lblNameTwo.tag==4 || cell.lblNameTwo.tag==8)
+			{
+				SelectedTag= cell.lblNameTwo.tag;
+				PickerView.hidden=FALSE;
+				ToolBar.hidden=FALSE;
+				btnSave.enabled=FALSE; 
+				int row;
+				
+				if(SelectedTag==1)
+				{
+					NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+					lblData.text=@"Select BP Systolic/Diastolic";
+					[PickerView reloadAllComponents];
+					if([self.Vitals_Detailref.BP  length]==0)
+					{
+						[PickerView selectRow:0 inComponent:0 animated:NO];
+						[PickerView selectRow:0 inComponent:1 animated:NO];
+					}
+					else
+					{
+						NSArray *arr=[self.Vitals_Detailref.BP componentsSeparatedByString:@"/"]; 
+						row=[self GetPickerRow:[arr objectAtIndex:0] component:SelectedTag];
+						[PickerView selectRow:row inComponent:0 animated:NO];
+						row=[self GetPickerRow:[arr objectAtIndex:1] component:SelectedTag];
+						[PickerView selectRow:row inComponent:1 animated:NO];
+					}
+					[Pool release];
+				}
+				
+				else if(SelectedTag==3)
+				{
+					if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Temperature"] isEqualToString:@"F"])
+					{
+						NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+						lblData.text=@"Select Temperature in ºF";
+						SelectedTag=4;
+						[PickerView reloadAllComponents];
+						if([self.Vitals_Detailref.TempF length]==0)
+						{
+							[PickerView selectRow:0 inComponent:0 animated:NO];
+							[PickerView selectRow:0 inComponent:1 animated:NO];
+						}
+						else
+						{
+							NSArray *arr=[self.Vitals_Detailref.TempF componentsSeparatedByString:@"."]; 
+							int row=[self GetPickerRow:[arr objectAtIndex:0] component:SelectedTag];
+							[PickerView selectRow:row inComponent:0 animated:NO];
+							if([arr count]>1)
+								row=[self GetPickerRow:[arr objectAtIndex:1] component:11];
+							else
+								row=0;
+							[PickerView selectRow:row inComponent:1 animated:NO];
+						}
+						[Pool release];
+					}
+					else
+					{
+						NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+						lblData.text=@"Select Temperature in ºC";
+						[PickerView reloadAllComponents];
+						if([self.Vitals_Detailref.TempC length]==0)
+						{
+							[PickerView selectRow:0 inComponent:0 animated:NO];
+							[PickerView selectRow:0 inComponent:1 animated:NO];
+						}
+						else
+						{
+							NSArray *arr=[self.Vitals_Detailref.TempC componentsSeparatedByString:@"."]; 
+							int row=[self GetPickerRow:[arr objectAtIndex:0] component:SelectedTag];
+							[PickerView selectRow:row inComponent:0 animated:NO];
+							if([arr count]>1)
+								row=[self GetPickerRow:[arr objectAtIndex:1] component:11];
+							else
+								row=0;
+							[PickerView selectRow:row inComponent:1 animated:NO];
+						}
+						[Pool release];
+					}
+				}
+				else if(SelectedTag==5)
+				{
+					NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+					lblData.text=@"Select Pulse";
+					[PickerView reloadAllComponents];
+					row=[self GetPickerRow:self.Vitals_Detailref.Pulse component:SelectedTag];
+					[PickerView selectRow:row inComponent:0 animated:NO];
+					[Pool release];
+				}
+				else if(SelectedTag==2)
+				{
+					NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+					lblData.text=@"Select Blood Sugar";
+					[PickerView reloadAllComponents];
+					if([self.Vitals_Detailref.BloodSugar length]==0)
+					{
+						row=99;
+					}
+					else
+						row=[self GetPickerRow:self.Vitals_Detailref.BloodSugar component:SelectedTag];
+					[PickerView selectRow:row inComponent:0 animated:NO];
+					[Pool release];
+				}
+				else if(SelectedTag==4)
+				{
+					NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+					SelectedTag=12;
+					lblData.text=@"Select Fasting Blood Sugar";
+					[PickerView reloadAllComponents];
+					if([self.Vitals_Detailref.Fasting length]==0)
+					{
+						row=99;
+					}
+					else
+						
+						row=[self GetPickerRow:self.Vitals_Detailref.Fasting component:SelectedTag];
+					[PickerView selectRow:row inComponent:0 animated:NO];
+					[Pool release];
+				}
+				else if(SelectedTag==7)
+				{
+					if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Weight"] isEqualToString:@"LBs"])
+					{
+						NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+						lblData.text=@"Select Weight (Lbs)";
+						SelectedTag=7;
+						[PickerView reloadAllComponents];
+						if([self.Vitals_Detailref.WeightLbs length]==0)
+						{
+							if([[[NSUserDefaults standardUserDefaults] valueForKey:[NSString stringWithFormat:@"%d_WeightLbs",appDeleagte.SelectedUserID]] length]>0)
+							{
+								NSString *Str1=[[NSUserDefaults standardUserDefaults] valueForKey:[NSString stringWithFormat:@"%d_WeightLbs",appDeleagte.SelectedUserID]];
+								NSArray *arr=[Str1 componentsSeparatedByString:@"."]; 
+								int row=[self GetPickerRow:[arr objectAtIndex:0] component:SelectedTag];
+								[PickerView selectRow:row inComponent:0 animated:NO];
+								
+								row=[self GetPickerRow:[arr objectAtIndex:1] component:SelectedTag+1];
+								[PickerView selectRow:row inComponent:1 animated:NO];
+							}
+							else
+							{
+							[PickerView selectRow:0 inComponent:0 animated:NO];
+							[PickerView selectRow:0 inComponent:1 animated:NO];
+							}
+						}
+						else
+						{
+							NSArray *arr=[self.Vitals_Detailref.WeightLbs componentsSeparatedByString:@"."]; 
+							int row=[self GetPickerRow:[arr objectAtIndex:0] component:SelectedTag];
+							[PickerView selectRow:row inComponent:0 animated:NO];
+							
+							row=[self GetPickerRow:[arr objectAtIndex:1] component:SelectedTag+1];
+							[PickerView selectRow:row inComponent:1 animated:NO];
+						}
+						[Pool release];
+					}
+					else
+					{
+						NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+						lblData.text=@"Select Weight (Kgs)";
+						SelectedTag=9;
+						[PickerView reloadAllComponents];
+						if([self.Vitals_Detailref.WeightKgs length]==0 )
+						{
+							if([[[NSUserDefaults standardUserDefaults] valueForKey:[NSString stringWithFormat:@"%d_WeightKgs",appDeleagte.SelectedUserID]] length]>0)
+							{
+								NSString *Str1=[[NSUserDefaults standardUserDefaults] valueForKey:[NSString stringWithFormat:@"%d_WeightKgs",appDeleagte.SelectedUserID]];
+								NSArray *arr=[Str1 componentsSeparatedByString:@"."]; 
+								int row=[self GetPickerRow:[arr objectAtIndex:0] component:SelectedTag];
+								[PickerView selectRow:row inComponent:0 animated:NO];
+								
+								row=[self GetPickerRow:[arr objectAtIndex:1] component:SelectedTag+1];
+								[PickerView selectRow:row inComponent:1 animated:NO];
+							}
+							else
+							{
+							[PickerView selectRow:0 inComponent:0 animated:NO];
+							[PickerView selectRow:0 inComponent:1 animated:NO];
+							}
+						}
+						else
+						{
+							NSArray *arr=[self.Vitals_Detailref.WeightKgs componentsSeparatedByString:@"."]; 
+							int row=[self GetPickerRow:[arr objectAtIndex:0] component:SelectedTag];
+							[PickerView selectRow:row inComponent:0 animated:NO];
+							
+							row=[self GetPickerRow:[arr objectAtIndex:1] component:SelectedTag+1];
+							[PickerView selectRow:row inComponent:1 animated:NO];
+						}
+						[Pool release];
+					}
+				}
+				else if(SelectedTag==6)
+				{
+					NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+					lblData.text=@"Select Respiration";
+					[PickerView reloadAllComponents];
+					row=[self GetPickerRow:self.Vitals_Detailref.Respiration component:SelectedTag];
+					[PickerView selectRow:row inComponent:0 animated:NO];
+					[Pool release];
+				}
+				else if(SelectedTag==8)
+				{
+					NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+					if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Height"] isEqualToString:@"Inches"])
+					{
+						lblData.text=@"Select Height in Feet/Inch";
+						SelectedTag=13;
+						[PickerView reloadAllComponents];
+						if([self.Vitals_Detailref.HeightInch length]==0)
+						{
+							[PickerView selectRow:0 inComponent:0 animated:NO];
+							[PickerView selectRow:0 inComponent:1 animated:NO];
+						}
+						else
+						{
+							NSArray *arr=[self.Vitals_Detailref.HeightInch componentsSeparatedByString:@"' "]; 
+							int row=[self GetPickerRow:[arr objectAtIndex:0] component:SelectedTag];
+							[PickerView selectRow:row inComponent:0 animated:NO];
+							
+							NSString *Str=[arr objectAtIndex:1];
+							Str=[Str stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+							row=[self GetPickerRow:Str component:SelectedTag+1];
+							[PickerView selectRow:row inComponent:1 animated:NO];
+						}
+					}
+					else
+					{
+						lblData.text=@"Select Height in Cms";
+						SelectedTag=15;
+						[PickerView reloadAllComponents];
+						int row=[self GetPickerRow:self.Vitals_Detailref.HeightCms component:15];
+						[PickerView selectRow:row inComponent:0 animated:NO];
+					}
+					[Pool release];
+				}
+				DatePicker.hidden=TRUE;
+			}
+			else 		
+			{
+				NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+				if(!appDeleagte.objDailyHourlyTextEntryViewController)
+				{
+					appDeleagte.objDailyHourlyTextEntryViewController=[[DailyHourlyTextEntryViewController alloc]initWithNibName:@"DHTextEntry" bundle:nil];
+				}
+				appDeleagte.SelectedStatus=@"Daily";
+				appDeleagte.objDailyHourlyTextEntryViewController.Vitals_Detailref=self.Vitals_Detailref;
+				appDeleagte.objDailyHourlyTextEntryViewController.selectedIndex=cell.lblNameTwo.tag;
+				appDeleagte.objDailyHourlyTextEntryViewController.selectedName=cell.lblName.text;
+				appDeleagte.objDailyHourlyTextEntryViewController.TextData=cell.lblNameTwo.text;
+				[self.navigationController pushViewController:appDeleagte.objDailyHourlyTextEntryViewController animated:YES];
+				[Pool release];
+			}
+		}
+	}
+	//[Pool release];
+}
+
+/*
+ // Override to allow orientations other than the default portrait orientation.
+ - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+ // Return YES for supported orientations
+ return (interfaceOrientation == UIInterfaceOrientationPortrait);
+ }
+ */
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
+    // Release anything that's not essential, such as cached data
+}
+
+
+//An event when user clicks on Done button.
+-(IBAction)btnDone_Clicked:(id)sender
+{	
+	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	btnSave.enabled=TRUE;
+	if(SelectedTag==0)
+	{
+		DatePicker.hidden=TRUE;
+		ToolBar.hidden=TRUE;
+		NSString *Date;
+		
+		[appDeleagte.DateFormatter setDateFormat:@"MM-dd-yyyy HH:mm"];
+		
+		Date=[appDeleagte.DateFormatter stringFromDate: DatePicker.date];
+		
+		arr1=[Date componentsSeparatedByString:@" "];
+		
+		NSString *DateTime=[arr1 objectAtIndex:1];
+		Date=[arr1 objectAtIndex:0];
+		
+		if(!([Date isEqualToString:self.Vitals_Detailref.EntryDate] && [DateTime isEqualToString:self.Vitals_Detailref.EntryTime]))	
+		{
+			NSArray *array2=[DateTime componentsSeparatedByString:@":"];
+			NSString *Mins=[appDeleagte CheckTIme:[[array2 objectAtIndex:1]intValue]];
+			DateTime=[NSString stringWithFormat:@"%@:%@",[array2 objectAtIndex:0],Mins];
+			[appDeleagte SelectVitalsDetail:Date  AndTime:DateTime andUserID:appDeleagte.SelectedUserID];
+			if([appDeleagte.DailyArray count]>0)
+			{
+				self.Vitals_Detailref =[appDeleagte.DailyArray objectAtIndex:0];
+			}
+			else
+			{
+				if(!self.Vitals_Detailref)
+				{
+					self.Vitals_Detailref=[[Vitals_Detail alloc]init];
+				}
+				else
+				{
+					[self.Vitals_Detailref ClearData];
+				}
+				
+				self.Vitals_Detailref.User_ID1=appDeleagte.SelectedUserID;
+				self.Vitals_Detailref.EntryDate=Date;
+				self.Vitals_Detailref.EntryTime=DateTime;
+		//		self.Vitals_Detailref.WeightLbs=[[NSUserDefaults standardUserDefaults] valueForKey:[NSString stringWithFormat:@"%d_WeightLbs",appDeleagte.SelectedUserID]];
+		//		self.Vitals_Detailref.WeightKgs=[[NSUserDefaults standardUserDefaults] valueForKey:[NSString stringWithFormat:@"%d_WeightKgs",appDeleagte.SelectedUserID]];
+			}
+			if(self.Vitals_Detailref.Vitals_ID!=0)
+			{
+				tblDaily.tableFooterView=viewFooter;
+			}
+			else
+			{
+				tblDaily.tableFooterView=nil;
+			}
+			
+			[tblDaily reloadData];
+		}
+		
+	}
+	else if(SelectedTag==1)
+	{
+		PickerView.hidden=TRUE;
+		ToolBar.hidden=TRUE;
+		NSString *strRestaurantTypeSecond;
+		NSString *strRestaurantType;
+		strRestaurantTypeSecond=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:[PickerView selectedRowInComponent:0]];
+		strRestaurantType=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:[PickerView selectedRowInComponent:1]];
+		self.Vitals_Detailref.BP=[NSString stringWithFormat:@"%@/%@",strRestaurantTypeSecond,strRestaurantType];
+		[tblDaily reloadData];
+		
+	}
+	else if(SelectedTag==3)
+	{
+		PickerView.hidden=TRUE;
+		ToolBar.hidden=TRUE;
+		NSString *strRestaurantTypeSecond;
+		NSString *strRestaurantType;
+		strRestaurantTypeSecond=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:[PickerView selectedRowInComponent:0]];
+		strRestaurantType=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",11]] objectAtIndex:[PickerView selectedRowInComponent:1]];
+		self.Vitals_Detailref.TempC=[NSString stringWithFormat:@"%@.%@",strRestaurantTypeSecond,strRestaurantType]; 
+		int C=[strRestaurantTypeSecond intValue];
+		int F=(1.8 * C)+32;
+		self.Vitals_Detailref.TempF=[NSString stringWithFormat:@"%d.0",F];
+		[tblDaily reloadData];
+		
+	}
+	else if(SelectedTag==4)
+	{
+		PickerView.hidden=TRUE;
+		ToolBar.hidden=TRUE;
+		NSString *strRestaurantTypeSecond;
+		NSString *strRestaurantType;
+		
+		strRestaurantTypeSecond=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:[PickerView selectedRowInComponent:0]];
+		strRestaurantType=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",11]] objectAtIndex:[PickerView selectedRowInComponent:1]];
+		self.Vitals_Detailref.TempF=[NSString stringWithFormat:@"%@.%@",strRestaurantTypeSecond,strRestaurantType]; 
+		int F=[strRestaurantTypeSecond intValue];
+		int C=(F - 32)/1.8;
+		self.Vitals_Detailref.TempC=[NSString stringWithFormat:@"%d.0",C];
+		[tblDaily reloadData];
+		
+	}
+    else if(SelectedTag==5)
+	{
+		PickerView.hidden=TRUE;
+		ToolBar.hidden=TRUE;
+		NSString *strRestaurantTypeSecond=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:[PickerView selectedRowInComponent:0]];
+		self.Vitals_Detailref.Pulse=strRestaurantTypeSecond; 
+		[tblDaily reloadData];
+	}	
+	else if(SelectedTag==2)
+	{
+		PickerView.hidden=TRUE;
+		ToolBar.hidden=TRUE;
+		NSString *strRestaurantTypeSecond=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:[PickerView selectedRowInComponent:0]];
+		self.Vitals_Detailref.BloodSugar=strRestaurantTypeSecond; 
+		[tblDaily reloadData];
+	}	
+	else if(SelectedTag==12)
+	{
+		PickerView.hidden=TRUE;
+		ToolBar.hidden=TRUE;
+		NSString *strRestaurantTypeSecond=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:[PickerView selectedRowInComponent:0]];
+		self.Vitals_Detailref.Fasting=strRestaurantTypeSecond; 
+		[tblDaily reloadData];
+	}	
+	else if(SelectedTag==6)
+	{
+		PickerView.hidden=TRUE;
+		ToolBar.hidden=TRUE;
+		NSString *strRestaurantTypeSecond=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:[PickerView selectedRowInComponent:0]];
+		self.Vitals_Detailref.Respiration=strRestaurantTypeSecond; 
+		[tblDaily reloadData];
+	}	
+	else if(SelectedTag==7 || SelectedTag==9)
+	{
+		PickerView.hidden=TRUE;
+		ToolBar.hidden=TRUE;
+		NSString *strRestaurantTypeSecond=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag+1]] objectAtIndex:[PickerView selectedRowInComponent:1]];
+		NSString *strRestaurantType=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:[PickerView selectedRowInComponent:0]];
+		
+		if(SelectedTag==7)
+		{
+			self.Vitals_Detailref.WeightLbs= [NSString stringWithFormat:@"%@.%@",strRestaurantType,strRestaurantTypeSecond];
+			
+			NSString *ConvertPound=[NSString stringWithFormat:@"%@.%@",strRestaurantType,strRestaurantTypeSecond];
+			
+			self.Vitals_Detailref.WeightKgs=[NSString stringWithFormat:@"%.1f",([ConvertPound doubleValue]/2.2)];
+			
+		}
+		if(SelectedTag==9)
+		{
+			self.Vitals_Detailref.WeightKgs= [NSString stringWithFormat:@"%@.%@",strRestaurantType,strRestaurantTypeSecond];
+			
+			NSString *ConvertPound=[NSString stringWithFormat:@"%@.%@",strRestaurantType,strRestaurantTypeSecond];
+			
+			self.Vitals_Detailref.WeightLbs=[NSString stringWithFormat:@"%.1f",([ConvertPound doubleValue]*2.2)];
+		}
+		
+		[tblDaily reloadData];
+	}
+  	else if(SelectedTag==13)
+	{
+		PickerView.hidden=TRUE;
+		ToolBar.hidden=TRUE;
+		NSString *strRestaurantTypeSecond=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",14]] objectAtIndex:[PickerView selectedRowInComponent:1]];
+		
+		NSString *strRestaurantType=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:[PickerView selectedRowInComponent:0]];
+		
+		self.Vitals_Detailref.HeightInch=	[NSString stringWithFormat:@"%@' %@\"",strRestaurantType,strRestaurantTypeSecond] ;
+		int CMS= [appDeleagte ConvertIntoCms:[NSString stringWithFormat:@"%@' %@\"",strRestaurantType,strRestaurantTypeSecond]];
+		
+		self.Vitals_Detailref.HeightCms=	[NSString stringWithFormat:@"%d",CMS] ;
+		[tblDaily reloadData];
+	}
+ else	if(SelectedTag==15)
+	{
+		PickerView.hidden=TRUE;
+		ToolBar.hidden=TRUE;
+		NSString* strRestaurantType=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:[PickerView selectedRowInComponent:0]];
+		
+		self.Vitals_Detailref.HeightCms=strRestaurantType;
+		NSString *Feet=[appDeleagte ConvertFeets:[strRestaurantType doubleValue]];
+		
+		self.Vitals_Detailref.HeightInch=Feet;
+		[tblDaily reloadData];
+		
+	}
+	[Pool release];
+}
+
+
+
+//An event when user clicks on delete button.
+-(IBAction)btnDelete_clicked:(id)sender
+{
+	if(self.Vitals_Detailref.Vitals_ID!=0)
+	{
+		UIActionSheet *action=[[UIActionSheet alloc]initWithTitle:@"Do you wish to delete the Vitals Entry?" delegate:self cancelButtonTitle:@"No" destructiveButtonTitle:@"Delete Vitals Entry" otherButtonTitles:nil];
+		action.actionSheetStyle=UIActionSheetStyleDefault;
+		[action showInView:self.view.superview.superview];
+		[action release];
+	}
+	else
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Record is not yet saved!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		alert.tag=6;
+		[alert show];
+		[alert release];
+	}
+	
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+	if(buttonIndex==0)
+	{
+		int result=[appDeleagte DeleteEntry:@"Vitals_Detail" ColumnName:@"Vitals_ID" PrimaryID:self.Vitals_Detailref.Vitals_ID]; 
+		if(result==1)
+		{
+			appDeleagte.isDailyReport=TRUE;
+			[self.navigationController popViewControllerAnimated:YES];
+		}
+	}
+	
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+	if(alertView.tag==1)
+	{
+		[self.navigationController popViewControllerAnimated:YES];
+	}
+	if(alertView.tag==5)
+	{
+
+		[self.navigationController popViewControllerAnimated:YES];
+	}
+}
+
+- (void)dealloc {
+	
+	[tblDaily release];
+	[btnSettings release];
+	[btnSave release];
+	[SettingsCon release];
+	[SelectOptionsView release];
+	
+	[toolBar release];
+	[DailySettings release];
+	
+	[DatePicker release];
+	[ToolBar release];
+	[lblData release];
+	[btnDone release];
+	[PickerView release];
+	[btnDelete release];
+//	[LadiesDatePicker release];
+	[lblHeader release];
+	[Mensturalref release];
+	[BtnSelected release];
+	[data release];
+	[btnDelete1 release];
+	[viewFooter release];
+	[Vitals_Detailref release];
+	
+    [super dealloc];
+}
+
+
+@end

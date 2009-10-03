@@ -1,0 +1,1317 @@
+//
+//  ShowReportViewController.m
+//  HealthTracker
+//
+//  Created by Bhoomi on 4/1/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import "ShowReportViewController.h"
+#import "CalendarTableViewCell.h"
+#import "Menstural_Cycle.h"
+
+#define Field_Array [NSArray arrayWithObjects: @"BP",@"Blood Sugar",@"Temperature",@"Fasting Blood Sugar", @"Pulse",@"Respiration",@"Weight",@"Height",@"Other-Vitals",@"Sleep", @"Exercise",@"Mood",@"Activity",@"Diapering", @"Feeding",@"Alcohol",@"Cigarettes",@"Drugs",@"Menstrution",@"Other-Routines",@"Medicine",nil]
+#define Field_Table_Array [NSArray arrayWithObjects: @"BP",@"BloodSugar",@"TemperatureF",@"Fasting", @"Pulse",@"Respiration",@"WeightKgs",@"HeightCms",@"Other_Vitals",@"Sleep", @"Exercise",@"Mood",@"Activity",@"Diapering", @"Feeding",@"Alcohol",@"Cigarrettes",@"Drugs",@"Menstrution",@"Other_Routines",@"Medicine_Entry",nil]
+
+@implementation ShowReportViewController
+@synthesize StringField,Index,Fields;
+
+- (void)viewDidLoad
+{
+	self.navigationItem.title=@"Report";
+	tblView.delegate=self;
+	tblView.dataSource=self;
+	self.navigationItem.rightBarButtonItem=btnEdit;
+	appDelegate=[[UIApplication sharedApplication]delegate];	
+	[viewHeader bringSubviewToFront:lblDate];
+	[viewHeader bringSubviewToFront:lblField];	
+	lblDate.font=[UIFont boldSystemFontOfSize:13];
+	lblField.font=[UIFont boldSystemFontOfSize:15];
+	lblDate.textAlignment=UITextAlignmentLeft;
+	lblField.textAlignment=UITextAlignmentCenter;
+	lblDate.text=@"Date & Time";
+	lblDate.frame =  CGRectMake(2, 5, 140, 50);
+	lblDate.numberOfLines=0;
+	lblField.frame =  CGRectMake(150, 5, 140, 30);
+	lblField.text=@"";	
+	[ScrollView scrollRectToVisible:CGRectMake(0,0, 320, 200) animated:YES];
+	[ScrollView addSubview:tblView];
+	ScrollView.bounces=NO;
+	tblView.rowHeight=40;
+	
+	UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
+	temporaryBarButtonItem.title = @"Back";
+	self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
+	[temporaryBarButtonItem release];	
+	UIView *view=[[UIView alloc]init];
+	view.frame=CGRectMake(50,0, 230, 30);
+	lblHeader = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
+	[lblHeader setFont:[UIFont boldSystemFontOfSize:12.0]];
+	[lblHeader setBackgroundColor:[UIColor clearColor]];
+	[lblHeader setTextAlignment:UITextAlignmentCenter];
+ 	[lblHeader setTextColor:[UIColor colorWithRed:0.3607  green:0.5333 blue:0.9019 alpha:1.0]];
+	[lblHeader setText:@""];
+	[view addSubview:lblHeader];	
+	lblFooter = [[UILabel alloc] initWithFrame:CGRectMake(23, 0, 130, 30)];
+	[lblFooter setFont:[UIFont boldSystemFontOfSize:15.0]];
+	[lblFooter setBackgroundColor:[UIColor clearColor]];
+	[lblFooter setTextAlignment:UITextAlignmentCenter];
+ 	[lblFooter setTextColor:[UIColor whiteColor]];
+	[lblFooter setText:@"Reports"];
+	[view addSubview:lblFooter];	
+	self.navigationItem.titleView=view;
+	[view release];
+    [super viewDidLoad];
+}
+
+void bubbleSort(NSMutableArray *array) 
+{ 
+	int n = [array count]; // n elements in array 
+	for (int i = 0; i < n-1; i++) // n-1 bubbling rounds 
+	{
+		for (int j = 0; j < n-i-1; j++) // for each element 
+		{
+			if ([[array objectAtIndex: j] compare:  [array objectAtIndex: j+1]] == NSOrderedDescending) 
+			{
+				NSString *strTemp= [array objectAtIndex:j];  			
+				[array replaceObjectAtIndex: j withObject: [array objectAtIndex: j+1]]; 
+				[array replaceObjectAtIndex: j+1 withObject: strTemp]; 
+			}
+		}
+	}
+}
+
+-(void)LoadReport
+{
+	NSAutoreleasePool  *Pool=[[NSAutoreleasePool alloc]init];
+	NSLog(@"Show Load");
+	@try 
+	{
+		NSArray *Start=[appDelegate.ReportStartDate componentsSeparatedByString:@" "];
+		NSArray *End=[appDelegate.ReportEndDate componentsSeparatedByString:@" "];
+		if(!appDelegate.ReportArray)
+		{
+			appDelegate.ReportArray=[[NSMutableDictionary alloc]init];
+		}
+		else if([appDelegate.ReportArray count]>0)
+		{
+			[appDelegate.ReportArray removeAllObjects];
+		}
+		
+		if(!appDelegate.WeekArray)
+		{
+			appDelegate.WeekArray=[[NSMutableArray alloc]init];
+		}
+		else if([appDelegate.WeekArray count]>0)
+		{
+			[appDelegate.WeekArray removeAllObjects];
+		}
+		NSString *Coulmnname=@"";
+		NSArray *arr2=[appDelegate.SelectedReportField componentsSeparatedByString:@", "]; 
+		for(int i=0;i<[arr2 count];i++)
+		{
+			NSString *Str=[arr2 objectAtIndex:i];
+			Index=[Field_Table_Array indexOfObject:Str];
+			Coulmnname=[Field_Table_Array objectAtIndex:Index];
+			if(Index==6)
+			{
+				if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Weight"] isEqualToString:@"LBs"])
+				{
+					Coulmnname=@"WeightLbs";
+				}
+				else
+				{
+					Coulmnname=@"WeightKgs";
+				}				
+			}			
+			if(Index==7)
+			{
+				if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Height"] isEqualToString:@"Inches"])
+				{
+					Coulmnname=@"HeightInch";
+				}
+				else
+				{
+					Coulmnname=@"HeightCms";
+				}				
+			}			
+			if(Index==2)
+			{
+				if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Temperature"] isEqualToString:@"F"])
+				{
+					Coulmnname=@"TemperatureF";
+				}
+				else
+				{
+					Coulmnname=@"TemperatureC";
+				}
+			}			
+			NSString *TableName=@"Vitals_Detail";
+			if(Index>8)
+			{
+				TableName=@"Routine_Detail";
+			}
+			if(Index==20)
+			{
+				TableName=@"Medicine";
+			}
+			if(Index==18)
+			{
+				[appDelegate SelectWeeklyDataForMemstrual:[Start objectAtIndex:0]  PassEndDate:[End objectAtIndex:0] andUserID:appDelegate.SelectedUserID]; 
+			}			
+			else
+			{
+				[appDelegate GetVitalsCalendarData:Coulmnname StartDate:[Start objectAtIndex:0]  Enddate:[End objectAtIndex:0] StartTime:[Start objectAtIndex:1] EndTime:[End objectAtIndex:1] andUserID:appDelegate.SelectedUserID andTableName:TableName];
+			}
+		}	
+	}
+	@catch (NSException * e) {
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"Catch" message:[NSString stringWithFormat:@"%@",e] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}
+	NSLog(@"Show Load End");
+	[Pool release];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+	tblView.userInteractionEnabled=TRUE;
+	NSLog(@"Show will3");
+	
+	if(appDelegate.isDailyReport==TRUE)
+	{
+		[self LoadReport];
+		bubbleSort(appDelegate.WeekArray);
+		NSArray *arr2=[appDelegate.ReportField componentsSeparatedByString:@", "];
+		TotlaDataCount=[appDelegate.WeekArray count];
+		ISFinish=FALSE;
+		DisplanyCount=25;
+		
+		if(TotlaDataCount>25)
+		{
+			height=25*50;
+		}
+		else
+		{
+			height=TotlaDataCount*50;
+		}
+		if(height>320)
+		{
+			height=TotlaDataCount*50;
+		}
+		else
+			height=460;
+		if([arr2 count]<3)
+		{
+			viewHeader.frame=CGRectMake(0, 0, 320, 55);
+			Width=320;
+		}
+		else
+		{
+			viewHeader.frame=CGRectMake(0, 0, ([arr2 count]+1)*90, 55);
+			Width=([arr2 count]+1)*90;
+		}
+		tblView.frame=CGRectMake(0, 0, Width, height);
+		ScrollView.contentSize=CGSizeMake( Width, height);
+		
+		arr3=[appDelegate.SelectedReportField componentsSeparatedByString:@", "];
+		Count=[arr3 count];
+		[arr3 retain];
+		[tblView reloadData];
+	}
+	NSLog(@"Show will4");
+	if(appDelegate.isFromReport==TRUE)
+	{
+		NSArray *subView=[viewHeader subviews];
+		for(int i=2; i<[subView count]; i++)
+			[[subView objectAtIndex:i] removeFromSuperview];
+		ISEdit=FALSE;
+		btnEdit.style=UIBarButtonItemStyleBordered;
+		btnEdit.title=@"Edit ";
+		appDelegate.isFromReport=FALSE;
+		lblFooter.frame=CGRectMake(23, 0, 130, 30);
+		lblHeader.text=@"";
+		NSArray *arr2=[appDelegate.ReportField componentsSeparatedByString:@", "];
+		if([arr2 count]<3)
+		{
+			viewHeader.frame=CGRectMake(0, 0, 320, 55);			
+		}
+		else
+		{
+			viewHeader.frame=CGRectMake(0, 0, ([arr2 count]+1)*90, 55);			
+		}
+		int X=0;
+		for(int i=0;i<[arr2 count];i++)
+		{
+			UILabel *lbl1=[[UILabel alloc]init];
+			lbl1.font=[UIFont boldSystemFontOfSize:12];
+			lbl1.textAlignment=UITextAlignmentCenter;
+			lbl1.numberOfLines=0;
+			X=X+90;
+			if(i==0)
+			{
+				lbl1.frame =  CGRectMake(100, 5, 80, 50);
+			}
+			else
+			{
+				lbl1.frame =  CGRectMake(X, 5, 80, 50);
+			}
+			
+			lbl1.text=[arr2 objectAtIndex:i];
+			lbl1.backgroundColor=[UIColor clearColor];
+			//[viewHeader addSubview:lbl1];
+			[viewHeader insertSubview:lbl1 atIndex:i];
+			[viewHeader bringSubviewToFront:lbl1];
+			[lbl1 release];
+		}
+		subView=[viewHeader subviews];
+		NSLog(@"sad");
+	}
+	tblView.tableHeaderView=viewHeader;
+	
+	NSLog(@"Show will End ");
+}
+- (void)viewDidDisappear:(BOOL)animated
+{
+	[[UIDevice currentDevice] setOrientation:UIInterfaceOrientationPortrait];
+	//[SelectedText resignFirstResponder];
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+	if(interfaceOrientation==UIInterfaceOrientationPortrait)
+	{
+		self.view.frame=CGRectMake(0, 0, 320, 460);
+		tblView.frame=CGRectMake(0, 0, Width, height);
+		ScrollView.contentSize=CGSizeMake( Width, height);
+		if(Width<=320)
+		{
+			viewHeader.frame=CGRectMake(0, 0, 360, 55);
+		}
+		else
+		{
+			viewHeader.frame=CGRectMake(0, 0, Width, 55);
+		}
+		
+		return (interfaceOrientation == UIInterfaceOrientationPortrait);
+	}
+	else if(interfaceOrientation==UIInterfaceOrientationLandscapeLeft)
+	{
+		self.view.frame=CGRectMake(0, 0, 480, 320);
+		if(Width<=480)
+		{
+			tblView.frame=CGRectMake(0, 0, 480, height);
+					ScrollView.contentSize=CGSizeMake( 480, height);
+			viewHeader.frame=CGRectMake(0, 0, 500, 55);
+		}
+		else
+		{
+			tblView.frame=CGRectMake(0, 0, Width, height);
+		ScrollView.contentSize=CGSizeMake( Width, height);
+			viewHeader.frame=CGRectMake(0, 0, Width, 55);
+		}
+		return (interfaceOrientation == UIInterfaceOrientationLandscapeLeft);
+	}
+	else if(interfaceOrientation==UIInterfaceOrientationLandscapeRight)
+	{
+		self.view.frame=CGRectMake(0, 0, 480, 320);
+		if(Width<=480)
+		{
+			tblView.frame=CGRectMake(0, 0, 480, height);
+			ScrollView.contentSize=CGSizeMake( 480, height);
+		//	self.view.frame=CGRectMake(0, 0, 480, 320);
+			viewHeader.frame=CGRectMake(0, 0, 500, 55);
+		}
+		else
+		{
+			tblView.frame=CGRectMake(0, 0, Width, height);
+			ScrollView.contentSize=CGSizeMake( Width, height);
+		//	self.view.frame=CGRectMake(0, 0, 480, 320);
+			viewHeader.frame=CGRectMake(0, 0, Width, 55);
+		}
+
+		return (interfaceOrientation == UIInterfaceOrientationLandscapeRight);
+	}
+	return NO;
+}
+
+#pragma mark Table view methods
+
+-(CGFloat)findHeightForCell:(NSString *)text
+{
+	CGFloat		result = 40.0f;
+	CGFloat		width = 0;
+	
+	width = 77;
+	if (text)
+	{
+		CGSize		textSize = { width, 20000.0f };		// width and height of text area
+		CGSize		size = [text sizeWithFont:[UIFont boldSystemFontOfSize:12.5f] constrainedToSize:textSize lineBreakMode:UILineBreakModeCharacterWrap];
+		
+		size.height += 25.0f;			// top and bottom margin
+		result = MAX(size.height, 40.0f);	// at least one row		
+	}
+	else
+	{
+		return 40;
+	}
+	return result;	
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	if(!ISFinish)
+	{
+		if(indexPath.row==DisplanyCount)
+		{	
+			return 45;
+		}
+		else
+		{			
+			NSString *Str=[appDelegate.WeekArray objectAtIndex:indexPath.row];
+			CGFloat Maxheight=40;
+			for(int i=0;i<Count;i++)
+			{
+				FieldName=[arr3 objectAtIndex:i];
+				NSDictionary *Dict=[appDelegate.ReportArray valueForKey:FieldName];
+				NSString *Str1=[Dict valueForKey:Str];
+				CGFloat TmpHeight=[self findHeightForCell:Str1];
+				if(TmpHeight>Maxheight)
+				{
+					Maxheight=TmpHeight;
+				}
+			}
+			if(Maxheight>50)
+				height=height+(Maxheight-50);
+			NSLog(@"%d",height);
+			tblView.frame=CGRectMake(0, 0, Width, height);
+			ScrollView.contentSize=CGSizeMake( Width, height);
+			return Maxheight;
+		}
+	}
+	else if(ISFinish)
+	{
+		NSString *Str=(NSString*)[appDelegate.WeekArray objectAtIndex:indexPath.row];
+		CGFloat Maxheight=40;
+		for(int i=0;i<Count;i++)
+		{
+			FieldName=[arr3 objectAtIndex:i];
+			NSDictionary *Dict=[appDelegate.ReportArray valueForKey:FieldName];
+			NSString *Str1=[Dict valueForKey:Str];
+			CGFloat TmpHeight=[self findHeightForCell:Str1];
+			if(TmpHeight>Maxheight)
+			{
+				Maxheight=TmpHeight;
+			}
+		}
+		if(Maxheight>50)
+			height=height+(Maxheight-50);
+		NSLog(@"%d",height);
+		tblView.frame=CGRectMake(0, 0, Width, height);
+		ScrollView.contentSize=CGSizeMake( Width, height);
+		return Maxheight;
+	}
+	return 40;
+}
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+
+// Customize the number of rows in the table view.
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+	if(TotlaDataCount>DisplanyCount)
+	{
+		ISFinish=FALSE;
+		return DisplanyCount+1;
+	}
+	else
+	{
+		ISFinish=TRUE;
+		NSLog(@"%d",[appDelegate.WeekArray count]);
+		DisplanyCount=-1;
+		return [appDelegate.WeekArray count];
+	}
+}
+
+
+// Customize the appearance of table view cells.
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+	NSLog(@"Show cell");
+	if(indexPath.row==DisplanyCount)
+	{			
+		static NSString *CellIdentifier1 = @"Cell1";
+		UITableViewCell *cell1 =(UITableViewCell *) [tableView dequeueReusableCellWithIdentifier:CellIdentifier1];
+		if (cell1 == nil) {
+			cell1 = [[[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier1] autorelease];
+		}	
+		cell1.accessoryType=UITableViewCellAccessoryNone;
+		cell1.textAlignment = UITextAlignmentCenter;
+		cell1.text=@"Show More 25";
+		return cell1;			
+	}
+	else
+	{
+		static NSString *CellIdentifier = @"Cell";			
+		CalendarTableViewCell *cell = (CalendarTableViewCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+		if (cell == nil) {
+			cell = [[[CalendarTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier] autorelease];
+		}
+		
+		cell.lblName.text=(NSString*)[appDelegate.WeekArray objectAtIndex:indexPath.row];
+		NSString *Str1=@"";
+		for(int i=0;i<Count;i++)
+		{
+			FieldName=[arr3 objectAtIndex:i];
+			NSDictionary *Dict;
+			if(i==0)
+				[cell addColumn:100];
+			else
+				[cell addColumn:90*(i+1)];
+			
+			if([FieldName isEqualToString:@"Menstrution"])
+			{
+				Dict=[appDelegate.ReportArray valueForKey:FieldName];
+				NSLog(cell.lblName.text);
+				if([[Dict valueForKey:[NSString stringWithFormat:@"%@_Start",cell.lblName.text]] length]>0)
+				{
+					Str1=@"Menstruation Start";
+				}
+				else if([[Dict valueForKey:[NSString stringWithFormat:@"%@_End",cell.lblName.text]] length]>0)
+				{
+					Str1=@"Menstruation Ended";
+				}
+				else
+					Str1=@"";
+			}
+			else
+			{
+				if([FieldName isEqualToString:@"WeightKgs"])
+				{
+					if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Weight"] isEqualToString:@"LBs"])
+					{
+						
+						FieldName=@"WeightLbs";
+					}
+					else
+					{
+						
+						FieldName=@"WeigthKgs";
+					}
+				}
+				if([FieldName isEqualToString:@"HeightCms"])
+				{
+					if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Height"] isEqualToString:@"Inches"])
+					{
+						FieldName=@"HeightInch";
+					}
+					else
+					{
+						FieldName=@"HeightCms";
+					}				
+				}	
+				if([FieldName isEqualToString:@"TemperatureF"])
+				{
+					
+					if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Temperature"] isEqualToString:@"F"])
+					{
+						FieldName=@"TemperatureF";
+					}
+					else
+					{
+						FieldName=@"TemperatureC";
+					}
+				}
+				Dict=[appDelegate.ReportArray valueForKey:FieldName];
+				Str1=[Dict valueForKey:cell.lblName.text];
+			}				
+			if(i==0)
+			{
+				cell.Hour1.text=Str1;
+			}
+			else if(i==1)
+			{
+				cell.Hour2.text=Str1;
+			}
+			else if(i==2)
+			{
+				cell.Hour3.text=Str1;
+			}
+			else if(i==3)
+			{
+				cell.Hour4.text=Str1;
+			}
+			else if(i==4)
+			{
+				cell.Hour5.text=Str1;
+			}
+			else if(i==5)
+			{
+				cell.Hour6.text=Str1;
+			}
+			else if(i==6)
+			{
+				cell.Hour7.text=Str1;
+			}
+			else if(i==7)
+			{
+				cell.Hour8.text=Str1;
+			}
+			else if(i==8)
+			{
+				cell.Hour9.text=Str1;
+			}
+			else if(i==9)
+			{
+				cell.Hour10.text=Str1;
+			}
+			else if(i==10)
+			{
+				cell.Hour11.text=Str1;
+			}
+			else if(i==11)
+			{
+				cell.Hour12.text=Str1;
+			}
+			else if(i==12)
+			{
+				cell.Hour13.text=Str1;
+			}
+			else if(i==13)
+			{
+				cell.Hour14.text=Str1;
+			}
+			else if(i==14)
+			{
+				cell.Hour15.text=Str1;
+			}
+			else if(i==15)
+			{
+				cell.Hour16.text=Str1;
+			}
+			else if(i==16)
+			{
+				cell.Hour17.text=Str1;
+			}
+			else if(i==17)
+			{
+				cell.Hour18.text=Str1;
+			}
+			else if(i==18)
+			{
+				cell.Hour19.text=Str1;
+			}
+			else if(i==19)
+			{
+				cell.Hour20.text=Str1;
+			}
+		}
+		return cell;
+	}
+	
+	/*
+	
+	if(ISFinish==FALSE)
+	{
+		if(indexPath.row==DisplanyCount)
+		{			
+			static NSString *CellIdentifier1 = @"Cell1";
+			UITableViewCell *cell1 =(UITableViewCell *) [tableView dequeueReusableCellWithIdentifier:CellIdentifier1];
+			if (cell1 == nil) {
+				cell1 = [[[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier1] autorelease];
+			}	
+			cell1.accessoryType=UITableViewCellAccessoryNone;
+			cell1.textAlignment = UITextAlignmentCenter;
+			cell1.text=@"Show More 25";
+			return cell1;			
+		}
+		else
+		{
+			static NSString *CellIdentifier = @"Cell";			
+			CalendarTableViewCell *cell = (CalendarTableViewCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+			if (cell == nil) {
+				cell = [[[CalendarTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier] autorelease];
+			}
+			
+			cell.lblName.text=(NSString*)[appDelegate.WeekArray objectAtIndex:indexPath.row];
+			NSString *Str1=@"";
+			for(int i=0;i<Count;i++)
+			{
+				FieldName=[arr3 objectAtIndex:i];
+				NSDictionary *Dict;
+				if(i==0)
+					[cell addColumn:100];
+				else
+					[cell addColumn:90*(i+1)];
+				
+				if([FieldName isEqualToString:@"Menstrution"])
+				{
+					Dict=[appDelegate.ReportArray valueForKey:FieldName];
+					NSLog(cell.lblName.text);
+					if([[Dict valueForKey:[NSString stringWithFormat:@"%@_Start",cell.lblName.text]] length]>0)
+					{
+						Str1=@"Start Date";
+					}
+					else if([[Dict valueForKey:[NSString stringWithFormat:@"%@_End",cell.lblName.text]] length]>0)
+					{
+						Str1=@"End Date";
+					}
+					else
+						Str1=@"";
+				}
+				else
+				{
+					if([FieldName isEqualToString:@"WeightKgs"])
+					{
+						if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Weight"] isEqualToString:@"LBs"])
+						{
+							
+							FieldName=@"WeightLbs";
+						}
+						else
+						{
+							
+							FieldName=@"WeigthKgs";
+						}
+					}
+					if([FieldName isEqualToString:@"TemperatureF"])
+					{
+						
+						if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Temperature"] isEqualToString:@"F"])
+						{
+							FieldName=@"TemperatureF";
+						}
+						else
+						{
+							FieldName=@"TemperatureC";
+						}
+					}
+					Dict=[appDelegate.ReportArray valueForKey:FieldName];
+					Str1=[Dict valueForKey:cell.lblName.text];
+				}				
+				if(i==0)
+				{
+					cell.Hour1.text=Str1;
+				}
+				else if(i==1)
+				{
+					cell.Hour2.text=Str1;
+				}
+				else if(i==2)
+				{
+					cell.Hour3.text=Str1;
+				}
+				else if(i==3)
+				{
+					cell.Hour4.text=Str1;
+				}
+				else if(i==4)
+				{
+					cell.Hour5.text=Str1;
+				}
+				else if(i==5)
+				{
+					cell.Hour6.text=Str1;
+				}
+				else if(i==6)
+				{
+					cell.Hour7.text=Str1;
+				}
+				else if(i==7)
+				{
+					cell.Hour8.text=Str1;
+				}
+				else if(i==8)
+				{
+					cell.Hour9.text=Str1;
+				}
+				else if(i==9)
+				{
+					cell.Hour10.text=Str1;
+				}
+				else if(i==10)
+				{
+					cell.Hour11.text=Str1;
+				}
+				else if(i==11)
+				{
+					cell.Hour12.text=Str1;
+				}
+				else if(i==12)
+				{
+					cell.Hour13.text=Str1;
+				}
+				else if(i==13)
+				{
+					cell.Hour14.text=Str1;
+				}
+				else if(i==14)
+				{
+					cell.Hour15.text=Str1;
+				}
+				else if(i==15)
+				{
+					cell.Hour16.text=Str1;
+				}
+				else if(i==16)
+				{
+					cell.Hour17.text=Str1;
+				}
+				else if(i==17)
+				{
+					cell.Hour18.text=Str1;
+				}
+				else if(i==18)
+				{
+					cell.Hour19.text=Str1;
+				}
+				else if(i==19)
+				{
+					cell.Hour20.text=Str1;
+				}
+			}
+			return cell;
+		}
+	}
+	else
+	{
+		static NSString *CellIdentifier2 = @"Cell2";		
+		CalendarTableViewCell *cell2 = (CalendarTableViewCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier2];
+		if (cell2 == nil) {
+			cell2 = [[[CalendarTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier2] autorelease];
+		}		
+		cell2.lblName.text=(NSString*)[appDelegate.WeekArray objectAtIndex:indexPath.row];
+		NSString *Str1=@"";
+		for(int i=0;i<Count;i++)
+		{
+			FieldName=[arr3 objectAtIndex:i];
+			NSDictionary *Dict;
+			if(i==0)
+				[cell2 addColumn:100];
+			else
+				[cell2 addColumn:90*(i+1)];
+			
+			if([FieldName isEqualToString:@"Menstrution"])
+			{
+				Dict=[appDelegate.ReportArray valueForKey:FieldName];
+				NSLog(cell2.lblName.text);
+				if([[Dict valueForKey:[NSString stringWithFormat:@"%@_Start",cell2.lblName.text]] length]>0)
+				{
+					Str1=@"Start Date";
+				}
+				else if([[Dict valueForKey:[NSString stringWithFormat:@"%@_End",cell2.lblName.text]] length]>0)
+				{
+					Str1=@"End Date";
+				}
+				else
+					Str1=@"";
+			}
+			else
+			{
+				if([FieldName isEqualToString:@"WeightKgs"])
+				{
+					if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Weight"] isEqualToString:@"LBs"])
+					{
+						
+						FieldName=@"WeightLbs";
+					}
+					else
+					{
+						
+						FieldName=@"WeightKgs";
+					}
+				}
+				if([FieldName isEqualToString:@"TemperatureF"])
+				{
+					
+					if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Temperature"] isEqualToString:@"F"])
+					{
+						FieldName=@"TemperatureF";
+					}
+					else
+					{
+						FieldName=@"TemperatureC";
+					}
+				}
+				Dict=[appDelegate.ReportArray valueForKey:FieldName];
+				Str1=[Dict valueForKey:cell2.lblName.text];				
+			}			
+			if(i==0)
+			{
+				cell2.Hour1.text=Str1;
+			}
+			else if(i==1)
+			{
+				cell2.Hour2.text=Str1;
+			}
+			else if(i==2)
+			{
+				cell2.Hour3.text=Str1;
+			}
+			else if(i==3)
+			{
+				cell2.Hour4.text=Str1;
+			}
+			else if(i==4)
+			{
+				cell2.Hour5.text=Str1;
+			}
+			else if(i==5)
+			{
+				cell2.Hour6.text=Str1;
+			}
+			else if(i==6)
+			{
+				cell2.Hour7.text=Str1;
+			}
+			else if(i==7)
+			{
+				cell2.Hour8.text=Str1;
+			}
+			else if(i==8)
+			{
+				cell2.Hour9.text=Str1;
+			}
+			else if(i==9)
+			{
+				cell2.Hour10.text=Str1;
+			}
+			else if(i==10)
+			{
+				cell2.Hour11.text=Str1;
+			}
+			else if(i==11)
+			{
+				cell2.Hour12.text=Str1;
+			}
+			else if(i==12)
+			{
+				cell2.Hour13.text=Str1;
+			}
+			else if(i==13)
+			{
+				cell2.Hour14.text=Str1;
+			}
+			else if(i==14)
+			{
+				cell2.Hour15.text=Str1;
+			}
+			else if(i==15)
+			{
+				cell2.Hour16.text=Str1;
+			}
+			else if(i==16)
+			{
+				cell2.Hour17.text=Str1;
+			}
+			else if(i==17)
+			{
+				cell2.Hour18.text=Str1;
+			}
+			else if(i==18)
+			{
+				cell2.Hour19.text=Str1;
+			}
+			else if(i==19)
+			{
+				cell2.Hour20.text=Str1;
+			}
+		}
+		NSLog(@"Show cell end");
+		return cell2;
+	}
+	*/
+
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+	[tblView deselectRowAtIndexPath:indexPath animated:YES];
+	if(ISEdit==TRUE)
+	{
+		if(ISFinish==FALSE)
+		{
+			if(indexPath.row!=DisplanyCount)
+			{
+				Row=indexPath.row;
+				tblView.userInteractionEnabled=FALSE;
+				indexPathObj=indexPath;
+				[NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(Click_Edit) userInfo:nil repeats:NO];
+			}
+		}
+		else
+		{
+			Row=indexPath.row;
+			tblView.userInteractionEnabled=FALSE;
+			indexPathObj=indexPath;
+			[NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(Click_Edit) userInfo:nil repeats:NO];
+		}
+	}
+	else
+	{
+	
+			if(indexPath.row==DisplanyCount)
+			{
+				[NSTimer scheduledTimerWithTimeInterval:(0.1) target:self selector:@selector(Click_Next) userInfo:nil repeats:NO];
+			}
+	}
+}
+
+-(void)Click_Next
+{
+	DisplanyCount=DisplanyCount+25;	
+	if(TotlaDataCount>DisplanyCount)
+	{
+		height=DisplanyCount*60;
+	}
+	else
+	{
+		height=TotlaDataCount*60;
+	}
+	tblView.frame=CGRectMake(0, 0, Width, height);
+	ScrollView.contentSize=CGSizeMake( Width, height);
+	[tblView reloadData];
+}
+
+-(void)Click_Edit
+{
+	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	appDelegate.isDailyReport=FALSE;
+	appDelegate.isFromChart=TRUE;
+	appDelegate.isFromEditReport=TRUE;
+	int x=appDelegate.SelectedLocation.x;
+	int Z=x/90;
+	if(Z!=0)
+	{
+		NSString *Str=[arr3 objectAtIndex:Z-1];
+		Index=[Field_Table_Array  indexOfObject:Str];
+		if([Str isEqualToString:@"WeightKgs"])
+		{
+			Index=6;
+			if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Weight"] isEqualToString:@"LBs"])
+			{
+				
+				Str=@"WeightLbs";
+			}
+			else
+			{
+				
+				Str=@"WeightKgs";
+			}
+		}
+		if([Str isEqualToString:@"HeightCms"])
+		{
+			Index=7;
+			if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Height"] isEqualToString:@"Inches"])
+			{
+				Str=@"HeightInch";
+			}
+			else
+			{
+				Str=@"HeightCms";
+			}				
+		}
+		if([Str isEqualToString:@"TemperatureF"])
+		{
+			Index=2;
+			if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Temperature"] isEqualToString:@"F"])
+			{
+				Str=@"TemperatureF";
+			}
+			else
+			{
+				Str=@"TemperatureC";
+			}
+		}		
+		if(Index==18)
+		{
+			UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Menstrual cycle can not be edited!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+			[alert show];
+			[alert release];
+		}
+		else 
+		{
+			Date=[appDelegate.WeekArray objectAtIndex:Row];
+			NSDictionary *Dict=[appDelegate.ReportArray valueForKey:Str];
+			String=@"";
+			String=[Dict valueForKey:Date];
+			if(String!=nil)
+			{
+				lbl=[self CellLable:Z];
+				lbl.backgroundColor=[UIColor colorWithRed:0.3607  green:0.5333 blue:0.9019 alpha:1.0];
+				lbl.textColor=[UIColor whiteColor];
+				NSArray *Arr4=[Date componentsSeparatedByString:@" "];
+				Date=[Arr4 objectAtIndex:0];
+				DateTime=@"";
+				if([Arr4 count]>1)
+				{
+					DateTime=[Arr4 objectAtIndex:1];
+				}
+				tblView.userInteractionEnabled=TRUE;
+				if(Index==20)
+				{
+					if(!appDelegate.objMedicineViewController )
+					{
+						appDelegate.objMedicineViewController=[[MedicineViewController alloc]initWithNibName:@"MedicineView" bundle:nil];
+					}					
+					[appDelegate Medicinedata:Date  ToTime:DateTime anduserid:appDelegate.SelectedUserID]; 
+					if([appDelegate.EntryArray count]>0)
+					{
+						appDelegate.objMedicineViewController.MedicineRef =[appDelegate.EntryArray objectAtIndex:0];
+					}
+					else
+					{
+						if(!appDelegate.objMedicineViewController.MedicineRef)
+						{
+							appDelegate.objMedicineViewController.MedicineRef=[[Medicine alloc]init];
+						}
+						else
+						{
+							[appDelegate.objMedicineViewController.MedicineRef ClearData];
+						}
+						appDelegate.objMedicineViewController.MedicineRef.EntryDate=Date;
+						appDelegate.objMedicineViewController.MedicineRef.EntryTime=[NSString stringWithFormat:@"%@",DateTime];
+						appDelegate.objMedicineViewController.MedicineRef.UserID=appDelegate.SelectedUserID;
+					}
+					[self.navigationController pushViewController:appDelegate.objMedicineViewController animated:YES];
+				}
+				else if(Index>8)
+				{
+					if(!appDelegate.objHourlyStatusViewController)
+					{
+						appDelegate.objHourlyStatusViewController=[[HourlyStatusViewController alloc]initWithNibName:@"HourlyStatus" bundle:nil];
+					}					
+					[appDelegate SelectRoutinesDetail:Date  AndTime:DateTime andUserID:appDelegate.SelectedUserID];
+					[appDelegate selectMenstural:appDelegate.SelectedUserID  passDate:Date];
+					if([appDelegate.HourlyDataArray count]>0)
+					{
+						appDelegate.objHourlyStatusViewController.Routine_Detailrf =[appDelegate.HourlyDataArray objectAtIndex:0];
+					}
+					else
+					{
+						if(!appDelegate.objHourlyStatusViewController.Routine_Detailrf)
+						{
+							appDelegate.objHourlyStatusViewController.Routine_Detailrf=[[Routine_Detail alloc]init];
+						}
+						else
+						{
+							[appDelegate.objHourlyStatusViewController.Routine_Detailrf ClearData];
+						}
+						appDelegate.objHourlyStatusViewController.Routine_Detailrf.User_ID=appDelegate.SelectedUserID;
+						appDelegate.objHourlyStatusViewController.Routine_Detailrf.EntryDate=Date;
+						appDelegate.objHourlyStatusViewController.Routine_Detailrf.EntryTime=[NSString stringWithFormat:@"%@",DateTime];						
+					}
+					if([appDelegate.MensturalArray count]>0)
+					{
+						appDelegate.objHourlyStatusViewController.Mensturalref=[appDelegate.MensturalArray objectAtIndex:0];
+						if([appDelegate.objHourlyStatusViewController.Mensturalref.EndDate length]>0)
+						{
+							[appDelegate.objHourlyStatusViewController.Mensturalref ClearData];
+							appDelegate.objHourlyStatusViewController.Mensturalref.User_ID=appDelegate.SelectedUserID;
+							appDelegate.objHourlyStatusViewController.Mensturalref.Daily_Date=Date;
+						}
+					}
+					else
+					{
+						if(!appDelegate.objHourlyStatusViewController.Mensturalref)
+						{
+							appDelegate.objHourlyStatusViewController.Mensturalref=[[Menstural_Cycle alloc]init];
+						}
+						else
+						{
+							[appDelegate.objHourlyStatusViewController.Mensturalref ClearData];
+						}
+						appDelegate.objHourlyStatusViewController.Mensturalref.User_ID=appDelegate.SelectedUserID;
+						appDelegate.objHourlyStatusViewController.Mensturalref.Daily_Date=Date;						
+					}
+					appDelegate.SaveMenstural=FALSE; 
+					[self.navigationController pushViewController:appDelegate.objHourlyStatusViewController animated:YES];					
+				}
+				else
+				{
+					if(!appDelegate.objDailyStatusViewController)
+					{
+						appDelegate.objDailyStatusViewController=[[DailyStatusViewController alloc]initWithNibName:@"DailyStatus" bundle:nil];
+					}					
+					[appDelegate SelectVitalsDetail:Date  AndTime:DateTime andUserID:appDelegate.SelectedUserID];					
+					if([appDelegate.DailyArray count]>0)
+					{
+						appDelegate.objDailyStatusViewController.Vitals_Detailref =[appDelegate.DailyArray objectAtIndex:0];
+					}
+					else
+					{
+						if(!appDelegate.objDailyStatusViewController.Vitals_Detailref)
+						{
+							appDelegate.objDailyStatusViewController.Vitals_Detailref=[[Vitals_Detail alloc]init];
+						}
+						else
+						{
+							[appDelegate.objDailyStatusViewController.Vitals_Detailref ClearData];
+						}
+						appDelegate.objDailyStatusViewController.Vitals_Detailref.User_ID1=appDelegate.SelectedUserID;
+						appDelegate.objDailyStatusViewController.Vitals_Detailref.EntryDate=Date;
+						appDelegate.objDailyStatusViewController.Vitals_Detailref.WeightLbs=[[NSUserDefaults standardUserDefaults] valueForKey:[NSString stringWithFormat:@"%d_WeightLbs",appDelegate.SelectedUserID]];
+						appDelegate.objDailyStatusViewController.Vitals_Detailref.WeightKgs=[[NSUserDefaults standardUserDefaults] valueForKey:[NSString stringWithFormat:@"%d_WeightKgs",appDelegate.SelectedUserID]];
+						
+						appDelegate.objDailyStatusViewController.Vitals_Detailref.EntryTime=[NSString stringWithFormat:@"%@",DateTime];						
+					}
+					[self.navigationController pushViewController:appDelegate.objDailyStatusViewController animated:YES];				
+				}				
+				[NSTimer scheduledTimerWithTimeInterval:(0.2) target:self selector:@selector(RemoveColor) userInfo:nil repeats:NO];
+			}
+			else 
+				tblView.userInteractionEnabled=TRUE;
+		}
+	}
+	else
+		tblView.userInteractionEnabled=TRUE;	
+	tblView.userInteractionEnabled=TRUE;	
+	[Pool release];
+}
+
+-(void)RemoveColor
+{
+	lbl.backgroundColor=[UIColor clearColor];
+	NSLog(@"Show will2");
+	lbl.textColor=[UIColor blackColor];
+}
+
+/*
+ // Override to allow orientations other than the default portrait orientation.
+ - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+ // Return YES for supported orientations
+ return (interfaceOrientation == UIInterfaceOrientationPortrait);
+ }
+ */
+
+- (void)didReceiveMemoryWarning {
+	// Releases the view if it doesn't have a superview.
+    [super didReceiveMemoryWarning];
+	
+	// Release any cached data, images, etc that aren't in use.
+}
+
+- (void)viewDidUnload {
+	// Release any retained subviews of the main view.
+	// e.g. self.myOutlet = nil;
+}
+
+-(UILabel *)CellLable:(NSInteger)Label
+{
+	CalendarTableViewCell *cell=(CalendarTableViewCell *)[tblView cellForRowAtIndexPath:indexPathObj];
+	if(Label==1)
+	{
+		return cell.Hour1;
+	}
+	else if(Label==2)
+	{
+		return cell.Hour2;
+	}
+	else if(Label==3)
+	{
+		return cell.Hour3;
+	}
+	else if(Label==4)
+	{
+		return cell.Hour4;
+	}
+	else if(Label==5)
+	{
+		return cell.Hour5;
+	}
+	else if(Label==6)
+	{
+		return cell.Hour6;
+	}
+	else if(Label==7)
+	{
+		return cell.Hour7;
+	}
+	else if(Label==8)
+	{
+		return cell.Hour8;
+	}
+	else if(Label==9)
+	{
+		return cell.Hour9;
+	}
+	else if(Label==10)
+	{
+		return cell.Hour10;
+	}
+	else if(Label==11)
+	{
+		return cell.Hour11;
+	}
+	else if(Label==12)
+	{
+		return cell.Hour12;
+	}
+	else if(Label==13)
+	{
+		return cell.Hour13;
+	}
+	else if(Label==14)
+	{
+		return cell.Hour14;
+	}
+	else if(Label==15)
+	{
+		return cell.Hour15;
+	}
+	else if(Label==16)
+	{
+		return cell.Hour16;
+	}
+	else if(Label==17)
+	{
+		return cell.Hour17;
+	}
+	else if(Label==18)
+	{
+		return cell.Hour18;
+	}
+	else if(Label==19)
+	{
+		return cell.Hour19;
+	}
+	else
+		return cell.Hour20;
+	
+}
+
+-(IBAction)btnEdit_Click:(id)sender
+{
+	if(ISEdit==TRUE)
+	{
+		ISEdit=FALSE;
+		btnEdit.style=UIBarButtonItemStyleBordered;
+		btnEdit.title=@"Edit ";
+		lblFooter.frame=CGRectMake(23, 0, 130, 30);
+		lblHeader.text=@"";
+		//(23, 0, 130, 30)
+	}
+	else
+	{
+		btnEdit.style=UIBarButtonItemStyleDone;
+		btnEdit.title=@"Done";
+		ISEdit=TRUE;
+		lblHeader.frame=CGRectMake(23, -2, 130, 15);
+		lblFooter.frame=CGRectMake(23, 13, 130, 15);
+		lblHeader.text=@"Tap on the cell to edit!";
+	}
+	//	[tblView reloadData];
+}
+- (void)dealloc {
+	
+	[tblView release];
+	[viewHeader release];
+	[lblDate release];
+	[lblField release];
+	[StringField release];
+	
+    [super dealloc];
+}
+
+
+@end

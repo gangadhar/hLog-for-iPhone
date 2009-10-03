@@ -1,0 +1,96 @@
+//
+//  ToogleTableViewCell.m
+//  HealthTracker
+//
+//  Created by Bhoomi on 3/4/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+#import "ToogleTableViewCell.h"
+
+
+@implementation ToogleTableViewCell
+@synthesize SegMent,btnPrev,btnNext ;
+- (id)initWithFrame:(CGRect)frame reuseIdentifier:(NSString *)reuseIdentifier
+{
+	NSArray *segmentTextContent = [NSArray arrayWithObjects: @"Daily", @"Hourly", nil];
+    if (self = [super initWithFrame:frame reuseIdentifier:reuseIdentifier]) {
+       
+		
+		//segmentedControl = [[UISegmentedControl alloc] initWithItems:segmentTextContent];
+		UIView *MycontentView =self.contentView;
+	
+		SegMent=[[UISegmentedControl alloc] initWithItems:segmentTextContent];
+		SegMent.segmentedControlStyle  =UISegmentedControlStyleBar;
+		SegMent.tintColor=[UIColor lightGrayColor]; 
+		[MycontentView addSubview:SegMent];
+		[SegMent release];
+		
+		
+		btnPrev = [[UIButton buttonWithType:UIButtonTypeCustom] retain];
+		[btnPrev setBackgroundImage:[UIImage imageNamed:@"arrow_left.png"] forState:UIControlStateNormal];
+		[btnPrev setBackgroundImage:[UIImage imageNamed:@"arrow_left.png"] forState:UIControlStateHighlighted];
+		[btnPrev setBackgroundImage:[UIImage imageNamed:@"arrow_left.png"] forState:UIControlStateSelected];
+		btnPrev.enabled=TRUE;
+		btnPrev.showsTouchWhenHighlighted = TRUE;
+
+		[MycontentView addSubview:btnPrev];
+		[btnPrev release];
+		
+		btnNext = [[UIButton buttonWithType:UIButtonTypeCustom] retain];
+		[btnNext setBackgroundImage:[UIImage imageNamed:@"arrow_right.png"] forState:UIControlStateNormal];
+		[btnNext setBackgroundImage:[UIImage imageNamed:@"arrow_right.png"] forState:UIControlStateHighlighted];
+		btnNext.enabled=TRUE;
+		btnNext.showsTouchWhenHighlighted = TRUE;
+		[MycontentView addSubview:btnNext];
+		[btnNext release];
+    }
+    return self;
+}
+
+- (UILabel *)newLabelWithPrimaryColor:(UIColor *)primaryColor selectedColor:(UIColor *)selectedColor fontSize:(CGFloat)fontSize bold:(BOOL)bold
+{	
+    UIFont *font;
+    if (bold) {
+        font = [UIFont boldSystemFontOfSize:fontSize];
+    } else {
+        font = [UIFont systemFontOfSize:fontSize];
+    }	
+	UILabel *newLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+	newLabel.backgroundColor = [UIColor whiteColor];
+	newLabel.opaque = YES;
+	newLabel.textColor = primaryColor;
+	newLabel.highlightedTextColor = selectedColor;
+	newLabel.font = font;	
+	return newLabel;
+}
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+
+    [super setSelected:FALSE animated:animated];
+
+    // Configure the view for the selected state
+}
+
+
+- (void)layoutSubviews {
+	
+    [super layoutSubviews];
+	CGRect contentRect = self.contentView.bounds;   
+	
+	CGFloat boundsX = contentRect.origin.x;
+	//self.lblName.frame =  CGRectMake(2, 8, 140, 30);
+//	SegMent.frame = CGRectMake(boundsX + 150, 7, 145, 30);
+	
+	
+	//self.lblName.frame =  CGRectMake(2, 8, 100, 30);
+	SegMent.frame = CGRectMake(boundsX + 40, 10, 225, 25);
+//	btnNext.frame=CGRectMake(285, 10, 30, 25);
+//	btnPrev.frame=CGRectMake(10, 10, 30, 25);
+	
+}
+- (void)dealloc {
+    [super dealloc];
+}
+
+
+@end

@@ -1,0 +1,679 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
+		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
+		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
+		2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */; };
+		2899E5600DE3E45000AC0155 /* RootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2899E55F0DE3E45000AC0155 /* RootViewController.xib */; };
+		28AD73600D9D9599002E5188 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD735F0D9D9599002E5188 /* MainWindow.xib */; };
+		28C286E10D94DF7D0034E888 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28C286E00D94DF7D0034E888 /* RootViewController.m */; };
+		631F442E0F5EA10C0057533A /* Back1.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 631F442D0F5EA10C0057533A /* Back1.tiff */; };
+		631F444E0F5EA4340057533A /* check.png in Resources */ = {isa = PBXBuildFile; fileRef = 631F444D0F5EA4340057533A /* check.png */; };
+		631F45CB0F5EACFB0057533A /* arrow_left.png in Resources */ = {isa = PBXBuildFile; fileRef = 631F45C90F5EACFB0057533A /* arrow_left.png */; };
+		631F45CC0F5EACFB0057533A /* arrow_right.png in Resources */ = {isa = PBXBuildFile; fileRef = 631F45CA0F5EACFB0057533A /* arrow_right.png */; };
+		638525770F6E5325001D6B67 /* logo1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 638525760F6E5325001D6B67 /* logo1.jpg */; };
+		6385280A0F6E63FF001D6B67 /* Menstural_Cycle.m in Sources */ = {isa = PBXBuildFile; fileRef = 638528090F6E63FF001D6B67 /* Menstural_Cycle.m */; };
+		638FB2CC0F662DDD0029D082 /* User_Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 638FB2CB0F662DDD0029D082 /* User_Settings.m */; };
+		638FB5A00F6662F50029D082 /* DailyHourlyTextEntryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 638FB59F0F6662F50029D082 /* DailyHourlyTextEntryViewController.m */; };
+		638FB7CF0F6689A80029D082 /* DHTextEntry.xib in Resources */ = {isa = PBXBuildFile; fileRef = 638FB7CE0F6689A80029D082 /* DHTextEntry.xib */; };
+		6390209E0F85CD3400AB82DB /* menu.png in Resources */ = {isa = PBXBuildFile; fileRef = 639020990F85CD3400AB82DB /* menu.png */; };
+		639020A00F85CD3400AB82DB /* User_pro.png in Resources */ = {isa = PBXBuildFile; fileRef = 6390209B0F85CD3400AB82DB /* User_pro.png */; };
+		639020A10F85CD3400AB82DB /* Vitals.png in Resources */ = {isa = PBXBuildFile; fileRef = 6390209C0F85CD3400AB82DB /* Vitals.png */; };
+		639020AA0F85CE0F00AB82DB /* Medicine.png in Resources */ = {isa = PBXBuildFile; fileRef = 639020A90F85CE0F00AB82DB /* Medicine.png */; };
+		639020B80F85D13100AB82DB /* Favorites_2.png in Resources */ = {isa = PBXBuildFile; fileRef = 639020B60F85D13100AB82DB /* Favorites_2.png */; };
+		639020B90F85D13100AB82DB /* report_2.png in Resources */ = {isa = PBXBuildFile; fileRef = 639020B70F85D13100AB82DB /* report_2.png */; };
+		6390E1180F80AD90009D7B3B /* First_View.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6390E1170F80AD90009D7B3B /* First_View.xib */; };
+		6390E11C0F80ADC0009D7B3B /* FirstViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6390E11B0F80ADC0009D7B3B /* FirstViewController.m */; };
+		6390E15C0F80B449009D7B3B /* SelectSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6390E15B0F80B449009D7B3B /* SelectSettingsViewController.m */; };
+		6390E1670F80B5C0009D7B3B /* First_Settings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6390E1660F80B5C0009D7B3B /* First_Settings.xib */; };
+		6390E1970F80B695009D7B3B /* UserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6390E1960F80B695009D7B3B /* UserViewController.m */; };
+		6390E19F0F80B797009D7B3B /* UserSelect.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6390E19E0F80B797009D7B3B /* UserSelect.xib */; };
+		6390E1C70F80C3AB009D7B3B /* UnitsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6390E1C60F80C3AB009D7B3B /* UnitsViewController.m */; };
+		6390E1D30F80C5D0009D7B3B /* UnitsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6390E1D20F80C5D0009D7B3B /* UnitsView.xib */; };
+		6390E25B0F80D368009D7B3B /* Vitals_Detail.m in Sources */ = {isa = PBXBuildFile; fileRef = 6390E25A0F80D368009D7B3B /* Vitals_Detail.m */; };
+		6390E49C0F80F42D009D7B3B /* MedicineViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6390E49B0F80F42D009D7B3B /* MedicineViewController.m */; };
+		6390E4AD0F80F5FA009D7B3B /* Medicine.m in Sources */ = {isa = PBXBuildFile; fileRef = 6390E4AC0F80F5FA009D7B3B /* Medicine.m */; };
+		6390E5130F80FCE5009D7B3B /* MedicineView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6390E5120F80FCE5009D7B3B /* MedicineView.xib */; };
+		639128570F64EF1800222EAF /* libsqlite3.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 639128560F64EF1700222EAF /* libsqlite3.0.dylib */; };
+		639129A30F65064B00222EAF /* UserTextEntryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 639129A20F65064B00222EAF /* UserTextEntryViewController.m */; };
+		639129A60F65066D00222EAF /* TextEntry.xib in Resources */ = {isa = PBXBuildFile; fileRef = 639129A50F65066D00222EAF /* TextEntry.xib */; };
+		639EE45F0F68EA10005D6445 /* SelectMedicineSettingsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 639EE45E0F68EA10005D6445 /* SelectMedicineSettingsController.m */; };
+		639EE4A50F68EE20005D6445 /* MedicineSettings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 639EE4A40F68EE20005D6445 /* MedicineSettings.xib */; };
+		63A4876C0F84F30F00AD9033 /* CalendarTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 63A4876B0F84F30F00AD9033 /* CalendarTableViewCell.m */; };
+		63A487A50F84F85A00AD9033 /* delete_Routines.png in Resources */ = {isa = PBXBuildFile; fileRef = 63A487A30F84F85A00AD9033 /* delete_Routines.png */; };
+		63A487A60F84F85A00AD9033 /* delete_vitals.png in Resources */ = {isa = PBXBuildFile; fileRef = 63A487A40F84F85A00AD9033 /* delete_vitals.png */; };
+		63A487D70F8501DE00AD9033 /* healthtracker.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = 63A487D60F8501DE00AD9033 /* healthtracker.sqlite */; };
+		63A490820F8DBB7D006ADCCF /* AddFieldTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 63A490810F8DBB7D006ADCCF /* AddFieldTableViewCell.m */; };
+		63A625F10F82098400F534A4 /* Routine_Detail.m in Sources */ = {isa = PBXBuildFile; fileRef = 63A625F00F82098400F534A4 /* Routine_Detail.m */; };
+		63AB64D60F7896340059DB2C /* SelectButtonViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 63AB64D50F7896340059DB2C /* SelectButtonViewController.m */; };
+		63AB64F40F789A850059DB2C /* SelectButton.xib in Resources */ = {isa = PBXBuildFile; fileRef = 63AB64F30F789A850059DB2C /* SelectButton.xib */; };
+		63ACC6250F70AECE00A29083 /* EnterPasscodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 63ACC6240F70AECE00A29083 /* EnterPasscodeViewController.m */; };
+		63ACC6330F70B17400A29083 /* Passcode.xib in Resources */ = {isa = PBXBuildFile; fileRef = 63ACC6320F70B17400A29083 /* Passcode.xib */; };
+		63B414620F6A8E0E00C1A300 /* IsKidTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 63B414610F6A8E0E00C1A300 /* IsKidTableViewCell.m */; };
+		63B5CD920F8350F4007CB65A /* setting1.png in Resources */ = {isa = PBXBuildFile; fileRef = 63B5CD900F8350F4007CB65A /* setting1.png */; };
+		63B5CD930F8350F4007CB65A /* User_Menu.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 63B5CD910F8350F4007CB65A /* User_Menu.jpg */; };
+		63B5CE570F8371B8007CB65A /* CalendarReportViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 63B5CE560F8371B8007CB65A /* CalendarReportViewController.m */; };
+		63B5CE590F8371C6007CB65A /* Calendar.xib in Resources */ = {isa = PBXBuildFile; fileRef = 63B5CE580F8371C6007CB65A /* Calendar.xib */; };
+		63B5CF640F8389B7007CB65A /* ShowReportViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 63B5CF630F8389B7007CB65A /* ShowReportViewController.m */; };
+		63B5CF910F838B73007CB65A /* ShowCalendar.xib in Resources */ = {isa = PBXBuildFile; fileRef = 63B5CF900F838B73007CB65A /* ShowCalendar.xib */; };
+		63B5D14B0F839AED007CB65A /* HealthTrackerAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 63B5D14A0F839AED007CB65A /* HealthTrackerAppDelegate.m */; };
+		63B5D1900F83A240007CB65A /* routine.png in Resources */ = {isa = PBXBuildFile; fileRef = 63B5D18F0F83A240007CB65A /* routine.png */; };
+		63B6BBBA0F6FDA8C00B7ADC2 /* PasscodeSettings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 63B6BBB90F6FDA8C00B7ADC2 /* PasscodeSettings.xib */; };
+		63B6BBBE0F6FDAB800B7ADC2 /* PasscodeSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 63B6BBBD0F6FDAB800B7ADC2 /* PasscodeSettingsViewController.m */; };
+		63BC728E0F7E04B7000142FE /* AddUserSegmentTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 63BC728D0F7E04B7000142FE /* AddUserSegmentTableCell.m */; };
+		63BC74A90F7E3203000142FE /* CustomSwitch.m in Sources */ = {isa = PBXBuildFile; fileRef = 63BC74A80F7E3203000142FE /* CustomSwitch.m */; };
+		63BF23EE0F6B6CEC00D64FEF /* LadiesDatePickerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 63BF23ED0F6B6CEC00D64FEF /* LadiesDatePickerController.m */; };
+		63BF241D0F6B6F9F00D64FEF /* DatePick.xib in Resources */ = {isa = PBXBuildFile; fileRef = 63BF241C0F6B6F9F00D64FEF /* DatePick.xib */; };
+		63C2EA750F5CF06500652849 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C2EA740F5CF06500652849 /* SettingsViewController.m */; };
+		63C2EA780F5CF07400652849 /* SettingTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C2EA770F5CF07400652849 /* SettingTableViewCell.m */; };
+		63C2EA8F0F5CF3A800652849 /* checked.png in Resources */ = {isa = PBXBuildFile; fileRef = 63C2EA8C0F5CF3A800652849 /* checked.png */; };
+		63C2EA900F5CF3A800652849 /* unchecked.png in Resources */ = {isa = PBXBuildFile; fileRef = 63C2EA8D0F5CF3A800652849 /* unchecked.png */; };
+		63C2EA910F5CF3A800652849 /* User.png in Resources */ = {isa = PBXBuildFile; fileRef = 63C2EA8E0F5CF3A800652849 /* User.png */; };
+		63C2EB390F5D06CA00652849 /* AddUserButtonTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C2EB380F5D06CA00652849 /* AddUserButtonTableViewCell.m */; };
+		63C2EB650F5D0B8300652849 /* 02.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 63C2EB630F5D0B8300652849 /* 02.jpg */; };
+		63C2EB660F5D0B8300652849 /* 04.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 63C2EB640F5D0B8300652849 /* 04.jpg */; };
+		63C2EB800F5D0C0000652849 /* AddUserTwoButtonsCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C2EB7F0F5D0C0000652849 /* AddUserTwoButtonsCell.m */; };
+		63C2EBDC0F5D111400652849 /* DailyStatusTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C2EBDB0F5D111400652849 /* DailyStatusTableViewCell.m */; };
+		63C2EC710F5D17D900652849 /* SelectOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C2EC700F5D17D900652849 /* SelectOptionsViewController.m */; };
+		63C2EC840F5D1B1100652849 /* SelectOptions.xib in Resources */ = {isa = PBXBuildFile; fileRef = 63C2EC830F5D1B1100652849 /* SelectOptions.xib */; };
+		63C2ECEE0F5D25B100652849 /* HourlyStatusViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C2ECED0F5D25B100652849 /* HourlyStatusViewController.m */; };
+		63C2ED4D0F5D2B8F00652849 /* HourlyStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 63C2ED4C0F5D2B8F00652849 /* HourlyStatus.xib */; };
+		63C2EDDC0F5D395A00652849 /* PastTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C2EDDB0F5D395A00652849 /* PastTableViewCell.m */; };
+		63C2EE900F5D466900652849 /* MedicationEntryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C2EE8F0F5D466900652849 /* MedicationEntryViewController.m */; };
+		63C2EE960F5D46FD00652849 /* Medicine.xib in Resources */ = {isa = PBXBuildFile; fileRef = 63C2EE950F5D46FD00652849 /* Medicine.xib */; };
+		63C8C4340F5C19B900D40558 /* DailyStatusViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 63C8C4330F5C19B900D40558 /* DailyStatusViewController.m */; };
+		63C8C43D0F5C1ACA00D40558 /* DailyStatus.xib in Resources */ = {isa = PBXBuildFile; fileRef = 63C8C43C0F5C1ACA00D40558 /* DailyStatus.xib */; };
+		63E9AF180F5E66AE009BFDC1 /* ToogleTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 63E9AF170F5E66AE009BFDC1 /* ToogleTableViewCell.m */; };
+		C8888D1A0F909F3800B6DFC0 /* Settings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6390DBE60F90923D00BECA34 /* Settings.xib */; };
+		C89236240F5BA11400837802 /* AddNewUserTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C89236230F5BA11400837802 /* AddNewUserTableCell.m */; };
+		C89236270F5BA19000837802 /* AddNewUser.xib in Resources */ = {isa = PBXBuildFile; fileRef = C89236260F5BA19000837802 /* AddNewUser.xib */; };
+		C892362A0F5BA1B100837802 /* AddNewUserController.m in Sources */ = {isa = PBXBuildFile; fileRef = C89236290F5BA1B100837802 /* AddNewUserController.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		1D6058910D05DD3D006BFB54 /* HealthTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HealthTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		2899E55F0DE3E45000AC0155 /* RootViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RootViewController.xib; sourceTree = "<group>"; };
+		28A0AAE50D9B0CCF005BE974 /* HealthTracker_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HealthTracker_Prefix.pch; sourceTree = "<group>"; };
+		28AD735F0D9D9599002E5188 /* MainWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainWindow.xib; sourceTree = "<group>"; };
+		28C286DF0D94DF7D0034E888 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
+		28C286E00D94DF7D0034E888 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
+		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		631F442D0F5EA10C0057533A /* Back1.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Back1.tiff; path = Images/Back1.tiff; sourceTree = "<group>"; };
+		631F444D0F5EA4340057533A /* check.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = check.png; path = Images/check.png; sourceTree = "<group>"; };
+		631F45C90F5EACFB0057533A /* arrow_left.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = arrow_left.png; path = Images/arrow_left.png; sourceTree = "<group>"; };
+		631F45CA0F5EACFB0057533A /* arrow_right.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = arrow_right.png; path = Images/arrow_right.png; sourceTree = "<group>"; };
+		638525760F6E5325001D6B67 /* logo1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = logo1.jpg; path = Images/logo1.jpg; sourceTree = "<group>"; };
+		638528080F6E63FF001D6B67 /* Menstural_Cycle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Menstural_Cycle.h; sourceTree = "<group>"; };
+		638528090F6E63FF001D6B67 /* Menstural_Cycle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Menstural_Cycle.m; sourceTree = "<group>"; };
+		638FB2CA0F662DDD0029D082 /* User_Settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = User_Settings.h; sourceTree = "<group>"; };
+		638FB2CB0F662DDD0029D082 /* User_Settings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = User_Settings.m; sourceTree = "<group>"; };
+		638FB59E0F6662F40029D082 /* DailyHourlyTextEntryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DailyHourlyTextEntryViewController.h; sourceTree = "<group>"; };
+		638FB59F0F6662F50029D082 /* DailyHourlyTextEntryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DailyHourlyTextEntryViewController.m; sourceTree = "<group>"; };
+		638FB7CE0F6689A80029D082 /* DHTextEntry.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DHTextEntry.xib; sourceTree = "<group>"; };
+		639020990F85CD3400AB82DB /* menu.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = menu.png; path = Images/menu.png; sourceTree = "<group>"; };
+		6390209B0F85CD3400AB82DB /* User_pro.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = User_pro.png; path = Images/User_pro.png; sourceTree = "<group>"; };
+		6390209C0F85CD3400AB82DB /* Vitals.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Vitals.png; path = Images/Vitals.png; sourceTree = "<group>"; };
+		639020A90F85CE0F00AB82DB /* Medicine.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Medicine.png; path = Images/Medicine.png; sourceTree = "<group>"; };
+		639020B60F85D13100AB82DB /* Favorites_2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Favorites_2.png; path = Images/Favorites_2.png; sourceTree = "<group>"; };
+		639020B70F85D13100AB82DB /* report_2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = report_2.png; path = Images/report_2.png; sourceTree = "<group>"; };
+		6390DBE60F90923D00BECA34 /* Settings.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Settings.xib; sourceTree = "<group>"; };
+		6390E1170F80AD90009D7B3B /* First_View.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = First_View.xib; sourceTree = "<group>"; };
+		6390E11A0F80ADC0009D7B3B /* FirstViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FirstViewController.h; sourceTree = "<group>"; };
+		6390E11B0F80ADC0009D7B3B /* FirstViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FirstViewController.m; sourceTree = "<group>"; };
+		6390E15A0F80B449009D7B3B /* SelectSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelectSettingsViewController.h; sourceTree = "<group>"; };
+		6390E15B0F80B449009D7B3B /* SelectSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectSettingsViewController.m; sourceTree = "<group>"; };
+		6390E1660F80B5C0009D7B3B /* First_Settings.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = First_Settings.xib; sourceTree = "<group>"; };
+		6390E1950F80B695009D7B3B /* UserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserViewController.h; sourceTree = "<group>"; };
+		6390E1960F80B695009D7B3B /* UserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserViewController.m; sourceTree = "<group>"; };
+		6390E19E0F80B797009D7B3B /* UserSelect.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = UserSelect.xib; sourceTree = "<group>"; };
+		6390E1C50F80C3AB009D7B3B /* UnitsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UnitsViewController.h; sourceTree = "<group>"; };
+		6390E1C60F80C3AB009D7B3B /* UnitsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UnitsViewController.m; sourceTree = "<group>"; };
+		6390E1D20F80C5D0009D7B3B /* UnitsView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = UnitsView.xib; sourceTree = "<group>"; };
+		6390E2590F80D368009D7B3B /* Vitals_Detail.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vitals_Detail.h; sourceTree = "<group>"; };
+		6390E25A0F80D368009D7B3B /* Vitals_Detail.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Vitals_Detail.m; sourceTree = "<group>"; };
+		6390E49A0F80F42D009D7B3B /* MedicineViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MedicineViewController.h; sourceTree = "<group>"; };
+		6390E49B0F80F42D009D7B3B /* MedicineViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MedicineViewController.m; sourceTree = "<group>"; };
+		6390E4AB0F80F5FA009D7B3B /* Medicine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Medicine.h; sourceTree = "<group>"; };
+		6390E4AC0F80F5FA009D7B3B /* Medicine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Medicine.m; sourceTree = "<group>"; };
+		6390E5120F80FCE5009D7B3B /* MedicineView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MedicineView.xib; sourceTree = "<group>"; };
+		639128560F64EF1700222EAF /* libsqlite3.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.0.dylib; path = usr/lib/libsqlite3.0.dylib; sourceTree = SDKROOT; };
+		639129A10F65064B00222EAF /* UserTextEntryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserTextEntryViewController.h; sourceTree = "<group>"; };
+		639129A20F65064B00222EAF /* UserTextEntryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserTextEntryViewController.m; sourceTree = "<group>"; };
+		639129A50F65066D00222EAF /* TextEntry.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TextEntry.xib; sourceTree = "<group>"; };
+		639EE45D0F68EA10005D6445 /* SelectMedicineSettingsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelectMedicineSettingsController.h; sourceTree = "<group>"; };
+		639EE45E0F68EA10005D6445 /* SelectMedicineSettingsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectMedicineSettingsController.m; sourceTree = "<group>"; };
+		639EE4A40F68EE20005D6445 /* MedicineSettings.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MedicineSettings.xib; sourceTree = "<group>"; };
+		63A4876A0F84F30F00AD9033 /* CalendarTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CalendarTableViewCell.h; sourceTree = "<group>"; };
+		63A4876B0F84F30F00AD9033 /* CalendarTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CalendarTableViewCell.m; sourceTree = "<group>"; };
+		63A487A30F84F85A00AD9033 /* delete_Routines.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = delete_Routines.png; path = Images/delete_Routines.png; sourceTree = "<group>"; };
+		63A487A40F84F85A00AD9033 /* delete_vitals.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = delete_vitals.png; path = Images/delete_vitals.png; sourceTree = "<group>"; };
+		63A487D60F8501DE00AD9033 /* healthtracker.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; name = healthtracker.sqlite; path = Database/healthtracker.sqlite; sourceTree = "<group>"; };
+		63A490800F8DBB7D006ADCCF /* AddFieldTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddFieldTableViewCell.h; sourceTree = "<group>"; };
+		63A490810F8DBB7D006ADCCF /* AddFieldTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddFieldTableViewCell.m; sourceTree = "<group>"; };
+		63A625EF0F82098400F534A4 /* Routine_Detail.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Routine_Detail.h; sourceTree = "<group>"; };
+		63A625F00F82098400F534A4 /* Routine_Detail.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Routine_Detail.m; sourceTree = "<group>"; };
+		63A6A7DC0F8A1E1700B65873 /* HealthTrackerAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HealthTrackerAppDelegate.h; sourceTree = SOURCE_ROOT; };
+		63AB64D40F7896340059DB2C /* SelectButtonViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelectButtonViewController.h; sourceTree = "<group>"; };
+		63AB64D50F7896340059DB2C /* SelectButtonViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectButtonViewController.m; sourceTree = "<group>"; };
+		63AB64F30F789A850059DB2C /* SelectButton.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SelectButton.xib; sourceTree = "<group>"; };
+		63ACC6230F70AECE00A29083 /* EnterPasscodeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EnterPasscodeViewController.h; sourceTree = "<group>"; };
+		63ACC6240F70AECE00A29083 /* EnterPasscodeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EnterPasscodeViewController.m; sourceTree = "<group>"; };
+		63ACC6320F70B17400A29083 /* Passcode.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Passcode.xib; sourceTree = "<group>"; };
+		63B414600F6A8E0E00C1A300 /* IsKidTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IsKidTableViewCell.h; sourceTree = "<group>"; };
+		63B414610F6A8E0E00C1A300 /* IsKidTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IsKidTableViewCell.m; sourceTree = "<group>"; };
+		63B5CD900F8350F4007CB65A /* setting1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = setting1.png; path = Images/setting1.png; sourceTree = "<group>"; };
+		63B5CD910F8350F4007CB65A /* User_Menu.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = User_Menu.jpg; path = Images/User_Menu.jpg; sourceTree = "<group>"; };
+		63B5CE550F8371B8007CB65A /* CalendarReportViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CalendarReportViewController.h; sourceTree = "<group>"; };
+		63B5CE560F8371B8007CB65A /* CalendarReportViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CalendarReportViewController.m; sourceTree = "<group>"; };
+		63B5CE580F8371C6007CB65A /* Calendar.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Calendar.xib; sourceTree = "<group>"; };
+		63B5CF620F8389B7007CB65A /* ShowReportViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShowReportViewController.h; sourceTree = "<group>"; };
+		63B5CF630F8389B7007CB65A /* ShowReportViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShowReportViewController.m; sourceTree = "<group>"; };
+		63B5CF900F838B73007CB65A /* ShowCalendar.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ShowCalendar.xib; sourceTree = "<group>"; };
+		63B5D14A0F839AED007CB65A /* HealthTrackerAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HealthTrackerAppDelegate.m; sourceTree = "<group>"; };
+		63B5D18F0F83A240007CB65A /* routine.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = routine.png; path = Images/routine.png; sourceTree = "<group>"; };
+		63B6BBB90F6FDA8C00B7ADC2 /* PasscodeSettings.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PasscodeSettings.xib; sourceTree = "<group>"; };
+		63B6BBBC0F6FDAB800B7ADC2 /* PasscodeSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PasscodeSettingsViewController.h; sourceTree = "<group>"; };
+		63B6BBBD0F6FDAB800B7ADC2 /* PasscodeSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PasscodeSettingsViewController.m; sourceTree = "<group>"; };
+		63BC728C0F7E04B7000142FE /* AddUserSegmentTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddUserSegmentTableCell.h; sourceTree = "<group>"; };
+		63BC728D0F7E04B7000142FE /* AddUserSegmentTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddUserSegmentTableCell.m; sourceTree = "<group>"; };
+		63BC74A70F7E3203000142FE /* CustomSwitch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomSwitch.h; sourceTree = "<group>"; };
+		63BC74A80F7E3203000142FE /* CustomSwitch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomSwitch.m; sourceTree = "<group>"; };
+		63BF23EC0F6B6CEC00D64FEF /* LadiesDatePickerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LadiesDatePickerController.h; sourceTree = "<group>"; };
+		63BF23ED0F6B6CEC00D64FEF /* LadiesDatePickerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LadiesDatePickerController.m; sourceTree = "<group>"; };
+		63BF241C0F6B6F9F00D64FEF /* DatePick.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DatePick.xib; sourceTree = "<group>"; };
+		63C2EA730F5CF06500652849 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
+		63C2EA740F5CF06500652849 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
+		63C2EA760F5CF07400652849 /* SettingTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingTableViewCell.h; sourceTree = "<group>"; };
+		63C2EA770F5CF07400652849 /* SettingTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingTableViewCell.m; sourceTree = "<group>"; };
+		63C2EA8C0F5CF3A800652849 /* checked.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = checked.png; path = Images/checked.png; sourceTree = "<group>"; };
+		63C2EA8D0F5CF3A800652849 /* unchecked.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = unchecked.png; path = Images/unchecked.png; sourceTree = "<group>"; };
+		63C2EA8E0F5CF3A800652849 /* User.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = User.png; path = Images/User.png; sourceTree = "<group>"; };
+		63C2EB370F5D06CA00652849 /* AddUserButtonTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddUserButtonTableViewCell.h; sourceTree = "<group>"; };
+		63C2EB380F5D06CA00652849 /* AddUserButtonTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddUserButtonTableViewCell.m; sourceTree = "<group>"; };
+		63C2EB630F5D0B8300652849 /* 02.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = 02.jpg; path = Images/02.jpg; sourceTree = "<group>"; };
+		63C2EB640F5D0B8300652849 /* 04.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = 04.jpg; path = Images/04.jpg; sourceTree = "<group>"; };
+		63C2EB7E0F5D0C0000652849 /* AddUserTwoButtonsCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddUserTwoButtonsCell.h; sourceTree = "<group>"; };
+		63C2EB7F0F5D0C0000652849 /* AddUserTwoButtonsCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddUserTwoButtonsCell.m; sourceTree = "<group>"; };
+		63C2EBDA0F5D111400652849 /* DailyStatusTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DailyStatusTableViewCell.h; sourceTree = "<group>"; };
+		63C2EBDB0F5D111400652849 /* DailyStatusTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DailyStatusTableViewCell.m; sourceTree = "<group>"; };
+		63C2EC6F0F5D17D900652849 /* SelectOptionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelectOptionsViewController.h; sourceTree = "<group>"; };
+		63C2EC700F5D17D900652849 /* SelectOptionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectOptionsViewController.m; sourceTree = "<group>"; };
+		63C2EC830F5D1B1100652849 /* SelectOptions.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SelectOptions.xib; sourceTree = "<group>"; };
+		63C2ECEC0F5D25B100652849 /* HourlyStatusViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HourlyStatusViewController.h; sourceTree = "<group>"; };
+		63C2ECED0F5D25B100652849 /* HourlyStatusViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HourlyStatusViewController.m; sourceTree = "<group>"; };
+		63C2ED4C0F5D2B8F00652849 /* HourlyStatus.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = HourlyStatus.xib; sourceTree = "<group>"; };
+		63C2EDDA0F5D395A00652849 /* PastTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PastTableViewCell.h; sourceTree = "<group>"; };
+		63C2EDDB0F5D395A00652849 /* PastTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PastTableViewCell.m; sourceTree = "<group>"; };
+		63C2EE8E0F5D466900652849 /* MedicationEntryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MedicationEntryViewController.h; sourceTree = "<group>"; };
+		63C2EE8F0F5D466900652849 /* MedicationEntryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MedicationEntryViewController.m; sourceTree = "<group>"; };
+		63C2EE950F5D46FD00652849 /* Medicine.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Medicine.xib; sourceTree = "<group>"; };
+		63C8C4320F5C19B900D40558 /* DailyStatusViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DailyStatusViewController.h; sourceTree = "<group>"; };
+		63C8C4330F5C19B900D40558 /* DailyStatusViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DailyStatusViewController.m; sourceTree = "<group>"; };
+		63C8C43C0F5C1ACA00D40558 /* DailyStatus.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = DailyStatus.xib; sourceTree = "<group>"; };
+		63E9AF160F5E66AE009BFDC1 /* ToogleTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ToogleTableViewCell.h; sourceTree = "<group>"; };
+		63E9AF170F5E66AE009BFDC1 /* ToogleTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ToogleTableViewCell.m; sourceTree = "<group>"; };
+		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C89236220F5BA11400837802 /* AddNewUserTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddNewUserTableCell.h; sourceTree = "<group>"; };
+		C89236230F5BA11400837802 /* AddNewUserTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddNewUserTableCell.m; sourceTree = "<group>"; };
+		C89236260F5BA19000837802 /* AddNewUser.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AddNewUser.xib; sourceTree = "<group>"; };
+		C89236280F5BA1B100837802 /* AddNewUserController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddNewUserController.h; sourceTree = "<group>"; };
+		C89236290F5BA1B100837802 /* AddNewUserController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddNewUserController.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1D60588F0D05DD3D006BFB54 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
+				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
+				2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */,
+				639128570F64EF1800222EAF /* libsqlite3.0.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		080E96DDFE201D6D7F000001 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				28C286DF0D94DF7D0034E888 /* RootViewController.h */,
+				28C286E00D94DF7D0034E888 /* RootViewController.m */,
+				63A6A7DC0F8A1E1700B65873 /* HealthTrackerAppDelegate.h */,
+				63B5D14A0F839AED007CB65A /* HealthTrackerAppDelegate.m */,
+				C89236280F5BA1B100837802 /* AddNewUserController.h */,
+				C89236290F5BA1B100837802 /* AddNewUserController.m */,
+				63C8C4320F5C19B900D40558 /* DailyStatusViewController.h */,
+				63C8C4330F5C19B900D40558 /* DailyStatusViewController.m */,
+				639EE45D0F68EA10005D6445 /* SelectMedicineSettingsController.h */,
+				639EE45E0F68EA10005D6445 /* SelectMedicineSettingsController.m */,
+				63C2EA730F5CF06500652849 /* SettingsViewController.h */,
+				63C2EA740F5CF06500652849 /* SettingsViewController.m */,
+				63C2EC6F0F5D17D900652849 /* SelectOptionsViewController.h */,
+				63C2EC700F5D17D900652849 /* SelectOptionsViewController.m */,
+				63C2ECEC0F5D25B100652849 /* HourlyStatusViewController.h */,
+				63C2ECED0F5D25B100652849 /* HourlyStatusViewController.m */,
+				63C2EE8E0F5D466900652849 /* MedicationEntryViewController.h */,
+				63C2EE8F0F5D466900652849 /* MedicationEntryViewController.m */,
+				639129A10F65064B00222EAF /* UserTextEntryViewController.h */,
+				639129A20F65064B00222EAF /* UserTextEntryViewController.m */,
+				638FB59E0F6662F40029D082 /* DailyHourlyTextEntryViewController.h */,
+				638FB59F0F6662F50029D082 /* DailyHourlyTextEntryViewController.m */,
+				63BF23EC0F6B6CEC00D64FEF /* LadiesDatePickerController.h */,
+				63BF23ED0F6B6CEC00D64FEF /* LadiesDatePickerController.m */,
+				63B6BBBC0F6FDAB800B7ADC2 /* PasscodeSettingsViewController.h */,
+				63B6BBBD0F6FDAB800B7ADC2 /* PasscodeSettingsViewController.m */,
+				63ACC6230F70AECE00A29083 /* EnterPasscodeViewController.h */,
+				63ACC6240F70AECE00A29083 /* EnterPasscodeViewController.m */,
+				63AB64D40F7896340059DB2C /* SelectButtonViewController.h */,
+				63AB64D50F7896340059DB2C /* SelectButtonViewController.m */,
+				6390E11A0F80ADC0009D7B3B /* FirstViewController.h */,
+				6390E11B0F80ADC0009D7B3B /* FirstViewController.m */,
+				6390E15A0F80B449009D7B3B /* SelectSettingsViewController.h */,
+				6390E15B0F80B449009D7B3B /* SelectSettingsViewController.m */,
+				6390E1950F80B695009D7B3B /* UserViewController.h */,
+				6390E1960F80B695009D7B3B /* UserViewController.m */,
+				6390E1C50F80C3AB009D7B3B /* UnitsViewController.h */,
+				6390E1C60F80C3AB009D7B3B /* UnitsViewController.m */,
+				6390E49A0F80F42D009D7B3B /* MedicineViewController.h */,
+				6390E49B0F80F42D009D7B3B /* MedicineViewController.m */,
+				63B5CE550F8371B8007CB65A /* CalendarReportViewController.h */,
+				63B5CE560F8371B8007CB65A /* CalendarReportViewController.m */,
+				63B5CF620F8389B7007CB65A /* ShowReportViewController.h */,
+				63B5CF630F8389B7007CB65A /* ShowReportViewController.m */,
+			);
+			path = Classes;
+			sourceTree = "<group>";
+		};
+		19C28FACFE9D520D11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1D6058910D05DD3D006BFB54 /* HealthTracker.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
+			isa = PBXGroup;
+			children = (
+				C8B6BEDB0F5B9C1A00604D8E /* Images */,
+				638FB23F0F6626AF0029D082 /* DataClasses */,
+				C8B6BECF0F5B9B1C00604D8E /* CustomTableCell */,
+				080E96DDFE201D6D7F000001 /* Classes */,
+				29B97315FDCFA39411CA2CEA /* Other Sources */,
+				29B97317FDCFA39411CA2CEA /* Resources */,
+				29B97323FDCFA39411CA2CEA /* Frameworks */,
+				19C28FACFE9D520D11CA2CBB /* Products */,
+				63C8C43C0F5C1ACA00D40558 /* DailyStatus.xib */,
+				63C2EC830F5D1B1100652849 /* SelectOptions.xib */,
+				63C2ED4C0F5D2B8F00652849 /* HourlyStatus.xib */,
+				63C2EE950F5D46FD00652849 /* Medicine.xib */,
+				639129A50F65066D00222EAF /* TextEntry.xib */,
+				638FB7CE0F6689A80029D082 /* DHTextEntry.xib */,
+				639EE4A40F68EE20005D6445 /* MedicineSettings.xib */,
+				63BF241C0F6B6F9F00D64FEF /* DatePick.xib */,
+				63B6BBB90F6FDA8C00B7ADC2 /* PasscodeSettings.xib */,
+				63ACC6320F70B17400A29083 /* Passcode.xib */,
+				63AB64F30F789A850059DB2C /* SelectButton.xib */,
+				6390E1170F80AD90009D7B3B /* First_View.xib */,
+				6390E1660F80B5C0009D7B3B /* First_Settings.xib */,
+				6390E19E0F80B797009D7B3B /* UserSelect.xib */,
+				6390E1D20F80C5D0009D7B3B /* UnitsView.xib */,
+				6390E5120F80FCE5009D7B3B /* MedicineView.xib */,
+				63B5CE580F8371C6007CB65A /* Calendar.xib */,
+				63B5CF900F838B73007CB65A /* ShowCalendar.xib */,
+			);
+			name = CustomTemplate;
+			sourceTree = "<group>";
+		};
+		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
+			isa = PBXGroup;
+			children = (
+				28A0AAE50D9B0CCF005BE974 /* HealthTracker_Prefix.pch */,
+				29B97316FDCFA39411CA2CEA /* main.m */,
+			);
+			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+		29B97317FDCFA39411CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				6390DBE60F90923D00BECA34 /* Settings.xib */,
+				63A487D60F8501DE00AD9033 /* healthtracker.sqlite */,
+				2899E55F0DE3E45000AC0155 /* RootViewController.xib */,
+				28AD735F0D9D9599002E5188 /* MainWindow.xib */,
+				8D1107310486CEB800E47090 /* Info.plist */,
+				C89236260F5BA19000837802 /* AddNewUser.xib */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				639128560F64EF1700222EAF /* libsqlite3.0.dylib */,
+				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,
+				1D30AB110D05D00D00671497 /* Foundation.framework */,
+				2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		638FB23F0F6626AF0029D082 /* DataClasses */ = {
+			isa = PBXGroup;
+			children = (
+				638FB2CA0F662DDD0029D082 /* User_Settings.h */,
+				638FB2CB0F662DDD0029D082 /* User_Settings.m */,
+				638528080F6E63FF001D6B67 /* Menstural_Cycle.h */,
+				638528090F6E63FF001D6B67 /* Menstural_Cycle.m */,
+				6390E2590F80D368009D7B3B /* Vitals_Detail.h */,
+				6390E25A0F80D368009D7B3B /* Vitals_Detail.m */,
+				6390E4AB0F80F5FA009D7B3B /* Medicine.h */,
+				6390E4AC0F80F5FA009D7B3B /* Medicine.m */,
+				63A625EF0F82098400F534A4 /* Routine_Detail.h */,
+				63A625F00F82098400F534A4 /* Routine_Detail.m */,
+			);
+			name = DataClasses;
+			sourceTree = "<group>";
+		};
+		C8B6BECF0F5B9B1C00604D8E /* CustomTableCell */ = {
+			isa = PBXGroup;
+			children = (
+				63A490800F8DBB7D006ADCCF /* AddFieldTableViewCell.h */,
+				63A490810F8DBB7D006ADCCF /* AddFieldTableViewCell.m */,
+				C89236220F5BA11400837802 /* AddNewUserTableCell.h */,
+				C89236230F5BA11400837802 /* AddNewUserTableCell.m */,
+				63C2EA760F5CF07400652849 /* SettingTableViewCell.h */,
+				63C2EA770F5CF07400652849 /* SettingTableViewCell.m */,
+				63C2EB370F5D06CA00652849 /* AddUserButtonTableViewCell.h */,
+				63C2EB380F5D06CA00652849 /* AddUserButtonTableViewCell.m */,
+				63C2EB7E0F5D0C0000652849 /* AddUserTwoButtonsCell.h */,
+				63C2EB7F0F5D0C0000652849 /* AddUserTwoButtonsCell.m */,
+				63C2EBDA0F5D111400652849 /* DailyStatusTableViewCell.h */,
+				63C2EBDB0F5D111400652849 /* DailyStatusTableViewCell.m */,
+				63C2EDDA0F5D395A00652849 /* PastTableViewCell.h */,
+				63C2EDDB0F5D395A00652849 /* PastTableViewCell.m */,
+				63E9AF160F5E66AE009BFDC1 /* ToogleTableViewCell.h */,
+				63E9AF170F5E66AE009BFDC1 /* ToogleTableViewCell.m */,
+				63B414600F6A8E0E00C1A300 /* IsKidTableViewCell.h */,
+				63B414610F6A8E0E00C1A300 /* IsKidTableViewCell.m */,
+				63BC728C0F7E04B7000142FE /* AddUserSegmentTableCell.h */,
+				63BC728D0F7E04B7000142FE /* AddUserSegmentTableCell.m */,
+				63BC74A70F7E3203000142FE /* CustomSwitch.h */,
+				63BC74A80F7E3203000142FE /* CustomSwitch.m */,
+				63A4876A0F84F30F00AD9033 /* CalendarTableViewCell.h */,
+				63A4876B0F84F30F00AD9033 /* CalendarTableViewCell.m */,
+			);
+			name = CustomTableCell;
+			sourceTree = "<group>";
+		};
+		C8B6BEDB0F5B9C1A00604D8E /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				639020B60F85D13100AB82DB /* Favorites_2.png */,
+				639020B70F85D13100AB82DB /* report_2.png */,
+				639020A90F85CE0F00AB82DB /* Medicine.png */,
+				639020990F85CD3400AB82DB /* menu.png */,
+				6390209B0F85CD3400AB82DB /* User_pro.png */,
+				6390209C0F85CD3400AB82DB /* Vitals.png */,
+				63A487A30F84F85A00AD9033 /* delete_Routines.png */,
+				63A487A40F84F85A00AD9033 /* delete_vitals.png */,
+				63B5D18F0F83A240007CB65A /* routine.png */,
+				63B5CD900F8350F4007CB65A /* setting1.png */,
+				63B5CD910F8350F4007CB65A /* User_Menu.jpg */,
+				638525760F6E5325001D6B67 /* logo1.jpg */,
+				631F45C90F5EACFB0057533A /* arrow_left.png */,
+				631F45CA0F5EACFB0057533A /* arrow_right.png */,
+				631F444D0F5EA4340057533A /* check.png */,
+				631F442D0F5EA10C0057533A /* Back1.tiff */,
+				63C2EB630F5D0B8300652849 /* 02.jpg */,
+				63C2EB640F5D0B8300652849 /* 04.jpg */,
+				63C2EA8C0F5CF3A800652849 /* checked.png */,
+				63C2EA8D0F5CF3A800652849 /* unchecked.png */,
+				63C2EA8E0F5CF3A800652849 /* User.png */,
+			);
+			name = Images;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1D6058900D05DD3D006BFB54 /* HealthTracker */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "HealthTracker" */;
+			buildPhases = (
+				1D60588D0D05DD3D006BFB54 /* Resources */,
+				1D60588E0D05DD3D006BFB54 /* Sources */,
+				1D60588F0D05DD3D006BFB54 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HealthTracker;
+			productName = HealthTracker;
+			productReference = 1D6058910D05DD3D006BFB54 /* HealthTracker.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		29B97313FDCFA39411CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "HealthTracker" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+				en,
+			);
+			mainGroup = 29B97314FDCFA39411CA2CEA /* CustomTemplate */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1D6058900D05DD3D006BFB54 /* HealthTracker */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1D60588D0D05DD3D006BFB54 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				28AD73600D9D9599002E5188 /* MainWindow.xib in Resources */,
+				2899E5600DE3E45000AC0155 /* RootViewController.xib in Resources */,
+				C89236270F5BA19000837802 /* AddNewUser.xib in Resources */,
+				63C8C43D0F5C1ACA00D40558 /* DailyStatus.xib in Resources */,
+				63C2EA8F0F5CF3A800652849 /* checked.png in Resources */,
+				63C2EA900F5CF3A800652849 /* unchecked.png in Resources */,
+				63C2EA910F5CF3A800652849 /* User.png in Resources */,
+				63C2EB650F5D0B8300652849 /* 02.jpg in Resources */,
+				63C2EB660F5D0B8300652849 /* 04.jpg in Resources */,
+				63C2EC840F5D1B1100652849 /* SelectOptions.xib in Resources */,
+				63C2ED4D0F5D2B8F00652849 /* HourlyStatus.xib in Resources */,
+				63C2EE960F5D46FD00652849 /* Medicine.xib in Resources */,
+				631F442E0F5EA10C0057533A /* Back1.tiff in Resources */,
+				631F444E0F5EA4340057533A /* check.png in Resources */,
+				631F45CB0F5EACFB0057533A /* arrow_left.png in Resources */,
+				631F45CC0F5EACFB0057533A /* arrow_right.png in Resources */,
+				639129A60F65066D00222EAF /* TextEntry.xib in Resources */,
+				638FB7CF0F6689A80029D082 /* DHTextEntry.xib in Resources */,
+				639EE4A50F68EE20005D6445 /* MedicineSettings.xib in Resources */,
+				63BF241D0F6B6F9F00D64FEF /* DatePick.xib in Resources */,
+				638525770F6E5325001D6B67 /* logo1.jpg in Resources */,
+				63B6BBBA0F6FDA8C00B7ADC2 /* PasscodeSettings.xib in Resources */,
+				63ACC6330F70B17400A29083 /* Passcode.xib in Resources */,
+				63AB64F40F789A850059DB2C /* SelectButton.xib in Resources */,
+				6390E1180F80AD90009D7B3B /* First_View.xib in Resources */,
+				6390E1670F80B5C0009D7B3B /* First_Settings.xib in Resources */,
+				6390E19F0F80B797009D7B3B /* UserSelect.xib in Resources */,
+				6390E1D30F80C5D0009D7B3B /* UnitsView.xib in Resources */,
+				6390E5130F80FCE5009D7B3B /* MedicineView.xib in Resources */,
+				63B5CD920F8350F4007CB65A /* setting1.png in Resources */,
+				63B5CD930F8350F4007CB65A /* User_Menu.jpg in Resources */,
+				63B5CE590F8371C6007CB65A /* Calendar.xib in Resources */,
+				63B5CF910F838B73007CB65A /* ShowCalendar.xib in Resources */,
+				63B5D1900F83A240007CB65A /* routine.png in Resources */,
+				63A487A50F84F85A00AD9033 /* delete_Routines.png in Resources */,
+				63A487A60F84F85A00AD9033 /* delete_vitals.png in Resources */,
+				63A487D70F8501DE00AD9033 /* healthtracker.sqlite in Resources */,
+				6390209E0F85CD3400AB82DB /* menu.png in Resources */,
+				639020A00F85CD3400AB82DB /* User_pro.png in Resources */,
+				639020A10F85CD3400AB82DB /* Vitals.png in Resources */,
+				639020AA0F85CE0F00AB82DB /* Medicine.png in Resources */,
+				639020B80F85D13100AB82DB /* Favorites_2.png in Resources */,
+				639020B90F85D13100AB82DB /* report_2.png in Resources */,
+				C8888D1A0F909F3800B6DFC0 /* Settings.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1D60588E0D05DD3D006BFB54 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
+				28C286E10D94DF7D0034E888 /* RootViewController.m in Sources */,
+				C89236240F5BA11400837802 /* AddNewUserTableCell.m in Sources */,
+				C892362A0F5BA1B100837802 /* AddNewUserController.m in Sources */,
+				63C8C4340F5C19B900D40558 /* DailyStatusViewController.m in Sources */,
+				63C2EA750F5CF06500652849 /* SettingsViewController.m in Sources */,
+				63C2EA780F5CF07400652849 /* SettingTableViewCell.m in Sources */,
+				63C2EB390F5D06CA00652849 /* AddUserButtonTableViewCell.m in Sources */,
+				63C2EB800F5D0C0000652849 /* AddUserTwoButtonsCell.m in Sources */,
+				63C2EBDC0F5D111400652849 /* DailyStatusTableViewCell.m in Sources */,
+				63C2EC710F5D17D900652849 /* SelectOptionsViewController.m in Sources */,
+				63C2ECEE0F5D25B100652849 /* HourlyStatusViewController.m in Sources */,
+				63C2EDDC0F5D395A00652849 /* PastTableViewCell.m in Sources */,
+				63C2EE900F5D466900652849 /* MedicationEntryViewController.m in Sources */,
+				63E9AF180F5E66AE009BFDC1 /* ToogleTableViewCell.m in Sources */,
+				639129A30F65064B00222EAF /* UserTextEntryViewController.m in Sources */,
+				638FB2CC0F662DDD0029D082 /* User_Settings.m in Sources */,
+				638FB5A00F6662F50029D082 /* DailyHourlyTextEntryViewController.m in Sources */,
+				639EE45F0F68EA10005D6445 /* SelectMedicineSettingsController.m in Sources */,
+				63B414620F6A8E0E00C1A300 /* IsKidTableViewCell.m in Sources */,
+				63BF23EE0F6B6CEC00D64FEF /* LadiesDatePickerController.m in Sources */,
+				6385280A0F6E63FF001D6B67 /* Menstural_Cycle.m in Sources */,
+				63B6BBBE0F6FDAB800B7ADC2 /* PasscodeSettingsViewController.m in Sources */,
+				63ACC6250F70AECE00A29083 /* EnterPasscodeViewController.m in Sources */,
+				63AB64D60F7896340059DB2C /* SelectButtonViewController.m in Sources */,
+				63BC728E0F7E04B7000142FE /* AddUserSegmentTableCell.m in Sources */,
+				63BC74A90F7E3203000142FE /* CustomSwitch.m in Sources */,
+				6390E11C0F80ADC0009D7B3B /* FirstViewController.m in Sources */,
+				6390E15C0F80B449009D7B3B /* SelectSettingsViewController.m in Sources */,
+				6390E1970F80B695009D7B3B /* UserViewController.m in Sources */,
+				6390E1C70F80C3AB009D7B3B /* UnitsViewController.m in Sources */,
+				6390E25B0F80D368009D7B3B /* Vitals_Detail.m in Sources */,
+				6390E49C0F80F42D009D7B3B /* MedicineViewController.m in Sources */,
+				6390E4AD0F80F5FA009D7B3B /* Medicine.m in Sources */,
+				63A625F10F82098400F534A4 /* Routine_Detail.m in Sources */,
+				63B5CE570F8371B8007CB65A /* CalendarReportViewController.m in Sources */,
+				63B5CF640F8389B7007CB65A /* ShowReportViewController.m in Sources */,
+				63B5D14B0F839AED007CB65A /* HealthTrackerAppDelegate.m in Sources */,
+				63A4876C0F84F30F00AD9033 /* CalendarTableViewCell.m in Sources */,
+				63A490820F8DBB7D006ADCCF /* AddFieldTableViewCell.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1D6058940D05DD3E006BFB54 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jayanti Katriya";
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = HealthTracker_Prefix.pch;
+				INFOPLIST_FILE = Info.plist;
+				PRODUCT_NAME = HealthTracker;
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "0585AC52-00C0-4183-86B2-399C1ECB06DE";
+			};
+			name = Debug;
+		};
+		1D6058950D05DD3E006BFB54 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Jayanti Katriya";
+				COPY_PHASE_STRIP = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = HealthTracker_Prefix.pch;
+				INFOPLIST_FILE = Info.plist;
+				PRODUCT_NAME = HealthTracker;
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "0585AC52-00C0-4183-86B2-399C1ECB06DE";
+			};
+			name = Release;
+		};
+		C01FCF4F08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				SDKROOT = iphoneos2.2.1;
+			};
+			name = Debug;
+		};
+		C01FCF5008A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = iphoneos2.2.1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "HealthTracker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1D6058940D05DD3E006BFB54 /* Debug */,
+				1D6058950D05DD3E006BFB54 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "HealthTracker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4F08A954540054247B /* Debug */,
+				C01FCF5008A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
+}

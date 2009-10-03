@@ -1,0 +1,74 @@
+//
+//  Vitals_Detail.m
+//  HealthTracker
+//
+//  Created by MAC02 on 3/30/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import "Vitals_Detail.h"
+
+
+@implementation Vitals_Detail
+@synthesize EntryDate,EntryTime,Vitals_ID, User_ID1,BP,BloodSugar,Fasting,Other,TempC,TempF,Pulse,Respiration,WeightKgs,WeightLbs,HeightCms,HeightInch;
+
+-(id)init
+{
+	HeightCms=@"";
+	HeightInch=@"";
+	Vitals_ID=0;
+	User_ID1=0;
+	EntryDate=@"";
+	EntryTime=@"";
+	
+	BP=@"";
+	BloodSugar=@"";
+	Fasting=@"";
+	Other=@"";
+	TempC=@"";
+	TempF=@"";
+	Pulse=@"";
+	Respiration=@"";
+	WeightKgs=@"";
+	WeightLbs=@"";
+	return self;
+}
+
+-(void)ClearData
+{
+	HeightCms=@"";
+	HeightInch=@"";
+	Vitals_ID=0;
+	User_ID1=0;
+	EntryDate=@"";
+	EntryTime=@"";
+	
+	BP=@"";
+	BloodSugar=@"";
+	Fasting=@"";
+	Other=@"";
+	TempC=@"";
+	TempF=@"";
+	Pulse=@"";
+	Respiration=@"";
+	WeightKgs=@"";
+	WeightLbs=@"";
+}
+
+- (void)dealloc {
+	
+	[EntryDate release];
+	[EntryTime release];
+	[BP release];
+	[BloodSugar release];
+	[Fasting release];
+	[Other release];
+	[TempC release];
+	[TempF release];
+	[Pulse release];
+	[Respiration release];
+	[WeightKgs release];
+	[WeightLbs release];
+	[super dealloc];
+}
+@end

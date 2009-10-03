@@ -1,0 +1,24 @@
+//
+//  User_Settings.h
+//  HealthTracker
+//
+//  Created by Bhoomi on 3/10/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+
+@interface User_Settings : NSObject 
+{
+	NSInteger User_Id;
+	NSString *DailyEntryDetail;
+	NSString *HourlyEntryDetail;
+	NSString *MedicineEntryDetail;
+}
+
+@property(nonatomic,readwrite) NSInteger User_Id;
+@property (nonatomic,retain) NSString *DailyEntryDetail;
+@property (nonatomic,retain) NSString *HourlyEntryDetail;
+@property (nonatomic,retain) NSString *MedicineEntryDetail;
+@end

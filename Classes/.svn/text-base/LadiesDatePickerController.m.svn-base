@@ -1,0 +1,232 @@
+//
+//  LadiesDatePickerController.m
+//  HealthTracker
+//  Created by Bhoomi on 3/14/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+// Import All needed header files bellow.
+#import "LadiesDatePickerController.h"
+
+
+@implementation LadiesDatePickerController
+
+// Fields or variables or tools whose property has been declared must be Synthesize here...
+@synthesize Mensturalref;
+
+-(IBAction)dateChanged:(id)sender
+{
+	
+}
+
+
+//An event when user clicks on Save button.
+-(IBAction)Save_Clecked:(id)sender
+{
+	appDelegate.SaveMenstural=TRUE;
+	[self.navigationController popViewControllerAnimated:YES];
+}
+
+// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+- (void)viewDidLoad 
+{
+	self.navigationItem.title=@"Menstrual Cycle";
+	self.navigationItem.rightBarButtonItem=btnSave;
+	txtEndDate.tag=2;
+	txtStartDate.tag=1;
+	appDelegate=[[UIApplication sharedApplication]delegate];
+
+	//DateFormatter=[[NSDateFormatter alloc]init];
+	[appDelegate.DateFormatter setDateFormat:@"MM-dd-yyyy"];
+
+	[DatePicker setDate:[NSDate date] animated:YES];
+	ToolBar.tintColor=[UIColor blackColor];
+	lblData=[[UILabel alloc]init];
+	lblData.frame=CGRectMake(10,15 , 250, 20);
+	lblData.textColor=[UIColor whiteColor];
+	lblData.backgroundColor=[UIColor clearColor];
+	DatePicker.frame=CGRectMake(0, 200, 320, 216);
+	ToolBar.frame=CGRectMake(0, 220, 320, 44);
+	[ToolBar addSubview:lblData];
+	txtEndDate.delegate=self;
+	txtStartDate.delegate=self;
+	txtStartDate.font=[UIFont boldSystemFontOfSize:17];
+	txtEndDate.font=[UIFont boldSystemFontOfSize:17];
+	self.view.backgroundColor=[UIColor groupTableViewBackgroundColor];
+	[DatePicker setDate:[NSDate date] animated:YES];
+	[DatePicker setMaximumDate:[NSDate date]];
+    [super viewDidLoad];
+}
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{	
+	DatePicker.hidden=TRUE;
+	ToolBar.hidden=TRUE;
+}
+- (void)viewWillDisappear:(BOOL)animated
+{
+	if(appDelegate.SaveMenstural==TRUE)
+	{
+		self.Mensturalref.StartDate=StartDate;
+		self.Mensturalref.EndDate=EndDate;
+	}
+}
+
+//An event when user clicks on Done button.
+-(IBAction)btnDone_Clicked:(id)sender
+{
+	[appDelegate.DateFormatter setDateFormat:@"MM-dd-yyyy"];
+	if(SelectedTag==1)
+	{
+		if([EndDate isEqualToString:@""])
+		{
+			StartDate=[[appDelegate.DateFormatter stringFromDate:DatePicker.date]retain];
+			txtStartDate.text=StartDate;
+		}
+		else
+		{
+			NSDate *date=[appDelegate.DateFormatter dateFromString:EndDate];
+			if([DatePicker.date timeIntervalSinceDate:date]>=0)
+			{
+				UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Start date must be \n less than or equal to End date" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+				[alert show];
+				[alert release];
+			}
+			else
+			{
+				StartDate=[[appDelegate.DateFormatter stringFromDate:DatePicker.date]retain];
+				txtStartDate.text=StartDate;
+			}
+		}
+	}
+	else if(SelectedTag==2)
+	{
+		if([StartDate isEqualToString:@""])
+		{
+	
+		}
+		else
+		{
+			NSDate *date=[appDelegate.DateFormatter dateFromString:StartDate];
+			if([DatePicker.date timeIntervalSinceDate:date]<=0)
+			{
+				UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"End date must be \n greater than or equal to Start date" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+				[alert show];
+				[alert release];
+			}
+			else
+			{
+				EndDate=[[appDelegate.DateFormatter stringFromDate:DatePicker.date]retain];
+				txtEndDate.text=EndDate;
+			}
+		}
+	}
+	DatePicker.hidden=TRUE;
+	ToolBar.hidden=TRUE;
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{	
+	txtStartDate.text=self.Mensturalref.StartDate;
+	txtEndDate.text=self.Mensturalref.EndDate;
+	StartDate=self.Mensturalref.StartDate;
+	EndDate=self.Mensturalref.EndDate;
+	ToolBar.hidden=TRUE;
+	DatePicker.hidden=TRUE;
+}
+
+/*
+// Override to allow orientations other than the default portrait orientation.
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+    // Return YES for supported orientations
+    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+*/
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+	if(ToolBar.hidden=FALSE)
+	{
+		return NO;
+	}
+	else
+	{
+		SelectedTag=textField.tag;
+		[appDelegate.DateFormatter setDateFormat:@"MM-dd-yyyy"];
+		if(SelectedTag==2)
+		{
+			if([StartDate length]==0)
+			{
+				DatePicker.hidden=TRUE;
+				ToolBar.hidden=TRUE;
+				UIAlertView *Alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Select the start date first!" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+				[Alert show];
+				[Alert release];
+				return NO;
+			}
+			else
+			{
+				DatePicker.hidden=FALSE;
+				ToolBar.hidden=FALSE;
+				if([EndDate length]==0)
+				{
+					[DatePicker setDate:[NSDate date] animated:YES];
+				}
+				else
+				{
+					[DatePicker setDate:[appDelegate.DateFormatter dateFromString: EndDate]];
+				}
+				lblData.text=@"Select End Date";
+			}
+		}
+		else
+		{
+			DatePicker.hidden=FALSE;
+			ToolBar.hidden=FALSE;
+			if([StartDate length]==0)
+			{
+				[DatePicker setDate:[NSDate date] animated:YES];
+			}
+			else
+			{
+				[DatePicker setDate:[appDelegate.DateFormatter dateFromString:StartDate]];
+			}
+			lblData.text=@"Select Start Date";
+		}
+		return NO;
+	}
+}
+
+- (void)textFieldDidEndEditing:(UITextField *)textField
+{
+	
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+	return YES;
+}
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
+    // Release anything that's not essential, such as cached data
+}
+
+
+- (void)dealloc {
+	
+	[btnSave release];
+	[txtStartDate release];
+	[txtEndDate release];
+	[DatePicker release];
+	
+//	[DateFormatter release];
+	[lblData release];
+	[btnDone release];
+	[ToolBar release];
+	[Mensturalref release];
+	[StartDate release];
+	[EndDate release];
+	
+    [super dealloc];
+}
+
+
+@end

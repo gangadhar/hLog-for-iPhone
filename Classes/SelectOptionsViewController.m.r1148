@@ -1,0 +1,1074 @@
+//
+//  SelectOptionsViewController.m
+//  HealthTracker
+//  Created by Bhoomi on 3/3/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+// Import All needed header files bellow.
+#import "SelectOptionsViewController.h"
+#import "SettingTableViewCell.h"
+#import "User_Settings.h"
+#import "AddUserButtonTableViewCell.h"
+
+@implementation SelectOptionsViewController
+
+// Fields or variables or tools whose property has been declared must be Synthesize here...
+@synthesize NavText,MedicineRef,Routine_Detailref;
+/*
+ // The designated initializer. Override to perform setup that is required before the view is loaded.
+ - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+ if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+ // Custom initialization
+ }
+ return self;
+ }
+ */
+-(NSMutableArray *)FillArray:(int)i
+{
+	NSMutableArray *TypeArray;
+	TypeArray=[[[NSMutableArray alloc]init]autorelease];
+	if(i==2)
+	{
+		[TypeArray addObject:@"Aerobic"];
+		[TypeArray addObject:@"Walking"];
+		[TypeArray addObject:@"Strength"];
+		[TypeArray addObject:@"Yoga/Pilates"];
+	}
+	else if(i==3)
+	{
+		[TypeArray addObject:@"Stressed"];
+		[TypeArray addObject:@"Relaxed"];
+		[TypeArray addObject:@"Happy"];
+		[TypeArray addObject:@"Depressed"];
+	}
+	else if(i==4)
+	{
+		[TypeArray addObject:@"Normal"];
+		[TypeArray addObject:@"Sluggish and Sleepy"];
+		[TypeArray addObject:@"Fussy"];
+		[TypeArray addObject:@"Inconsolable"];
+	}
+	else if(i==5)
+	{
+		[TypeArray addObject:@"None"];
+		[TypeArray addObject:@"Soiled"];
+		[TypeArray addObject:@"Wet"];
+	}
+	
+	else if(i==6)
+	{
+		for(int i=1;i<60;i++)
+		{
+			[TypeArray addObject:[NSString stringWithFormat:@"%d",i]];
+		}
+	}
+	
+	return TypeArray;
+}
+/*
+ // Implement loadView to create a view hierarchy programmatically, without using a nib.
+ - (void)loadView {
+ }
+ */
+-(IBAction)btnMedidcine:(id)sender
+{
+	
+	if(!MedicationEntryView)
+	{
+		MedicationEntryView=[[MedicationEntryViewController alloc]initWithNibName:@"Medicine" bundle:nil];
+	}
+	MedicationEntryView.MED_ID=0;
+	MedicationEntryView.Data1=@"";
+	[self.navigationController pushViewController:MedicationEntryView animated:YES];
+}
+
+// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+- (void)viewDidLoad 
+{
+	tblView.delegate=self;
+	tblView.dataSource=self;
+	selectedImage = [UIImage imageNamed:@"checked.png"];
+	unselectedImage = [UIImage imageNamed:@"unchecked.png"];
+	self.navigationItem.leftBarButtonItem=btnCancle;
+	self.navigationItem.rightBarButtonItem=btnSave;
+	appDelegate=[[UIApplication sharedApplication]delegate];
+	if(!data)
+	{
+		data=[[NSMutableDictionary alloc]init];
+	}
+	for(int i = 1; i <=14; i++)
+	{
+		NSMutableArray *fillPicker=[self FillArray:i];		
+		
+		[data setObject:fillPicker forKey:[NSString stringWithFormat:@"%d",i]];		
+	}
+	toolBar.barStyle=UIBarStyleBlackOpaque;
+	btnEdit.style=UIBarButtonItemStyleBordered;
+	[self.view addSubview:PickerView];
+	[self.view addSubview:DatePicker];
+	PickerView.delegate=self;
+	DatePicker.frame=CGRectMake(0, 200, 320, 216);
+	PickerView.frame=CGRectMake(0, 200, 320, 216);
+	ToolBar.frame=CGRectMake(0, 220, 320, 44);
+	ToolBar.tintColor=[UIColor blackColor];
+	lblData=[[UILabel alloc]init];
+	lblData.frame=CGRectMake(10,12 , 250, 20);
+	lblData.textColor=[UIColor whiteColor];
+	lblData.backgroundColor=[UIColor clearColor];
+	lblData.font=[UIFont systemFontOfSize:16];
+	[ToolBar addSubview:lblData];
+	DatePicker.maximumDate=[NSDate date];
+	UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
+	temporaryBarButtonItem.title = @"Back";
+	self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
+	[temporaryBarButtonItem release];
+	
+    [super viewDidLoad];
+}
+- (void)viewWillAppear:(BOOL)animated
+{
+	[DatePicker setDate:[NSDate date] animated:YES];
+	ToolBar.hidden=TRUE;
+	DatePicker.hidden=TRUE;
+	//self.navigationItem.title=[NSString stringWithFormat:@"Select %@",NavText];// @"Select Exercise";
+	if(appDelegate.isFromChart==TRUE)
+	{
+		[tblView scrollRectToVisible:CGRectMake(0, 0, 320, 50)  animated:YES];
+		appDelegate.isFromChart=FALSE;
+	}
+	PickerView.hidden=TRUE;
+	UILabel *label1 = [[UILabel alloc] initWithFrame:CGRectMake(50, 0, 220, 30)];
+	[label1 setFont:[UIFont boldSystemFontOfSize:15.0]];
+	[label1 setBackgroundColor:[UIColor clearColor]];
+	[label1 setTextAlignment:UITextAlignmentCenter];
+ 	[label1 setTextColor:[UIColor whiteColor]];
+	[label1 setText:[NSString stringWithFormat:@"Select %@",NavText]];
+	self.navigationItem.titleView=label1;
+	[label1 release];
+	//	self.navigationItem.title=@"Change User";
+	NSLog(@"Options 1");
+	selectedArrayData=nil;
+	if(!selectedArrayData)
+		selectedArrayData=[[NSMutableArray alloc ]init];
+	NSLog(@"Options 2");
+	if(appDelegate.DailyTag==20)
+	{
+		NSLog(@"Options 3");
+		[appDelegate SelectUserSettings:appDelegate.SelectedUserID];
+		if([appDelegate.UserSettingsArray count]==1)
+		{
+			User_Settings *Data=[appDelegate.UserSettingsArray objectAtIndex:0];
+			if([Data.MedicineEntryDetail length]>0)
+			{
+				MedicineArray = [[Data.MedicineEntryDetail componentsSeparatedByString:@","]retain]; 
+			}
+			else
+			{
+				if(MedicineArray)
+				{
+					MedicineArray=nil;
+				}
+			}
+		}
+		NSLog(@"Options 4");
+		for(int i=0;i<[MedicineArray count];i++)
+		{
+			[selectedArrayData addObject:[appDelegate SelectMedicine:[[MedicineArray objectAtIndex:i]intValue]]]; 
+		}
+		toolBar.hidden=FALSE;		
+		tblView.frame=CGRectMake(0, 0, 320, 375);
+	}	
+	else
+	{
+		toolBar.hidden=TRUE;
+		tblView.frame=CGRectMake(0, 0, 320, 416);
+		selectedArrayData=[data objectForKey:[NSString stringWithFormat:@"%d",appDelegate.DailyTag]]; 
+	}
+	NSLog(@"Options 5");
+	[self populateSelectedArray];
+}
+-(IBAction)btnSettings_click:(id)sender
+{
+	
+	if(!SelectMedicineSettings)
+	{
+		SelectMedicineSettings=[[SelectMedicineSettingsController alloc]initWithNibName:@"MedicineSettings" bundle:nil];
+	}	
+	
+	if (SettingsCon == nil)
+	{
+		SettingsCon = [[UINavigationController alloc] initWithRootViewController:SelectMedicineSettings];
+	}
+	
+	User_Settings *Data=[appDelegate.UserSettingsArray objectAtIndex:0];
+	appDelegate.ReportField = Data.MedicineEntryDetail; 
+	[self.navigationController presentModalViewController:SettingsCon animated:YES];
+}
+
+//An event when user clicks on Cancel button.
+-(IBAction)Cancle:(id)sender
+{
+	ISEdit=FALSE;
+	btnEdit.style=UIBarButtonItemStyleBordered;
+	btnEdit.title=@"Edit ";
+	[SelectedText resignFirstResponder];
+	FirstValue[0]=0;
+	FirstValue[1]=0;
+	FirstValue[2]=0;
+	FirstValue[3]=0;
+	
+	[self.navigationController popViewControllerAnimated:YES];
+	
+}
+
+//An event when user clicks on Save button.
+-(IBAction)Save:(id)sender
+{
+	NSString *SelectedItems=@"";
+	
+	
+	[SelectedText resignFirstResponder];
+	if(!arr1)
+		arr1=[[NSMutableArray alloc]init];
+	if([arr1 count]>0)
+	{
+		[arr1 removeAllObjects];
+	}
+	if(!arr3)
+		arr3=[[NSMutableArray alloc]init];
+	if([arr3 count]>0)
+	{
+		[arr3 removeAllObjects];
+	}
+	NSString *MedicineData=@"";
+	
+	if(appDelegate.DailyTag==20)
+	{
+		for(int i=0;i<[selectedArrayData count];i++)
+		{
+			if([[selectedArray objectAtIndex:i]intValue]==1)
+			{
+				[arr1 addObject:[MedicineArray objectAtIndex:i]];
+				[arr3 addObject:[selectedArrayData objectAtIndex:i]];
+			}
+			
+		}
+		if([arr1 count]>0)
+		{
+			for(int i=0;i<[arr1 count];i++)
+			{
+				if(i==([arr1 count]-1))
+				{
+					SelectedItems=[SelectedItems stringByAppendingString:[NSString stringWithFormat:@"%@",[arr1 objectAtIndex:i]]];
+					MedicineData=[MedicineData stringByAppendingString:[NSString stringWithFormat:@"- %@",[arr3 objectAtIndex:i]]];
+				}
+				else
+				{
+					SelectedItems=[SelectedItems stringByAppendingString:[NSString stringWithFormat:@"%@, ",[arr1 objectAtIndex:i]]];
+					MedicineData=[MedicineData stringByAppendingString:[NSString stringWithFormat:@"- %@  \n",[arr3 objectAtIndex:i]]];
+				}
+			}
+		}
+	}
+	else
+	{
+		for(int i=0;i<[selectedArrayData count];i++)
+		{
+			if([[selectedArray objectAtIndex:i]intValue]==1)
+			{
+				[arr1 addObject:[selectedArrayData objectAtIndex:i]];
+			}
+			
+		}
+		if(appDelegate.DailyTag==2)
+		{
+			if([arr1 count]>0)
+			{
+				for(int i=0;i<[arr1 count];i++)
+				{
+					int Indes=[selectedArrayData indexOfObject:[arr1 objectAtIndex:i]];
+					if(i==([arr1 count]-1))
+					{
+						SelectedItems=[SelectedItems stringByAppendingString:[NSString stringWithFormat:@"%@ (%d)",[arr1 objectAtIndex:i],FirstValue[Indes]]];
+					}
+					else
+					{
+						SelectedItems=[SelectedItems stringByAppendingString:[NSString stringWithFormat:@"%@ (%d), ",[arr1 objectAtIndex:i],FirstValue[Indes]]];
+					}
+				}
+			}
+			FirstValue[0]=0;
+			FirstValue[1]=0;
+			FirstValue[2]=0;
+			FirstValue[3]=0;
+		}
+		else
+		{
+			if([arr1 count]>0)
+			{
+				for(int i=0;i<[arr1 count];i++)
+				{
+					if(i==([arr1 count]-1))
+					{
+						SelectedItems=[SelectedItems stringByAppendingString:[NSString stringWithFormat:@"%@",[arr1 objectAtIndex:i]]];
+					}
+					else
+					{
+						SelectedItems=[SelectedItems stringByAppendingString:[NSString stringWithFormat:@"%@, ",[arr1 objectAtIndex:i]]];
+					}
+				}
+			}
+			
+		}
+	}
+	if(appDelegate.DailyTag==2)
+	{
+		self.Routine_Detailref.Exercise=SelectedItems;
+	}
+	else if(appDelegate.DailyTag==3)
+	{
+		self.Routine_Detailref.Mood=SelectedItems;
+	}
+	else if(appDelegate.DailyTag==4)
+	{
+		self.Routine_Detailref.Activity=SelectedItems;
+	}
+	else if(appDelegate.DailyTag==5)
+	{
+		self.Routine_Detailref.Diapering=SelectedItems;
+	}
+	
+	else if(appDelegate.DailyTag==20)
+	{
+		self.MedicineRef.MedicineEntry=MedicineData;
+		self.MedicineRef.Medicine_Insert_ID=SelectedItems;
+		int result;
+		if(self.MedicineRef.MedicineID==0)
+		{
+			result= [appDelegate InsertMedicinedata:self.MedicineRef]; 
+		}
+		else
+		{
+			result=	[appDelegate UpdateData:self.MedicineRef]; 
+		}
+		if(result>0)
+		{
+			
+		}
+		appDelegate.isDailyReport=TRUE;
+	}
+	ISEdit=FALSE;
+	btnEdit.style=UIBarButtonItemStyleBordered;
+	btnEdit.title=@"Edit ";
+	[self.navigationController popViewControllerAnimated:YES];
+}
+- (void)populateSelectedArray
+{
+	NSLog(@"Options 6");
+	if([appDelegate.SelectedStatus isEqualToString:@"Hourly"])
+	{
+		if(appDelegate.DailyTag==2)
+		{
+			appDelegate.SelectedItems=self.Routine_Detailref.Exercise; 
+		}
+		else if(appDelegate.DailyTag==3)
+		{
+			appDelegate.SelectedItems=self.Routine_Detailref.Mood; 
+		}
+		else if(appDelegate.DailyTag==4)
+		{
+			appDelegate.SelectedItems=self.Routine_Detailref.Activity; 
+		}
+		else if(appDelegate.DailyTag==5)
+		{
+			appDelegate.SelectedItems=self.Routine_Detailref.Diapering; 
+		}
+	}
+	
+	//	selectedArray=nil;
+	NSLog(@"Options 7");
+	if(!selectedArray)
+		selectedArray=[[NSMutableArray alloc ]init];
+	else
+		[selectedArray removeAllObjects];
+	if(appDelegate.DailyTag==20)
+	{
+		NSLog(@"Options 8");
+		NSLog(@"%d",[selectedArrayData count]);
+		NSLog(@"%d",[MedicineArray count]);
+		if([appDelegate.SelectedItems isEqualToString:@""])
+		{
+			NSLog(@"Options 10");
+			for (int i=0; i < [selectedArrayData count]; i++)
+				[selectedArray addObject:[NSNumber numberWithBool:NO]];
+		}
+		else
+		{
+			NSLog(@"Options 9");
+			NSArray *arr2=[appDelegate.SelectedItems componentsSeparatedByString:@", "];
+			for(int i=0;i<[MedicineArray count];i++)
+			{
+				BOOL result = [arr2 containsObject:[MedicineArray objectAtIndex:i]]; 
+				if(result==TRUE)
+				{
+					[selectedArray addObject:[NSNumber numberWithBool:YES]];
+				}
+				else
+				{
+					[selectedArray addObject:[NSNumber numberWithBool:NO]];
+				}
+			}
+			NSLog(@"Options 11");
+		}
+	}
+	else if(appDelegate.DailyTag==2)
+	{
+		NSLog(@"Options 12");
+		if([appDelegate.SelectedItems isEqualToString:@""])
+		{
+			for (int i=0; i < [selectedArrayData count]; i++)
+				[selectedArray addObject:[NSNumber numberWithBool:NO]];
+		}
+		else
+		{
+			NSLog(@"Options 13");
+			NSArray *arr2=[appDelegate.SelectedItems componentsSeparatedByString:@", "];
+			NSString *SelectedItems=@"";
+			for(int i=0;i<[arr2 count];i++)
+			{
+				NSArray *arr4=[[arr2 objectAtIndex:i] componentsSeparatedByString:@" ("];
+				int INdex=[selectedArrayData indexOfObject:[arr4 objectAtIndex:0]];
+				NSString *Value=[arr4 objectAtIndex:1];
+				Value=[Value stringByReplacingOccurrencesOfString:@")"  withString:@""];
+				FirstValue[INdex]=[Value intValue];
+				if(i==([arr2 count]-1))
+				{
+					SelectedItems=[SelectedItems stringByAppendingString:[NSString stringWithFormat:@"%@",[arr4 objectAtIndex:0]]];
+				}
+				else
+				{
+					SelectedItems=[SelectedItems stringByAppendingString:[NSString stringWithFormat:@"%@, ",[arr4 objectAtIndex:0]]];
+				}
+			}
+			arr2=[SelectedItems componentsSeparatedByString:@", "];
+			for(int i=0;i<[selectedArrayData count];i++)
+			{
+				BOOL result = [arr2 containsObject:[selectedArrayData objectAtIndex:i]]; 
+				if(result==TRUE)
+				{
+					[selectedArray addObject:[NSNumber numberWithBool:YES]];
+				}
+				else
+				{
+					[selectedArray addObject:[NSNumber numberWithBool:NO]];
+				}
+			}
+		}
+	}
+	else
+	{
+		NSLog(@"Options 14");
+		if([appDelegate.SelectedItems isEqualToString:@""])
+		{
+			for (int i=0; i < [selectedArrayData count]; i++)
+				[selectedArray addObject:[NSNumber numberWithBool:NO]];
+		}
+		else
+		{
+			NSArray *arr2=[appDelegate.SelectedItems componentsSeparatedByString:@", "];
+			for(int i=0;i<[selectedArrayData count];i++)
+			{
+				BOOL result = [arr2 containsObject:[selectedArrayData objectAtIndex:i]]; 
+				if(result==TRUE)
+				{
+					[selectedArray addObject:[NSNumber numberWithBool:YES]];
+				}
+				else
+				{
+					[selectedArray addObject:[NSNumber numberWithBool:NO]];
+				}
+			}
+			NSLog(@"Options 15");
+		}		
+	}
+	NSLog(@"Options 16");
+	[tblView reloadData];
+}
+/*
+ // Override to allow orientations other than the default portrait orientation.
+ - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+ // Return YES for supported orientations
+ return (interfaceOrientation == UIInterfaceOrientationPortrait);
+ }
+ */
+
+-(CGFloat)findHeightForCell:(NSString *)text
+{
+	CGFloat		result = 40.0f;
+	CGFloat		width = 0;
+	
+	
+	width = 225;
+	// fudge factor
+	if (text)
+	{
+		CGSize		textSize = { width, 20000.0f };		// width and height of text area
+		CGSize		size = [text sizeWithFont:[UIFont boldSystemFontOfSize:14.0f] constrainedToSize:textSize lineBreakMode:UILineBreakModeCharacterWrap];
+		
+		size.height += 25.0f;			// top and bottom margin
+		result = MAX(size.height, 40.0f);	// at least one row		
+	}
+	else
+	{
+		return 40;
+	}
+	return result;	
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{		
+	if(appDelegate.DailyTag==20 && indexPath.section==1)
+		return [self  findHeightForCell:[selectedArrayData objectAtIndex:indexPath.row]]+5;
+	else
+		return 40;	
+}
+
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+	if(appDelegate.DailyTag==20)
+		return 2;
+	else
+		return 1;
+}
+
+// Customize the number of rows in the table view.
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+	
+	if(appDelegate.DailyTag==20 && section==0)
+		
+	{
+		
+		return 1;
+	}
+	else if(appDelegate.DailyTag==4 || appDelegate.DailyTag==3)
+	{
+		return [selectedArrayData count]+1;
+	}
+	else
+	{
+		NSLog(@"Options 16");
+		NSLog(@"%d",[selectedArrayData count]);
+		return [selectedArrayData count];
+	}
+}
+-(IBAction)ClickButton:(id)sender
+{
+	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];	
+	DatePicker.hidden=FALSE;
+	ToolBar.hidden=FALSE;
+	[appDelegate.DateFormatter setDateFormat:@"MM-dd-yyyy HH:mm"];
+	SelectedTag=0; 
+	if([self.MedicineRef.EntryDate length]==0)
+	{
+		[DatePicker setDate:[NSDate date] animated:YES];
+	}
+	else
+	{
+		[DatePicker setDate:[appDelegate.DateFormatter dateFromString: [NSString stringWithFormat:@"%@ %@",self.MedicineRef.EntryDate,self.MedicineRef.EntryTime]]];
+	}
+	
+	[Pool release];
+}
+
+// Customize the appearance of table view cells.
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+	
+    static NSString *CellIdentifier = @"Cell1";	
+	
+	if(appDelegate.DailyTag==20 && indexPath.section==0)
+	{
+		static NSString *CellIdentifier1 = @"Cell";
+		AddUserButtonTableViewCell  *cell1 = (AddUserButtonTableViewCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier1];
+		if (cell1 == nil) {
+			cell1 = [[[AddUserButtonTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier1] autorelease];
+		}
+		[cell1.BtnSelect addTarget:self action:@selector(ClickButton:) forControlEvents:UIControlEventTouchUpInside];
+		cell1.lblName.frame =  CGRectMake(2, 5, 140, 30);
+		cell1.BtnSelect.frame =  CGRectMake(150, 5, 140, 30 );
+		cell1.lblName.text=@"Date & Time";
+		[cell1.BtnSelect setTitle:[NSString stringWithFormat:@"  %@ %@",self.MedicineRef.EntryDate,self.MedicineRef.EntryTime] forState:UIControlStateNormal];
+		return cell1;
+	}
+	
+	else 	
+	{
+		SettingTableViewCell  *cell =(SettingTableViewCell *) [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+		if (cell == nil) 
+		{
+			cell = [[[SettingTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier] autorelease];
+		}	
+		cell.txtAmount.hidden=TRUE;
+		cell.txtAmount.delegate=self;
+		if(appDelegate.DailyTag==4 || appDelegate.DailyTag==3)
+		{
+			if(indexPath.row==[selectedArrayData count])
+			{
+				cell.lblName.text=@"Other";
+				cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
+				cell.btnDelete.hidden=TRUE;
+			}
+			else
+			{
+				cell.accessoryType=UITableViewCellAccessoryNone;
+				cell.btnDelete.hidden=FALSE;
+				NSNumber *selected = [selectedArray objectAtIndex:[indexPath row]];
+				cell.btnDelete.image = ([selected boolValue]) ? selectedImage : unselectedImage;
+				cell.lblName.text=[selectedArrayData objectAtIndex:indexPath.row]; 
+			}
+		}
+		else
+		{
+			NSLog(@"Options 17");
+			cell.accessoryType=UITableViewCellAccessoryNone;
+			cell.btnDelete.hidden=FALSE;
+			if(ISEdit==TRUE)
+			{
+				cell.btnDelete.hidden=TRUE;
+				cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
+			}
+			NSNumber *selected = [selectedArray objectAtIndex:[indexPath row]];
+			cell.btnDelete.image = ([selected boolValue]) ? selectedImage : unselectedImage;
+			cell.lblName.text=[selectedArrayData objectAtIndex:indexPath.row]; 
+			NSLog(@"Options 18");
+			if(appDelegate.DailyTag==2)
+			{
+				//cell.txtAmount.enabled=FALSE;
+				cell.txtAmount.delegate=self;
+				cell.txtAmount.tag=indexPath.row+1;
+				if(indexPath.row<4)
+				{
+					if(FirstValue[indexPath.row]==0)
+					{
+						cell.txtAmount.text=@"";
+					}
+					else
+						cell.txtAmount.text=[NSString stringWithFormat:@"%d",FirstValue[indexPath.row]];
+				}
+				else
+					cell.txtAmount.text=@"";
+				
+				if( ([selected boolValue])==TRUE)
+				{
+					cell.txtAmount.hidden=FALSE;
+				}
+				else
+				{
+					cell.txtAmount.hidden=TRUE;
+				}
+				NSLog(@"Options 20");
+				
+			}
+			else
+			{
+				cell.txtAmount.hidden=TRUE;
+			}
+		}
+		NSLog(@"Options 19");
+		
+		return cell;
+	}
+	return nil;
+}
+
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath 
+{
+	[tableView deselectRowAtIndexPath:indexPath animated:YES];
+	[SelectedText resignFirstResponder];
+	if(ISEdit==TRUE)
+	{
+		if(!MedicationEntryView)
+		{
+			MedicationEntryView=[[MedicationEntryViewController alloc]initWithNibName:@"Medicine" bundle:nil];
+		}
+		MedicationEntryView.MED_ID=[[MedicineArray objectAtIndex:indexPath.row]intValue];
+		MedicationEntryView.Data1=[selectedArrayData objectAtIndex:indexPath.row];
+		[self.navigationController pushViewController:MedicationEntryView animated:YES];
+	}
+	else
+	{
+		if(appDelegate.DailyTag==4 || appDelegate.DailyTag==3)
+		{
+			if(indexPath.row==[selectedArrayData count])
+			{
+				
+				appDelegate.iSfromAddUser=TRUE; 
+				if(!appDelegate.objDailyHourlyTextEntryViewController)
+				{
+					appDelegate.objDailyHourlyTextEntryViewController=[[DailyHourlyTextEntryViewController alloc]initWithNibName:@"DHTextEntry" bundle:nil];
+				}
+				appDelegate.objDailyHourlyTextEntryViewController.Routine_Detailref=self.Routine_Detailref;
+				
+				appDelegate.SelectedStatus=@"Hourly";
+				if(appDelegate.DailyTag==4)
+				{
+					appDelegate.objDailyHourlyTextEntryViewController.selectedIndex=26;
+					appDelegate.objDailyHourlyTextEntryViewController.selectedName=@"Enter Activity";
+					BOOL Check=[[data objectForKey:[NSString stringWithFormat:@"%d",appDelegate.DailyTag]] containsObject:appDelegate.SelectedItems];
+					if(Check==TRUE)
+					{
+						appDelegate.objDailyHourlyTextEntryViewController.TextData=@"";
+					}
+					else
+						appDelegate.objDailyHourlyTextEntryViewController.TextData=appDelegate.SelectedItems;
+				}
+				else
+				{
+					appDelegate.objDailyHourlyTextEntryViewController.selectedIndex=27;
+					appDelegate.objDailyHourlyTextEntryViewController.selectedName=@"Enter Mood";
+					BOOL Check=[[data objectForKey:[NSString stringWithFormat:@"%d",appDelegate.DailyTag]] containsObject:appDelegate.SelectedItems];
+					if(Check==TRUE)
+					{
+						appDelegate.objDailyHourlyTextEntryViewController.TextData=@"";
+					}
+					else
+						appDelegate.objDailyHourlyTextEntryViewController.TextData=appDelegate.SelectedItems;
+				}
+				
+				[self.navigationController pushViewController:appDelegate.objDailyHourlyTextEntryViewController animated:YES];
+			}
+			else
+			{
+				BOOL selected = [[selectedArray objectAtIndex:[indexPath row]] boolValue];
+				[selectedArray replaceObjectAtIndex:[indexPath row] withObject:[NSNumber numberWithBool:!selected]];
+				for(int i=0;i<[selectedArray count];i++)
+				{
+					if(i!=indexPath.row)
+					{
+						[selectedArray replaceObjectAtIndex:i withObject:[NSString stringWithFormat:@"%d",0]];
+					}
+				}
+				
+				[tableView reloadData];
+			}
+		}
+		
+		else
+		{
+			if(appDelegate.DailyTag==3 || appDelegate.DailyTag==5)
+			{
+				BOOL selected = [[selectedArray objectAtIndex:[indexPath row]] boolValue];
+				[selectedArray replaceObjectAtIndex:[indexPath row] withObject:[NSNumber numberWithBool:!selected]];
+				for(int i=0;i<[selectedArray count];i++)
+				{
+					if(i!=indexPath.row)
+					{
+						[selectedArray replaceObjectAtIndex:i withObject:[NSString stringWithFormat:@"%d",0]];
+					}
+				}
+				[tableView reloadData];
+			}
+			else if(appDelegate.DailyTag==2)
+			{
+				if(PickerView.hidden==TRUE)
+				{
+					tableView.userInteractionEnabled=FALSE;
+					BOOL selected = [[selectedArray objectAtIndex:[indexPath row]] boolValue];
+					[selectedArray replaceObjectAtIndex:[indexPath row] withObject:[NSNumber numberWithBool:!selected]];
+					[tableView reloadData];
+					PickerView.hidden=FALSE;
+					SelectedTag=indexPath.row+1; 
+					ToolBar.hidden=FALSE;
+					lblData.text=@"Select Exercise Duration in (Mins)";
+					[PickerView reloadAllComponents];
+					int row;
+					if(indexPath.row==0)
+					{
+						row=[self GetPickerRow:[NSString stringWithFormat:@"%d",FirstValue[0]] component:6];
+					}
+					else if(indexPath.row==1)
+					{
+						row=[self GetPickerRow:[NSString stringWithFormat:@"%d",FirstValue[1]] component:6];
+					}
+					else if(indexPath.row==2)
+					{
+						row=[self GetPickerRow:[NSString stringWithFormat:@"%d",FirstValue[2]] component:6];
+					}
+					else
+					{
+						row=[self GetPickerRow:[NSString stringWithFormat:@"%d",FirstValue[3]] component:6];
+					}
+					[PickerView selectRow:row inComponent:0 animated:NO];
+				}
+				
+			}
+			else
+			{
+				BOOL selected = [[selectedArray objectAtIndex:[indexPath row]] boolValue];
+				[selectedArray replaceObjectAtIndex:[indexPath row] withObject:[NSNumber numberWithBool:!selected]];
+				[tableView reloadData];
+			}
+		}
+	}
+}
+
+
+-(int)GetPickerRow:(NSString *)String component:(NSInteger)Tag
+{
+	NSString *str2;
+	
+	str2=String;
+	NSMutableArray *abc=[data objectForKey:[NSString stringWithFormat:@"%d",Tag]];
+	int Row=0;
+	for(Row=0; Row<[abc count];Row++)
+	{
+		NSString *str1=[abc objectAtIndex:Row];
+		
+		if([str1 isEqualToString:str2])
+		{
+			
+			return Row;
+		}
+	}
+	return 0;
+}
+
+-(IBAction)btnEdit_Click:(id)sender
+{
+	if(ISEdit==TRUE)
+	{
+		ISEdit=FALSE;
+		btnEdit.style=UIBarButtonItemStyleBordered;
+		btnEdit.title=@"Edit ";
+	}
+	else
+	{
+		btnEdit.style=UIBarButtonItemStyleDone;
+		btnEdit.title=@"Done";
+		ISEdit=TRUE;
+	}
+	[tblView reloadData];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
+    // Release anything that's not essential, such as cached data
+}
+
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+	//	[SelectedText resignFirstResponder];
+	SelectedTag=textField.tag;
+	SelectedText=textField;
+	PickerView.hidden=FALSE;
+	ToolBar.hidden=FALSE;
+	lblData.text=@"Select Exercise Duration in (Mins)";
+	[PickerView reloadAllComponents];
+	int row;
+	if(SelectedTag==1)
+	{
+		row=[self GetPickerRow:[NSString stringWithFormat:@"%d",FirstValue[0]] component:6];
+	}
+	else if(SelectedTag==2)
+	{
+		row=[self GetPickerRow:[NSString stringWithFormat:@"%d",FirstValue[1]] component:6];
+	}
+	else if(SelectedTag==3)
+	{
+		row=[self GetPickerRow:[NSString stringWithFormat:@"%d",FirstValue[2]] component:6];
+	}
+	else
+	{
+		row=[self GetPickerRow:[NSString stringWithFormat:@"%d",FirstValue[3]] component:6];
+	}
+	[PickerView selectRow:row inComponent:0 animated:NO];
+	return NO;
+}
+
+-(BOOL)keyboardInput:(id)k shouldInsertText:(id)i isMarkedText:(int)b 
+{
+	
+	int len=[SelectedText.text length];
+	
+	if(len<2)
+	{	
+		return YES;
+	}
+	else
+	{
+		return NO;
+	}
+	
+	return NO;
+	
+}
+
+- (void)textFieldDidEndEditing:(UITextField *)textField
+{
+	if(SelectedTag==0)
+	{
+		FirstValue[0]=[textField.text intValue];
+	}
+	else if(SelectedTag==1)
+	{
+		FirstValue[1]=[textField.text intValue];
+	}
+	else if(SelectedTag==2)
+	{
+		FirstValue[2]=[textField.text intValue];
+	}
+	else
+	{
+		FirstValue[3]=[textField.text intValue];
+	}
+}
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{
+	[SelectedText resignFirstResponder];
+}
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+	[SelectedText resignFirstResponder];
+	SelectedTag=textField.tag;
+	SelectedText=textField;
+	return YES;
+}
+-(IBAction)btnDone_Clicked:(id)sender
+{
+	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	tblView.userInteractionEnabled=TRUE;
+	ToolBar.hidden=TRUE;
+	PickerView.hidden=TRUE;
+	DatePicker.hidden=TRUE;
+	if(SelectedTag==0)
+	{
+		DatePicker.hidden=TRUE;
+		ToolBar.hidden=TRUE;
+		
+		[appDelegate.DateFormatter setDateFormat:@"MM-dd-yyyy HH:mm"];
+		NSString *Date=[appDelegate.DateFormatter stringFromDate: DatePicker.date];
+		
+		array=[Date componentsSeparatedByString:@" "];
+		
+		NSString *DateTime=[array objectAtIndex:1];
+		Date=[array objectAtIndex:0];
+		if(!([Date isEqualToString:self.MedicineRef.EntryDate] && [DateTime isEqualToString:self.MedicineRef.EntryTime]))
+			
+		{
+			appDelegate.DailyTag=20;
+			[appDelegate Medicinedata:Date  ToTime:DateTime anduserid:appDelegate.SelectedUserID]; 
+			if([appDelegate.EntryArray count]>0)
+			{
+				self.MedicineRef =[appDelegate.EntryArray objectAtIndex:0];
+				appDelegate.SelectedItems=self.MedicineRef.Medicine_Insert_ID;  
+			}
+			else
+			{
+				if(!self.MedicineRef)
+				{
+					self.MedicineRef=[[Medicine alloc]init];
+					
+				}
+				else
+				{
+					[self.MedicineRef ClearData];				
+				}
+				
+				self.MedicineRef.EntryDate= Date;
+				self.MedicineRef.EntryTime=DateTime;
+				self.MedicineRef.UserID=appDelegate.SelectedUserID;
+				appDelegate.SelectedItems=@"";
+			}
+			[self populateSelectedArray];
+			[tblView reloadData];
+		}
+	}
+	else if(SelectedTag==1)
+	{
+		PickerView.hidden=TRUE;
+		ToolBar.hidden=TRUE;
+		NSString *strRestaurantTypeSecond=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",6]] objectAtIndex:[PickerView selectedRowInComponent:0]];
+		FirstValue[0]=[strRestaurantTypeSecond intValue]; 
+		[tblView reloadData];
+	}
+	else if(SelectedTag==2)
+	{
+		PickerView.hidden=TRUE;
+		ToolBar.hidden=TRUE;
+		NSString *strRestaurantTypeSecond=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",6]] objectAtIndex:[PickerView selectedRowInComponent:0]];
+		FirstValue[1]=[strRestaurantTypeSecond intValue]; 
+		[tblView reloadData];
+		
+	}
+	else if(SelectedTag==3)
+	{
+		PickerView.hidden=TRUE;
+		ToolBar.hidden=TRUE;
+		NSString *strRestaurantTypeSecond=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",6]] objectAtIndex:[PickerView selectedRowInComponent:0]];
+		FirstValue[2]=[strRestaurantTypeSecond intValue]; 
+		[tblView reloadData];
+		
+	}
+	else if(SelectedTag==4)
+	{
+		PickerView.hidden=TRUE;
+		ToolBar.hidden=TRUE;
+		NSString *strRestaurantTypeSecond=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",6]] objectAtIndex:[PickerView selectedRowInComponent:0]];
+		FirstValue[3]=[strRestaurantTypeSecond intValue]; 
+		[tblView reloadData];
+		
+	}
+	
+	[Pool release];	
+}
+
+#pragma mark pickerView
+
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pV
+{	
+	return 1;
+}
+
+- (NSInteger)pickerView:(UIPickerView *)pV numberOfRowsInComponent:(NSInteger)component
+{	
+	//NSMutableArray *abc1=[data objectForKey:[NSString stringWithFormat:@"%d",1]] ;
+	return [[data objectForKey:[NSString stringWithFormat:@"%d",6]]  count];
+}
+
+- (NSString *)pickerView:(UIPickerView *)pV titleForRow:(NSInteger)row forComponent:(NSInteger)component
+{
+	NSString *strRestaurantType1=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",6]] objectAtIndex:row];
+	return [NSString stringWithFormat:@"%@ Minutes",strRestaurantType1];
+}
+
+- (void)dealloc {
+	
+	[tblView release];
+	[data release];
+	[selectedArray release];
+	[selectedArrayData release];
+	[selectedImage release];
+	[unselectedImage release];
+	[btnSave release];
+	[btnCancle release];
+	[appDelegate release];
+	[toolBar release];
+	[MedicationEntryView release];
+	
+	[arr1 release];
+	[NavText release];
+	[MedicineArray release];
+	[btnSettings release];
+	[SelectMedicineSettings release];
+	[SettingsCon release];
+	[MedicineRef release];
+	[Routine_Detailref release];
+	
+    [super dealloc];
+}
+
+
+@end

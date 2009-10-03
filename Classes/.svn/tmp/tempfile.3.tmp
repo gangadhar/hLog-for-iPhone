@@ -1,0 +1,2169 @@
+//
+//  HealthTrackerAppDelegate.m
+//  HealthTracker
+//
+//  Created by Bhoomi on 28/02/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+// Import All needed header files bellow.
+#import "HealthTrackerAppDelegate.h"
+#import "RootViewController.h"
+
+
+
+// implementation of Interface here in '.m' file.
+@implementation HealthTrackerAppDelegate
+
+
+// Fields or variables or tools whose property has been declared must be Synthesize here...
+@synthesize window,iSfromUsers,ReportArray,iSFirstTime;
+@synthesize navigationController,DailyTag,SelectedStatus,iSfromAddUser,VitalsMasterArray,ISfromSettings;
+@synthesize AddNewUserDict,UserSettingsArray,UserArray,EntryArray,SelectedUserID,SelectedItems,HourlyDataArray,MedicineArray,isFromChart;
+@synthesize IsKidOrNot,MensturalArray,SaveMenstural,PassCodeOnOff,WeekArray,DailyArray,isfromRoot,DailyReportArray,isDailyReport,SelectColumnName,HourlyReportArray,SelectColumnName1;
+
+@synthesize ReportStartDate,ReportEndDate,ReportField,UserName,SelectedLocation,DateFormatter,SelectedReportField,ISfromDefaultUser;
+
+@synthesize objDailyStatusViewController,objHourlyStatusViewController;
+@synthesize objSettingsViewController;
+@synthesize objSelectOptionsViewController;
+@synthesize objMedicineViewController;
+
+@synthesize objDailyHourlyTextEntryViewController;
+@synthesize objRootViewController;
+@synthesize objFirstViewController,isFromReport,isFromEditReport;
+
+- (void)applicationDidFinishLaunching:(UIApplication *)application {
+	
+	// Configure and show the window
+	iSFirstTime=TRUE;
+	DateFormatter=[[NSDateFormatter alloc]init];
+	[self createEditableCopyOfDatabaseIfNeeded];
+//	ISForChangePassword=TRUE;
+	if([[NSUserDefaults standardUserDefaults] valueForKey:@"Passcode"]==nil)
+	{
+		[[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@"%d",0] forKey:@"Passcode"];
+		[[NSUserDefaults standardUserDefaults] synchronize];
+		//PassCodeOnOff=1;
+	}
+	if([[NSUserDefaults standardUserDefaults] valueForKey:@"Weight"]==nil)
+	{
+		[[NSUserDefaults standardUserDefaults] setObject:@"LBs" forKey:@"Weight"];
+		[[NSUserDefaults standardUserDefaults] synchronize];
+		//PassCodeOnOff=1;
+	}
+	if([[NSUserDefaults standardUserDefaults] valueForKey:@"Temperature"]==nil)
+	{
+		[[NSUserDefaults standardUserDefaults] setObject:@"F" forKey:@"Temperature"];
+		[[NSUserDefaults standardUserDefaults] synchronize];
+		//PassCodeOnOff=1;
+	}
+	if([[NSUserDefaults standardUserDefaults] valueForKey:@"Height"]==nil)
+	{
+		[[NSUserDefaults standardUserDefaults] setObject:@"Inches" forKey:@"Height"];
+		[[NSUserDefaults standardUserDefaults] synchronize];
+		//PassCodeOnOff=1;
+	}
+	PassCodeOnOff=[[[NSUserDefaults standardUserDefaults] valueForKey:@"Passcode"]intValue];
+	SelectColumnName=@"";
+	if(PassCodeOnOff==1)
+	{
+		[self termCondition];
+	}
+	else
+	{
+		[window addSubview:[navigationController view]];
+		[window makeKeyAndVisible];
+	}
+//	[self selectMenstural:1  passDate:@""];
+	
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+	//Please Enter a passcode!
+	if(alertView.tag==2)
+	{
+		if(buttonIndex == 0)
+		{		
+			if([tf.text length]==0)
+			{
+				UIAlertView *alert3=[[UIAlertView alloc]initWithTitle:@"" message:@"Please Enter a passcode!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+				alert3.tag=3;
+				[alert3 show];
+				[alert3 release];
+			}
+		 	else if([tf.text length]==4)
+			{
+				NSString *Passcode=[[NSUserDefaults standardUserDefaults] valueForKey:@"PasscodeNo"];
+				if([Passcode isEqualToString:tf.text])
+				{
+
+					[window addSubview:[navigationController view]];
+					[window makeKeyAndVisible];
+				}
+				else
+				{
+					UIAlertView *alert3=[[UIAlertView alloc]initWithTitle:@"" message:@"Please Enter a correct passcode!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+					alert3.tag=3;
+					[alert3 show];
+					[alert3 release];
+					//tf.text=@"";
+					//[self termCondition]; 
+				}
+			}
+			else
+			{
+				UIAlertView *alert3=[[UIAlertView alloc]initWithTitle:@"" message:@"Passcode must contain four characters!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+				alert3.tag=3;
+				[alert3 show];
+				[alert3 release];
+			}
+			
+		}
+		else {
+			exit(-1);
+			
+		}
+	}
+	if(alertView.tag==3)
+	{
+		tf.text=@"";
+		[self termCondition]; 
+	}
+}
+
+-(BOOL)keyboardInput:(id)k shouldInsertText:(id)i isMarkedText:(int)b 
+{
+	char s=[i characterAtIndex:0];
+	if(s!=10)
+	{
+		int len=[tf.text length];
+		if(len<4)
+		{	
+			return YES;
+		}
+		else
+		{
+			return NO;
+		}
+	}
+	return NO;
+}		
+
+-(NSString *)CheckTIme:(int)Minutes
+{
+
+	if(Minutes==0)
+	{
+		return @"00";
+	}
+	else if(Minutes>0 && Minutes<15)
+	{
+		return @"00";
+	}
+	else if(Minutes>=15 && Minutes<30)
+	{
+		return @"15";
+	}
+	else if(Minutes>=30 && Minutes<45)
+	{
+		return @"30";
+	}
+	else if(Minutes>=45)
+	{
+		return @"45";
+	}
+	return @"00";
+}
+
+-(void)termCondition
+{
+	tf=[[UITextField alloc]initWithFrame:CGRectMake(12,55, 260, 30)];
+	tf.contentMode=UIViewContentModeCenter;
+	tf.font=[UIFont systemFontOfSize:15.5];
+	tf.secureTextEntry=YES; 
+	tf.keyboardAppearance=UIKeyboardAppearanceAlert; 
+	tf.clearButtonMode = UITextFieldViewModeWhileEditing;
+	[tf setDelegate:self];
+	tf.autocorrectionType=UITextAutocorrectionTypeNo;
+	tf.font=[UIFont systemFontOfSize:21];
+	tf.returnKeyType=UIReturnKeyDone;
+	tf.keyboardType=UIKeyboardTypeNumberPad;
+	tf.borderStyle=UITextBorderStyleRoundedRect;
+	tf.placeholder=@"Enter Passcode";	
+	alert1=[[UIAlertView alloc]initWithTitle:tf.placeholder message:@"\n\n" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+	alert1.frame=CGRectMake(10, 10, 280, 250);
+	[alert1 addSubview:tf];
+	[alert1 bringSubviewToFront:tf];
+	CGAffineTransform myTransform = CGAffineTransformMakeTranslation(0.0, 100.0);
+	[alert1 setTransform:myTransform];
+	[alert1 show];
+	[tf becomeFirstResponder];	
+	alert1.tag=2;
+	[alert1 release];	
+}
+
+///////Create Database in application
+
+-(void)createEditableCopyOfDatabaseIfNeeded
+{
+	BOOL success;
+	NSFileManager *fileManager=[NSFileManager defaultManager];
+	NSError *error;
+	NSArray *paths= NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+	NSString *documentsDirectory=[paths objectAtIndex:0];
+	NSString *writablePath = [documentsDirectory stringByAppendingPathComponent:@"healthtracker.sqlite"];
+	
+	success = [fileManager fileExistsAtPath:writablePath];
+	if(success)
+	{
+		if(sqlite3_open([writablePath UTF8String],&database)!=SQLITE_OK)
+		{
+			sqlite3_close(database);
+		}
+		return;
+	}
+	NSString *defaultPath=[[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"healthtracker.sqlite"];
+	success=[fileManager copyItemAtPath:defaultPath toPath:writablePath error:&error];
+	if(!success)
+	{
+		NSAssert1(0,@"Failed to create writable database file with message '%@' .",[error localizedDescription]);
+	}
+	else//First Time Loaded Application....
+	{
+		if(sqlite3_open([writablePath UTF8String],&database)!=SQLITE_OK)
+		{
+			sqlite3_close(database);
+		}
+	}
+	
+}
+- (void)applicationWillTerminate:(UIApplication *)application {
+	// Save data if appropriate
+}
+
+///////Make Dictionary for add one time user entry
+-(void)MakeDictForNewUser
+{
+//	AddNewUserDict=nil;
+	//NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	if(!self.AddNewUserDict)
+	{
+		self.AddNewUserDict=[[NSMutableDictionary alloc]init];
+	}
+	if([self.AddNewUserDict count]>0)
+	{
+		[self.AddNewUserDict removeAllObjects]; 
+	}
+	[self.AddNewUserDict setValue:@"" forKey:@"UserID"];
+	[self.AddNewUserDict setValue:@"" forKey:@"UserName"];
+	[self.AddNewUserDict setValue:@"" forKey:@"AgeMonth"];
+	[self.AddNewUserDict setValue:@"" forKey:@"Year"];
+	[self.AddNewUserDict setValue:@"" forKey:@"Age"];
+	[self.AddNewUserDict setValue:@"" forKey:@"HeightFT"];
+	[self.AddNewUserDict setValue:@"" forKey:@"HeightCMS"];
+	[self.AddNewUserDict setValue:@"Male" forKey:@"Gender"];
+	[self.AddNewUserDict setValue:@"" forKey:@"BloodGroup"];
+	[self.AddNewUserDict setValue:@"" forKey:@"WeightLBS"];
+	[self.AddNewUserDict setValue:@"" forKey:@"WeightKG"];
+	[self.AddNewUserDict setValue:@"" forKey:@"DOB"];
+	[self.AddNewUserDict setValue:@"0" forKey:@"Diabetes"];
+	[self.AddNewUserDict setValue:@"" forKey:@"Smoking"];
+	[self.AddNewUserDict setValue:@"" forKey:@"Drinking"];
+	[self.AddNewUserDict setValue:@"0" forKey:@"Drug"];
+	[self.AddNewUserDict setValue:@"" forKey:@"Past"];
+	[self.AddNewUserDict setValue:@"" forKey:@"PastName"];
+	[self.AddNewUserDict setValue:@"" forKey:@"PastPhoneNumber"];
+	[self.AddNewUserDict setValue:@"" forKey:@"PastIdentification"];
+	[self.AddNewUserDict setValue:@"" forKey:@"PastPolicyNo"];
+	[self.AddNewUserDict setValue:@"" forKey:@"PastPhone"];
+	[self.AddNewUserDict setValue:@"" forKey:@"PastEmrContact"];
+	[self.AddNewUserDict setValue:@"" forKey:@"PastMedicationList"];
+	[self.AddNewUserDict setValue:@"" forKey:@"PastMedicationListID"];
+	[self.AddNewUserDict setValue:@"" forKey:@"PastAllergyInfo"];
+	[self.AddNewUserDict setValue:@"" forKey:@"PastSurgeries"];
+	[self.AddNewUserDict setValue:@"0" forKey:@"IsKid"];
+	[self.AddNewUserDict setValue:@"1" forKey:@"Default"];
+	//[AddNewUserDict retain];
+	IsKidOrNot=0; 
+}
+
+////Insert User In User_Detail Table.
+
+-(int)InsertUser:(NSMutableDictionary *)UserDictionary
+{
+//	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	int i=0;
+	@try
+	{
+		sqlite3_stmt *statement=nil;
+		NSString  *sql=nil;	
+		sql=[NSString stringWithFormat:@"insert into User_detail(Age,BloodGroup,Diabetes_Situation,Drinking_Status,Drug_Taken,Gender,Height_Cms,Height_Inch,Smoking_Status,User_Name,Weight_Kgs,Weight_Pounds,Past_Name,Past_Health_Phone,Past_Identification,Past_PolicyNo,Past_Insurance_PN,Past_EmrContact,Past_Medication,Past_Allergy_Info,Past_Surgeries,IsKid,Past,DOB,DOBYear,ISdefault,Medicine_ListID) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"];
+		
+		if(sqlite3_prepare_v2(database, [sql UTF8String], -1, &statement, NULL)!=SQLITE_OK)
+		{
+			NSAssert1(0, @"Error: failed to prepare statement with message '%s'.", sqlite3_errmsg(database));
+		}	
+		
+		sqlite3_bind_text(statement, 1,[[NSString stringWithFormat:@"%@.%@",[UserDictionary objectForKey:@"Age"],[UserDictionary objectForKey:@"AgeMonth"]]UTF8String] , -1, SQLITE_TRANSIENT);
+		
+		sqlite3_bind_text(statement, 2,[[UserDictionary objectForKey:@"BloodGroup"]UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 3,[ [UserDictionary objectForKey:@"Diabetes"]UTF8String], -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 4,[[UserDictionary objectForKey:@"Drinking"]UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 5, [[UserDictionary objectForKey:@"Drug"]UTF8String], -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 6, [[UserDictionary objectForKey:@"Gender"]UTF8String], -1, SQLITE_TRANSIENT);
+		sqlite3_bind_int(statement, 7, [[UserDictionary objectForKey:@"HeightCMS"]intValue]);
+	
+		sqlite3_bind_text(statement, 8, [[UserDictionary objectForKey:@"HeightFT"]UTF8String], -1, SQLITE_TRANSIENT);
+		
+		sqlite3_bind_text(statement, 9,[[UserDictionary objectForKey:@"Smoking"]UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 10,[[UserDictionary objectForKey:@"UserName"]UTF8String] , -1, SQLITE_TRANSIENT);
+
+		sqlite3_bind_text(statement, 11, [[UserDictionary objectForKey:@"WeightLBS"]UTF8String], -1, SQLITE_TRANSIENT);
+		sqlite3_bind_double(statement, 12, [[UserDictionary objectForKey:@"WeightKG"]doubleValue]);
+		
+		sqlite3_bind_text(statement, 13,[ [UserDictionary objectForKey:@"PastName"]UTF8String], -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 14,[[UserDictionary objectForKey:@"PastPhoneNumber"]UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 15, [[UserDictionary objectForKey:@"PastIdentification"]UTF8String], -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 16, [[UserDictionary objectForKey:@"PastPolicyNo"]UTF8String], -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 17,[[UserDictionary objectForKey:@"PastPhone"]UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 18,[ [UserDictionary objectForKey:@"PastEmrContact"]UTF8String], -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 19,[[UserDictionary objectForKey:@"PastMedicationList"]UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 20, [[UserDictionary objectForKey:@"PastAllergyInfo"]UTF8String], -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 21, [[UserDictionary objectForKey:@"PastSurgeries"]UTF8String], -1, SQLITE_TRANSIENT);
+		sqlite3_bind_int(statement, 22, [[UserDictionary objectForKey:@"IsKid"]intValue]);
+		sqlite3_bind_text(statement, 23, [[UserDictionary objectForKey:@"Past"]UTF8String], -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 24, [[UserDictionary objectForKey:@"DOB"]UTF8String], -1, SQLITE_TRANSIENT);
+		
+		sqlite3_bind_text(statement, 25, [[UserDictionary objectForKey:@"Year"]UTF8String], -1, SQLITE_TRANSIENT);
+		
+		sqlite3_bind_int(statement, 26, [[UserDictionary objectForKey:@"Default"]intValue]);
+		sqlite3_bind_text(statement, 27,[[UserDictionary objectForKey:@"PastMedicationListID"]UTF8String] , -1, SQLITE_TRANSIENT);
+		int success=sqlite3_step(statement);
+		
+		if (success == SQLITE_ERROR) {
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		i= sqlite3_last_insert_rowid(database);
+		sqlite3_finalize(statement);
+		
+		//return i;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Actor record not Inserted" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}
+//	[Pool release];
+	return i;
+	
+}
+
+-(int)UpdateUser:(NSMutableDictionary *)UserDictionary
+{
+//	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	int i=0;
+	@try
+	{
+		sqlite3_stmt *statement=nil;
+		NSString  *sql=nil;	
+		sql=[NSString stringWithFormat:@"update User_detail set Age=?,BloodGroup=?,Diabetes_Situation=?,Drinking_Status=?,Drug_Taken=?,Gender=?,Height_Cms=?,Height_Inch=?,Smoking_Status=?,User_Name=?,Weight_Kgs=?,Weight_Pounds=?,Past_Name=?,Past_Health_Phone=?,Past_Identification=?,Past_PolicyNo=?,Past_Insurance_PN=?,Past_EmrContact=?,Past_Medication=?,Past_Allergy_Info=?,Past_Surgeries=?,IsKid=?,Past=?,DOB=?,DOBYear=?,isDefault=?,Medicine_ListID=? where User_Id=%d",[[UserDictionary objectForKey:@"UserID"]intValue]];
+		
+		if(sqlite3_prepare_v2(database, [sql UTF8String], -1, &statement, NULL)!=SQLITE_OK)
+		{
+			NSAssert1(0, @"Error: failed to prepare statement with message '%s'.", sqlite3_errmsg(database));
+		}	
+		
+		sqlite3_bind_text(statement, 1,[[NSString stringWithFormat:@"%@.%@",[UserDictionary objectForKey:@"Age"],[UserDictionary objectForKey:@"AgeMonth"]]UTF8String] , -1, SQLITE_TRANSIENT);
+		
+		sqlite3_bind_text(statement, 2,[[UserDictionary objectForKey:@"BloodGroup"]UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 3,[ [UserDictionary objectForKey:@"Diabetes"]UTF8String], -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 4,[[UserDictionary objectForKey:@"Drinking"]UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 5, [[UserDictionary objectForKey:@"Drug"]UTF8String], -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 6, [[UserDictionary objectForKey:@"Gender"]UTF8String], -1, SQLITE_TRANSIENT);
+		sqlite3_bind_int(statement, 7, [[UserDictionary objectForKey:@"HeightCMS"]intValue]);
+		
+		sqlite3_bind_text(statement, 8, [[UserDictionary objectForKey:@"HeightFT"]UTF8String], -1, SQLITE_TRANSIENT);
+		
+		sqlite3_bind_text(statement, 9,[[UserDictionary objectForKey:@"Smoking"]UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 10,[[UserDictionary objectForKey:@"UserName"]UTF8String] , -1, SQLITE_TRANSIENT);
+		
+		sqlite3_bind_text(statement, 11, [[UserDictionary objectForKey:@"WeightLBS"]UTF8String], -1, SQLITE_TRANSIENT);
+		sqlite3_bind_double(statement, 12, [[UserDictionary objectForKey:@"WeightKG"]doubleValue]);
+		
+		sqlite3_bind_text(statement, 13,[ [UserDictionary objectForKey:@"PastName"]UTF8String], -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 14,[[UserDictionary objectForKey:@"PastPhoneNumber"]UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 15, [[UserDictionary objectForKey:@"PastIdentification"]UTF8String], -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 16, [[UserDictionary objectForKey:@"PastPolicyNo"]UTF8String], -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 17,[[UserDictionary objectForKey:@"PastPhone"]UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 18,[ [UserDictionary objectForKey:@"PastEmrContact"]UTF8String], -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 19,[[UserDictionary objectForKey:@"PastMedicationList"]UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 20, [[UserDictionary objectForKey:@"PastAllergyInfo"]UTF8String], -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 21, [[UserDictionary objectForKey:@"PastSurgeries"]UTF8String], -1, SQLITE_TRANSIENT);
+		sqlite3_bind_int(statement, 22, [[UserDictionary objectForKey:@"IsKid"]intValue]);
+		sqlite3_bind_text(statement, 23, [[UserDictionary objectForKey:@"Past"]UTF8String], -1, SQLITE_TRANSIENT);
+		
+		sqlite3_bind_text(statement, 24, [[UserDictionary objectForKey:@"DOB"]UTF8String], -1, SQLITE_TRANSIENT);
+		
+		sqlite3_bind_text(statement, 25, [[UserDictionary objectForKey:@"Year"]UTF8String], -1, SQLITE_TRANSIENT);
+		
+		sqlite3_bind_int(statement, 26, [[UserDictionary objectForKey:@"Default"]intValue]);
+			sqlite3_bind_text(statement, 27,[[UserDictionary objectForKey:@"PastMedicationListID"]UTF8String] , -1, SQLITE_TRANSIENT);
+		int success=sqlite3_step(statement);
+		
+		if (success == SQLITE_ERROR) {
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		
+		sqlite3_finalize(statement);
+		i=1;
+		//return i;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Actor record not Inserted" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}
+	//[Pool release];
+	return i;
+}
+
+-(int)DefaultSet:(NSInteger)User_ID
+{
+	int i=0;
+	@try
+	{
+		sqlite3_stmt *statement=nil;
+		NSString  *sql=nil;	
+		sql=[NSString stringWithFormat:@"update User_detail set isdefault=1 where user_ID=%d",User_ID];
+		
+		
+		if(sqlite3_prepare_v2(database, [sql UTF8String], -1, &statement, NULL)!=SQLITE_OK)
+		{
+			NSAssert1(0, @"Error: failed to prepare statement with message '%s'.", sqlite3_errmsg(database));
+		}	
+		
+		int success=sqlite3_step(statement);
+		
+		if (success == SQLITE_ERROR) {
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		
+		sqlite3_finalize(statement);
+		i=1;
+		return i;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Actor record not Inserted" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}
+	return i;
+	
+}
+
+-(int)UpdateDefaultUser:(NSInteger)User_ID
+{
+	int i=0;
+	@try
+	{
+		sqlite3_stmt *statement=nil;
+		NSString  *sql=nil;	
+		sql=[NSString stringWithFormat:@"update User_detail set isdefault=0 where user_ID<>%d",User_ID];
+		
+		
+		if(sqlite3_prepare_v2(database, [sql UTF8String], -1, &statement, NULL)!=SQLITE_OK)
+		{
+			NSAssert1(0, @"Error: failed to prepare statement with message '%s'.", sqlite3_errmsg(database));
+		}	
+		
+		int success=sqlite3_step(statement);
+		
+		if (success == SQLITE_ERROR) {
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		
+		sqlite3_finalize(statement);
+		i=1;
+		return i;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Actor record not Inserted" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}
+	return i;
+	
+}
+
+/////// Insert Hourly and daily settings when create new user.
+
+-(int)InsertUserDailyHourly_Data:(NSInteger)Insert_User_Id
+{
+	int i=0;
+	@try
+	{
+		sqlite3_stmt *statement=nil;
+		NSString  *sql=nil;	
+		sql=[NSString stringWithFormat:@"insert into User_Settings(User_Id,RoutinesDetailSettings,VitalsEntryDetail,MedicineEntryDetail) values(?,?,?,?)"];
+		
+		if(sqlite3_prepare_v2(database, [sql UTF8String], -1, &statement, NULL)!=SQLITE_OK)
+		{
+			NSAssert1(0, @"Error: failed to prepare statement with message '%s'.", sqlite3_errmsg(database));
+		}	
+		
+		//	sqlite3_bind_int(statement, 1, [[UserDictionary objectForKey:@"Age"]intValue]);
+		sqlite3_bind_int(statement, 1, Insert_User_Id);
+		sqlite3_bind_text(statement, 3,[@"1,2,3,4,5,6,7,8" UTF8String] , -1, SQLITE_TRANSIENT);
+		if([[AddNewUserDict objectForKey:@"IsKid"]intValue]==1)
+		{
+			sqlite3_bind_text(statement, 2,[@"1,2,3,4,5,6,7,8,9,10,11" UTF8String] , -1, SQLITE_TRANSIENT);
+		}
+		else
+		{
+			sqlite3_bind_text(statement, 2,[@"1,2,3,6,7,8,9,10,11" UTF8String] , -1, SQLITE_TRANSIENT);
+		}
+		sqlite3_bind_text(statement, 4,[@"" UTF8String] , -1, SQLITE_TRANSIENT);
+		int success=sqlite3_step(statement);
+		
+		if (success == SQLITE_ERROR) {
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		i= sqlite3_last_insert_rowid(database);
+		sqlite3_finalize(statement);
+		
+		return i;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Actor record not Inserted" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}
+	return i;
+}
+
+////// Update user horuly, Daily and medicine settings 
+
+-(int)UpdateUserData:(NSInteger)Insert_User_Id DailyData:(NSString *)data ColumnName:(NSString *)Name
+{
+	int i=0;
+	@try
+	{
+		sqlite3_stmt *statement=nil;
+		NSString  *sql=nil;	
+		sql=[NSString stringWithFormat:@"update User_Settings set %@='%@' where User_ID=%d",Name,data,Insert_User_Id];
+		if(sqlite3_prepare_v2(database, [sql UTF8String], -1, &statement, NULL)!=SQLITE_OK)
+		{
+			NSAssert1(0, @"Error: failed to prepare statement with message '%s'.", sqlite3_errmsg(database));
+			i=0;
+		}	
+		
+		int success=sqlite3_step(statement);
+		
+		if (success == SQLITE_ERROR) {
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+			i=0;
+		}
+		sqlite3_finalize(statement);
+		i=1;
+		return i;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Favourite record not found." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}
+	return i;
+}
+
+//// get user settings.
+
+-(void)SelectUserSettings:(NSInteger)Insert_User_Id
+{
+	@try
+	{
+		if(!UserSettingsArray)
+			UserSettingsArray=[[NSMutableArray alloc]init];	
+
+		if([UserSettingsArray count]>0)
+		{
+			[UserSettingsArray removeAllObjects];
+		}	
+		sqlite3_stmt *selectstatement=nil;	
+		NSString *sql;
+		int returnvalue;
+		
+		sql=[NSString stringWithFormat:@"select User_ID,VitalsEntryDetail,RoutinesDetailsettings,MedicineEntryDetail from User_Settings where User_ID=%d",Insert_User_Id];
+		returnvalue = sqlite3_prepare_v2(database, [sql UTF8String], -1, &selectstatement, NULL);
+		if(returnvalue==1)
+		{
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		if(returnvalue==SQLITE_OK)
+		{		
+			while(sqlite3_step(selectstatement)==SQLITE_ROW)
+			{	
+				User_Settings *User_Data=[[User_Settings alloc]init];
+				User_Data.User_Id=sqlite3_column_int(selectstatement, 0);
+				
+				User_Data.DailyEntryDetail=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,1)];
+				User_Data.HourlyEntryDetail= [NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,2)];
+				User_Data.MedicineEntryDetail= [NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,3)];
+
+				[UserSettingsArray addObject:User_Data];			
+				[User_Data release];	
+			}
+		}
+		sqlite3_finalize(selectstatement);
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"User settings record not found." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}	
+}
+
+/// Get all users data.
+
+
+-(void)SelectsUsers
+{
+	//AutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	@try
+	{
+		if(!UserArray)
+			UserArray=[[NSMutableArray alloc]init];	
+		
+		if([UserArray count]>0)
+		{
+			[UserArray removeAllObjects];
+		}	
+		sqlite3_stmt *selectstatement=nil;	
+		NSString *sql;
+		int returnvalue;
+	
+		sql=@"Select User_ID,Age,BloodGroup,Diabetes_Situation,Drinking_Status,Drug_Taken,Gender,Height_Cms,Height_Inch,Smoking_Status,User_Name,Past_Name,Past_Health_Phone,Past_Identification,Past_PolicyNo,Past_Insurance_PN,Past_EmrContact,Past_Allergy_Info,Past_Surgeries,IsKid,Past,DOB,DOBYear,isdefault,Past_Medication,Medicine_ListID from User_Detail";
+		returnvalue = sqlite3_prepare_v2(database, [sql UTF8String], -1, &selectstatement, NULL);
+		if(returnvalue==1)
+		{
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		if(returnvalue==SQLITE_OK)
+		{		
+			while(sqlite3_step(selectstatement)==SQLITE_ROW)
+			{	
+				NSMutableDictionary *User_Data=[[NSMutableDictionary alloc]init];
+			
+				[User_Data setValue:[NSString stringWithFormat:@"%d",sqlite3_column_int(selectstatement, 0)] forKey:@"UserID"];
+				
+				NSArray *arr=[[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,1)] componentsSeparatedByString:@"."] ;
+				if([arr count]>1)
+				{
+					[User_Data setValue:[arr objectAtIndex:0] forKey:@"Age"];
+					[User_Data setValue:[arr objectAtIndex:1] forKey:@"AgeMonth"];
+				}
+
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,2)] forKey:@"BloodGroup"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,3)] forKey:@"Diabetes"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,4)] forKey:@"Drinking"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,5)] forKey:@"Drug"];
+	
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,6)] forKey:@"Gender"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,7)] forKey:@"HeightCMS"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,8)] forKey:@"HeightFT"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,9)] forKey:@"Smoking"];
+				
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,10)] forKey:@"UserName"];
+				
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,21)] forKey:@"DOB"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,11)] forKey:@"PastName"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,12)] forKey:@"PastPhoneNumber"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,13)] forKey:@"PastIdentification"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,15)] forKey:@"PastPhone"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,14)] forKey:@"PastPolicyNo"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,16)] forKey:@"PastEmrContact"];
+		
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,17)] forKey:@"PastAllergyInfo"];
+		
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,18)] forKey:@"PastSurgeries"];
+				[User_Data setValue:[NSString stringWithFormat:@"%d",sqlite3_column_int(selectstatement, 19)] forKey:@"IsKid"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,20)] forKey:@"Past"];
+				
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,22)] forKey:@"Year"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,24)] forKey:@"PastMedicationList"];
+				[User_Data setValue:[NSString stringWithFormat:@"%d",sqlite3_column_int(selectstatement, 23)] forKey:@"Default"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,25)] forKey:@"PastMedicationListID"];
+				[UserArray addObject:User_Data];			
+				[User_Data release];	
+			}
+		}
+		sqlite3_finalize(selectstatement);
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"User settings record not found." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}	
+}
+
+/// Select hourly and daily entry columns 
+
+-(void)EntryName:(NSInteger)Entry_ID
+{
+	@try
+	{
+		if(!EntryArray)
+			EntryArray=[[NSMutableArray alloc]init];	
+	
+		if([EntryArray count]>0)
+		{
+			[EntryArray removeAllObjects];
+		}	
+		sqlite3_stmt *selectstatement=nil;	
+		NSString *sql;
+		int returnvalue;
+		sql=[NSString stringWithFormat:@"Select Vitals_ID,Field_Name from Vitals_Master where Vitals_ID=%d",Entry_ID];
+		returnvalue = sqlite3_prepare_v2(database, [sql UTF8String], -1, &selectstatement, NULL);
+		if(returnvalue==1)
+		{
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		//int mile=set1.MaxDiatance;
+		if(returnvalue==SQLITE_OK)
+		{		
+			while(sqlite3_step(selectstatement)==SQLITE_ROW)
+			{	
+				//Vitals_Master *Master=[[Vitals_Master alloc]init]; 
+//				Master.Vilat_ID= sqlite3_column_int(selectstatement, 0);
+//				Master.FieldName= [NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,1)];
+//								
+//				[EntryArray addObject:Master];			
+//				[Master release];	
+				
+				NSMutableDictionary *Master=[[NSMutableDictionary alloc]init];
+				
+				[Master setValue:[NSString stringWithFormat:@"%d",sqlite3_column_int(selectstatement, 0)] forKey:@"Vital_ID"];
+				
+				[Master setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,1)] forKey:@"Name"];
+				[EntryArray addObject:Master];
+				[Master release];	
+				
+				
+			}
+		}
+		sqlite3_finalize(selectstatement);
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"User settings record not found." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}	
+	
+}
+
+
+///// Select all medicine names as per user
+
+-(void)SelectMedicineNames
+{
+	@try
+	{
+		if(!MedicineArray)
+			MedicineArray=[[NSMutableArray alloc]init];	
+		
+		if([MedicineArray count]>0)
+		{
+			[MedicineArray removeAllObjects];
+		}	
+		sqlite3_stmt *selectstatement=nil;	
+		NSString *sql;
+		int returnvalue;
+		sql=@"Select Medicine_Name,Medicine_ID from MedicineMst";
+		returnvalue = sqlite3_prepare_v2(database, [sql UTF8String], -1, &selectstatement, NULL);
+		if(returnvalue==1)
+		{
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		//int mile=set1.MaxDiatance;
+		if(returnvalue==SQLITE_OK)
+		{		
+			while(sqlite3_step(selectstatement)==SQLITE_ROW)
+			{	
+				NSMutableDictionary *Master=[[NSMutableDictionary alloc]init];
+				
+				[Master setValue:[NSString stringWithFormat:@"%d",sqlite3_column_int(selectstatement, 1)] forKey:@"Medicine_ID"];
+				
+				[Master setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,0)] forKey:@"Medicine_Name"];
+				[MedicineArray addObject:Master];
+				[Master release];	
+			}
+		}
+		sqlite3_finalize(selectstatement);
+		//return Name;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"User settings record not found." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}	
+	
+}
+
+////// get medicine name as per medicine ID
+
+-(NSString *)SelectMedicine:(NSInteger)MedicineID
+{
+	NSString *Name=@"";
+	@try
+	{
+		sqlite3_stmt *selectstatement=nil;	
+		NSString *sql;
+		int returnvalue;
+		sql=[NSString stringWithFormat:@"Select Medicine_Name from MedicineMst where Medicine_ID=%d",MedicineID];
+		returnvalue = sqlite3_prepare_v2(database, [sql UTF8String], -1, &selectstatement, NULL);
+		if(returnvalue==1)
+		{
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		//int mile=set1.MaxDiatance;
+		if(returnvalue==SQLITE_OK)
+		{		
+			while(sqlite3_step(selectstatement)==SQLITE_ROW)
+			{	
+				Name= [NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,0)];			
+			}
+		}
+		sqlite3_finalize(selectstatement);
+		return Name;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"User settings record not found." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}	
+		return Name;
+}
+
+//// get medicine id for store user medicine entry in settings table
+
+-(void)SelectMedicineID:(NSInteger)UserID
+{
+	@try
+	{
+		if(!MedicineArray)
+			MedicineArray=[[NSMutableArray alloc]init];	
+		
+		if([MedicineArray count]>0)
+		{
+			[MedicineArray removeAllObjects];
+		}	
+		sqlite3_stmt *selectstatement=nil;	
+		NSString *sql;
+		int returnvalue;
+		sql=[NSString stringWithFormat:@"Select Medicine_ID from MedicineMst where User_ID=%d",UserID];
+		returnvalue = sqlite3_prepare_v2(database, [sql UTF8String], -1, &selectstatement, NULL);
+		if(returnvalue==1)
+		{
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		if(returnvalue==SQLITE_OK)
+		{		
+			while(sqlite3_step(selectstatement)==SQLITE_ROW)
+			{	
+				[MedicineArray addObject:[NSString stringWithFormat:@"%d",sqlite3_column_int(selectstatement, 0)]];			
+			}
+		}
+		sqlite3_finalize(selectstatement);
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"User settings record not found." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}	
+	
+}
+
+/// delete daily or horuly data entry
+
+-(int)DeleteAllCategoriesData:(NSString *)TableName IDname:(NSString *)Name DeleteID:(NSInteger)IdDelete
+{
+	int ret;
+	@try
+	{
+		sqlite3_stmt *statement=nil;
+		NSString  *sql=nil;	
+		sql=[NSString stringWithFormat:@"delete from %@ where %@=%d",TableName,Name,IdDelete];
+		if(sqlite3_prepare_v2(database, [sql UTF8String], -1, &statement, NULL)!=SQLITE_OK)
+		{
+			NSAssert1(0, @"Error: failed to prepare statement with message '%s'.", sqlite3_errmsg(database));
+		}
+		//sqlite3_bind_int(statement, 1, Actor_ID);
+		
+		int success=sqlite3_step(statement);
+		sqlite3_finalize(statement);
+		if (success == SQLITE_ERROR) {
+			ret=0;
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		else
+		{
+			ret=1;
+		}
+	}
+	@catch (NSException *ex) 
+	{
+		ret=0;
+	}	
+	return ret;
+	
+}
+
+-(int)DeleteEntry:(NSString *)TableName ColumnName:(NSString *)PrimaryName PrimaryID:(NSInteger)ID
+{
+	int ret;
+		@try
+		{
+			sqlite3_stmt *statement=nil;
+			NSString  *sql=nil;	
+			sql=[NSString stringWithFormat:@"delete from %@ where %@=%d",TableName,PrimaryName,ID];
+			if(sqlite3_prepare_v2(database, [sql UTF8String], -1, &statement, NULL)!=SQLITE_OK)
+			{
+				NSAssert1(0, @"Error: failed to prepare statement with message '%s'.", sqlite3_errmsg(database));
+			}
+			int success=sqlite3_step(statement);
+			sqlite3_finalize(statement);
+			if (success == SQLITE_ERROR) {
+				ret=0;
+				NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+			}
+			else
+			{
+				ret=1;
+			}
+		}
+		@catch (NSException *ex) 
+		{
+			ret=0;
+		}	
+		return ret;
+	
+}
+
+//// insert Medicine
+-(BOOL)IsMedicineExist:(NSString*)MedicineName
+{
+	
+	@try
+	{
+		MedicineName=[MedicineName stringByReplacingOccurrencesOfString:@"'" withString:@"''"];	
+		sqlite3_stmt *statement=nil;
+		NSString  *sql=nil;	
+		sql=[NSString stringWithFormat:@"select Medicine_ID from MedicineMst where lower(Medicine_Name)='%@'",MedicineName];   /////
+		//sql=[NSString stringWithFormat:@"select REST_ID from Restaurants where REST_NAME='%@'",Rest_Name];   /////
+		if(sqlite3_prepare_v2(database, [sql UTF8String], -1, &statement, NULL)!=SQLITE_OK)
+		{
+			NSAssert1(0, @"Error: failed to prepare statement with message '%s'.", sqlite3_errmsg(database));
+		}	
+		
+		int success=sqlite3_step(statement);
+		sqlite3_finalize(statement);
+		if(success==SQLITE_ROW)
+		{		
+			return YES;
+		}
+		else
+		{
+			return NO;
+		}
+		if (success == SQLITE_ERROR) 
+		{
+			//sqlite3_finalize(statement);
+			
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		//sqlite3_finalize(statement);
+		//err = 0;
+		return NO;
+	}
+	@catch (NSException *e) 
+	{
+		
+	}
+	return NO;
+}
+-(int)InsertMedicine:(NSString *)MedicineName
+{
+	int i=0;
+	@try
+	{
+		sqlite3_stmt *statement=nil;
+		NSString  *sql=nil;	
+		sql=[NSString stringWithFormat:@"insert into MedicineMst(Medicine_Name) values(?)"];
+		
+		if(sqlite3_prepare_v2(database, [sql UTF8String], -1, &statement, NULL)!=SQLITE_OK)
+		{
+			NSAssert1(0, @"Error: failed to prepare statement with message '%s'.", sqlite3_errmsg(database));
+		}	
+		sqlite3_bind_text(statement, 1,[MedicineName UTF8String] , -1, SQLITE_TRANSIENT);
+		//sqlite3_bind_int(statement, 2, SelectedUserID);
+		
+		int success=sqlite3_step(statement);
+		
+		if (success == SQLITE_ERROR) {
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		i= sqlite3_last_insert_rowid(database);
+		sqlite3_finalize(statement);
+		
+		return i;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Medicine record not Inserted" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}
+	return i;	
+}
+
+-(int)UpdateMedicine:(NSString *)MedicineName andID:(NSInteger)Medicine_ID
+{
+	int i=0;
+	@try
+	{
+		sqlite3_stmt *statement=nil;
+		NSString  *sql=nil;	
+		sql=[NSString stringWithFormat:@"update MedicineMst set Medicine_Name=? where Medicine_ID=%d",Medicine_ID];
+		
+		if(sqlite3_prepare_v2(database, [sql UTF8String], -1, &statement, NULL)!=SQLITE_OK)
+		{
+			NSAssert1(0, @"Error: failed to prepare statement with message '%s'.", sqlite3_errmsg(database));
+		}	
+		sqlite3_bind_text(statement, 1,[MedicineName UTF8String] , -1, SQLITE_TRANSIENT);
+		//sqlite3_bind_int(statement, 2, SelectedUserID);
+		
+		int success=sqlite3_step(statement);
+		
+		if (success == SQLITE_ERROR) {
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		i= 1;
+		sqlite3_finalize(statement);
+		
+		return i;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Medicine record not Inserted" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}
+	return i;	
+}
+
+-(void)selectMenstural:(NSInteger)User_ID passDate:(NSString *)Daily_Date
+{
+	@try
+	{
+		if(!MensturalArray)
+			MensturalArray=[[NSMutableArray alloc]init];	
+		
+		if([MensturalArray count]>0)
+		{
+			[MensturalArray removeAllObjects];
+		}	
+		sqlite3_stmt *selectstatement=nil;	
+		NSString *sql;
+		int returnvalue;
+		sql=[NSString stringWithFormat:@"select User_id,startdate,enddate,daily_date,cycle_id from  Menstrual_cycle where user_id=%d and startdate <= '%@' order by startdate desc limit 1",User_ID,Daily_Date];
+		returnvalue = sqlite3_prepare_v2(database, [sql UTF8String], -1, &selectstatement, NULL);
+		if(returnvalue==1)
+		{
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		//int mile=set1.MaxDiatance;
+		if(returnvalue==SQLITE_OK)
+		{		
+			while(sqlite3_step(selectstatement)==SQLITE_ROW)
+			{	
+				Menstural_Cycle  *Master=[[Menstural_Cycle alloc]init]; 
+				Master.User_ID= sqlite3_column_int(selectstatement, 0);
+				Master.Cycle_ID=sqlite3_column_int(selectstatement, 4);
+				Master.StartDate=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,1)]; 
+				Master.EndDate=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,2)]; 
+				Master.Daily_Date=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,3)]; 
+				
+				[MensturalArray addObject:Master];
+				[Master release];	
+			}
+		}
+		sqlite3_finalize(selectstatement);
+		//return Name;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"User settings record not found." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}	
+	
+}
+
+
+-(int)InsertMenstural:(Menstural_Cycle *)Menstural
+{
+	int i=0;
+	@try
+	{
+		sqlite3_stmt *statement=nil;
+		NSString  *sql=nil;	
+		sql=[NSString stringWithFormat:@"insert into Menstrual_Cycle(User_Id,StartDate,EndDate,Daily_Date) values(?,?,?,?)"];
+		
+		if(sqlite3_prepare_v2(database, [sql UTF8String], -1, &statement, NULL)!=SQLITE_OK)
+		{
+			NSAssert1(0, @"Error: failed to prepare statement with message '%s'.", sqlite3_errmsg(database));
+		}	
+		
+		//	sqlite3_bind_int(statement, 1, [[UserDictionary objectForKey:@"Age"]intValue]);
+		sqlite3_bind_int(statement, 1, Menstural.User_ID);
+		sqlite3_bind_text(statement, 3,[Menstural.EndDate UTF8String] , -1, SQLITE_TRANSIENT);
+		
+			sqlite3_bind_text(statement, 2,[Menstural.StartDate  UTF8String] , -1, SQLITE_TRANSIENT);
+		
+		sqlite3_bind_text(statement, 4,[Menstural.Daily_Date UTF8String] , -1, SQLITE_TRANSIENT);
+		int success=sqlite3_step(statement);
+		
+		if (success == SQLITE_ERROR) {
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		i= sqlite3_last_insert_rowid(database);
+		sqlite3_finalize(statement);
+		
+		return i;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Actor record not Inserted" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}
+	return i;
+	
+}
+
+-(int)UpdateMenstural:(Menstural_Cycle *)Menstural
+{
+	int i=0;
+	@try
+	{
+		sqlite3_stmt *statement=nil;
+		NSString  *sql=nil;	
+		sql=[NSString stringWithFormat:@"update Menstrual_Cycle set StartDate=? ,EndDate=?, Daily_Date=? where Cycle_ID=%d",Menstural.Cycle_ID];
+		
+		if(sqlite3_prepare_v2(database, [sql UTF8String], -1, &statement, NULL)!=SQLITE_OK)
+		{
+			NSAssert1(0, @"Error: failed to prepare statement with message '%s'.", sqlite3_errmsg(database));
+		}	
+		sqlite3_bind_text(statement, 2,[Menstural.EndDate UTF8String] , -1, SQLITE_TRANSIENT);
+		
+		sqlite3_bind_text(statement, 1,[Menstural.StartDate  UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 3,[Menstural.Daily_Date  UTF8String] , -1, SQLITE_TRANSIENT);
+		int success=sqlite3_step(statement);
+		
+		if (success == SQLITE_ERROR) {
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		i=1;
+		sqlite3_finalize(statement);
+		
+		return i;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Actor record not Inserted" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}
+	return i;
+}
+
+
+-(int)DeleteMenstura:(NSInteger)Cycle_ID
+{
+	int ret;
+	@try
+	{
+		sqlite3_stmt *statement=nil;
+		NSString  *sql=nil;	
+		sql=[NSString stringWithFormat:@"delete from Menstrual_Cycle where Cycle_ID=%d",Cycle_ID];
+		if(sqlite3_prepare_v2(database, [sql UTF8String], -1, &statement, NULL)!=SQLITE_OK)
+		{
+			NSAssert1(0, @"Error: failed to prepare statement with message '%s'.", sqlite3_errmsg(database));
+		}
+		int success=sqlite3_step(statement);
+		sqlite3_finalize(statement);
+		if (success == SQLITE_ERROR) {
+			ret=0;
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		else
+		{
+			ret=1;
+		}
+	}
+	@catch (NSException *ex) 
+	{
+		ret=0;
+	}	
+	return ret;
+}
+
+#pragma mark NOT USAABLE
+
+-(void)SelectReportData:(NSString*)CoulumnName FromDate:(NSString*)StartDate ToDate:(NSString*)EndDate andUserID:(NSInteger)User_ID1
+{
+	@try
+	{
+		if(!DailyReportArray)
+			DailyReportArray=[[NSMutableArray alloc]init];	
+		
+		if([DailyReportArray count]>0)
+		{
+			[DailyReportArray removeAllObjects];
+		}	
+		sqlite3_stmt *selectstatement=nil;	
+		NSString *sql;
+		int returnvalue;
+		sql=[NSString stringWithFormat:@"select %@,EntryDate from Daily_Entry where user_id=%d and (EntryDate between '%@' and '%@')",CoulumnName,User_ID1,StartDate,EndDate];
+		returnvalue = sqlite3_prepare_v2(database, [sql UTF8String], -1, &selectstatement, NULL);
+		if(returnvalue==1)
+		{
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		//int mile=set1.MaxDiatance;
+		if(returnvalue==SQLITE_OK)
+		{		
+			while(sqlite3_step(selectstatement)==SQLITE_ROW)
+			{	
+				NSMutableDictionary *User_Data=[[NSMutableDictionary alloc]init];
+				
+				if([CoulumnName isEqualToString:@"NoofHoursofSleep"])
+				{
+					[User_Data setObject:[NSString stringWithFormat:@"%d",sqlite3_column_int(selectstatement, 0)] forKey:@"SelectData"];
+				}
+				else
+				{
+					[User_Data setObject:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,0)] forKey:@"SelectData"];
+				}
+				[User_Data setObject:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,1)] forKey:@"Date"];
+				[DailyReportArray addObject:User_Data];		
+				[User_Data release];
+			}
+		}
+		sqlite3_finalize(selectstatement);
+		//return Name;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Daily Report record not found." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}	
+	
+}
+
+-(void)SelectHourlyReportData:(NSString*)CoulumnName FromDate:(NSString*)StartDate andUserID:(NSInteger)User_ID1
+{
+	@try
+	{
+		if(!HourlyReportArray )
+			HourlyReportArray=[[NSMutableArray alloc]init];	
+		
+		if([HourlyReportArray count]>0)
+		{
+			[HourlyReportArray removeAllObjects];
+		}	
+		sqlite3_stmt *selectstatement=nil;	
+		NSString *sql;
+		int returnvalue;
+		sql=[NSString stringWithFormat:@"select %@,EntryDate,EntryTime from Hourly_Entry where user_id=%d and EntryDate='%@'",CoulumnName,User_ID1,StartDate];
+		returnvalue = sqlite3_prepare_v2(database, [sql UTF8String], -1, &selectstatement, NULL);
+		if(returnvalue==1)
+		{
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		//int mile=set1.MaxDiatance;
+		if(returnvalue==SQLITE_OK)
+		{		
+			while(sqlite3_step(selectstatement)==SQLITE_ROW)
+			{	
+				NSMutableDictionary *User_Data=[[NSMutableDictionary alloc]init];
+				[User_Data setObject:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,0)] forKey:@"SelectData"];
+				[User_Data setObject:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,1)] forKey:@"Date"];
+				[User_Data setObject:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,2)] forKey:@"Time"];
+				[HourlyReportArray addObject:User_Data];		
+				[User_Data release];
+			}
+		}
+		sqlite3_finalize(selectstatement);
+		//return Name;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Hourly Report record not found." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}	
+	
+}
+
+#pragma mark NEW database Changes
+//////////////////////  New data base changes
+
+
+-(void)SelectVitalsInfo:(NSInteger) User_ID
+{
+	@try
+	{
+		if(!VitalsMasterArray)
+			VitalsMasterArray=[[NSMutableArray alloc]init];	
+		
+		if([VitalsMasterArray count]>0)
+		{
+			[VitalsMasterArray removeAllObjects];
+		}	
+		sqlite3_stmt *selectstatement=nil;	
+		NSString *sql;
+		int returnvalue;
+		sql=[NSString stringWithFormat:@"select Field_Name,IsCommon,User_ID,Vitals_ID from Vitals_Master where (User_ID=0 or User_ID=%d)",User_ID];
+		returnvalue = sqlite3_prepare_v2(database, [sql UTF8String], -1, &selectstatement, NULL);
+		if(returnvalue==1)
+		{
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		//int mile=set1.MaxDiatance;
+		if(returnvalue==SQLITE_OK)
+		{		
+			while(sqlite3_step(selectstatement)==SQLITE_ROW)
+			{	
+				//Vitals_Master  *Data=[[Vitals_Master alloc]init];
+//				Data.User_ID=sqlite3_column_int(selectstatement, 2);
+//				Data.FieldName=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,0)];
+//				Data.IsCommon=sqlite3_column_int(selectstatement, 1);
+//				Data.Vilat_ID=sqlite3_column_int(selectstatement, 3);
+//				[VitalsMasterArray addObject:Data];
+//				[Data release];
+				
+				NSMutableDictionary *Master=[[NSMutableDictionary alloc]init];
+				
+				[Master setValue:[NSString stringWithFormat:@"%d",sqlite3_column_int(selectstatement, 2)] forKey:@"User_ID"];
+				
+				[Master setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,0)] forKey:@"Name"];
+				[Master setValue:[NSString stringWithFormat:@"%d",sqlite3_column_int(selectstatement, 1)] forKey:@"IScommon"];
+				[Master setValue:[NSString stringWithFormat:@"%d",sqlite3_column_int(selectstatement, 3)] forKey:@"Vital_ID"];
+				[VitalsMasterArray addObject:Master];
+				[Master release];	
+				
+				
+				
+				
+			}
+		}
+		sqlite3_finalize(selectstatement);
+		//return Name;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"User settings record not found." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}	
+	
+}
+
+
+-(void)SelectRoutineInfo:(NSInteger) User_ID
+{
+	@try
+	{
+		if(!VitalsMasterArray)
+			VitalsMasterArray=[[NSMutableArray alloc]init];	
+		
+		if([VitalsMasterArray count]>0)
+		{
+			[VitalsMasterArray removeAllObjects];
+		}	
+		sqlite3_stmt *selectstatement=nil;	
+		NSString *sql;
+		int returnvalue;
+		sql=[NSString stringWithFormat:@"select Field_Name,IsCommom,User_ID,Routine_ID from Routine_Master where (User_ID=0 or User_ID=%d)",User_ID];
+		returnvalue = sqlite3_prepare_v2(database, [sql UTF8String], -1, &selectstatement, NULL);
+		if(returnvalue==1)
+		{
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		//int mile=set1.MaxDiatance;
+		if(returnvalue==SQLITE_OK)
+		{		
+			while(sqlite3_step(selectstatement)==SQLITE_ROW)
+			{	
+				//Vitals_Master  *Data=[[Vitals_Master alloc]init];
+//				Data.User_ID=sqlite3_column_int(selectstatement, 2);
+//				Data.FieldName=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,0)];
+//				Data.IsCommon=sqlite3_column_int(selectstatement, 1);
+//				Data.Vilat_ID=sqlite3_column_int(selectstatement, 3);
+//				[VitalsMasterArray addObject:Data];
+//				[Data release];
+				
+				NSMutableDictionary *Master=[[NSMutableDictionary alloc]init];
+				
+				[Master setValue:[NSString stringWithFormat:@"%d",sqlite3_column_int(selectstatement, 2)] forKey:@"User_ID"];
+				
+				[Master setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,0)] forKey:@"Name"];
+				[Master setValue:[NSString stringWithFormat:@"%d",sqlite3_column_int(selectstatement, 1)] forKey:@"IScommon"];
+				[Master setValue:[NSString stringWithFormat:@"%d",sqlite3_column_int(selectstatement, 3)] forKey:@"Vital_ID"];
+				[VitalsMasterArray addObject:Master];
+				[Master release];	
+			}
+		}
+		sqlite3_finalize(selectstatement);
+		//return Name;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"User settings record not found." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}	
+	
+}
+
+-(void)RoutineName:(NSInteger)Entry_ID
+{
+	@try
+	{
+		if(!EntryArray)
+			EntryArray=[[NSMutableArray alloc]init];	
+		
+		if([EntryArray count]>0)
+		{
+			[EntryArray removeAllObjects];
+		}	
+		sqlite3_stmt *selectstatement=nil;	
+		NSString *sql;
+		int returnvalue;
+		sql=[NSString stringWithFormat:@"Select Routine_ID,Field_Name from Routine_Master where Routine_ID=%d",Entry_ID];
+		returnvalue = sqlite3_prepare_v2(database, [sql UTF8String], -1, &selectstatement, NULL);
+		if(returnvalue==1)
+		{
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		//int mile=set1.MaxDiatance;
+		if(returnvalue==SQLITE_OK)
+		{		
+			while(sqlite3_step(selectstatement)==SQLITE_ROW)
+			{	
+				//Vitals_Master *Master=[[Vitals_Master alloc]init]; 
+//				Master.Vilat_ID= sqlite3_column_int(selectstatement, 0);
+//				Master.FieldName= [NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,1)];
+//				
+//				[EntryArray addObject:Master];			
+//				[Master release];	
+				
+				NSMutableDictionary *Master=[[NSMutableDictionary alloc]init];
+				
+				[Master setValue:[NSString stringWithFormat:@"%d",sqlite3_column_int(selectstatement, 0)] forKey:@"Vital_ID"];
+				
+				[Master setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,1)] forKey:@"Name"];
+				
+				[EntryArray addObject:Master];
+				[Master release];	
+				
+			}
+		}
+		sqlite3_finalize(selectstatement);
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"User settings record not found." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}	
+	
+}
+
+#pragma mark NEW Medicine Table
+
+//////////////////  Medicine Table Data
+-(int)InsertMedicinedata:(Medicine *)MedicineRef
+{
+	int i=0;
+	@try
+	{
+		sqlite3_stmt *statement=nil;
+		NSString  *sql=nil;	
+		sql=[NSString stringWithFormat:@"insert into Medicine(User_ID,Medicine_Entry,EntryDate,EntryTime,Insert_Medicine_ID) values(?,?,?,?,?)"];
+		
+		if(sqlite3_prepare_v2(database, [sql UTF8String], -1, &statement, NULL)!=SQLITE_OK)
+		{
+			NSAssert1(0, @"Error: failed to prepare statement with message '%s'.", sqlite3_errmsg(database));
+		}	
+		
+		sqlite3_bind_int(statement, 1, MedicineRef.UserID);
+		sqlite3_bind_text(statement, 2,[MedicineRef.MedicineEntry  UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 3,[MedicineRef.EntryDate UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 4,[MedicineRef.EntryTime UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 5,[MedicineRef.Medicine_Insert_ID UTF8String] , -1, SQLITE_TRANSIENT);
+		int success=sqlite3_step(statement);
+		
+		if (success == SQLITE_ERROR) {
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		i= sqlite3_last_insert_rowid(database);
+		sqlite3_finalize(statement);
+		
+		return i;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Actor record not Inserted" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}
+	return i;
+}
+
+-(void)Medicinedata:(NSString*)EntryDate ToTime:(NSString *)EntryTime anduserid:(NSInteger)User_ID
+{
+	@try
+	{
+		if(!EntryArray)
+			EntryArray=[[NSMutableArray alloc]init];	
+		
+		if([EntryArray count]>0)
+		{
+			[EntryArray removeAllObjects];
+		}	
+		sqlite3_stmt *selectstatement=nil;	
+		NSString *sql;
+		int returnvalue;
+	//	sql=[NSString stringWithFormat:@"Select User_ID,Medicine_Entry,EntryDate,EntryTime,Medicine_ID from Routine_Master where Routine_ID=%d",Entry_ID];
+		sql=[NSString stringWithFormat:@"select User_ID,Medicine_Entry,EntryDate,EntryTime,Medicine_ID,Insert_Medicine_ID from Medicine where User_ID=%d and(EntryDate='%@' and EntryTime='%@')",User_ID,EntryDate,EntryTime];
+		returnvalue = sqlite3_prepare_v2(database, [sql UTF8String], -1, &selectstatement, NULL);
+		if(returnvalue==1)
+		{
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		//int mile=set1.MaxDiatance;
+		if(returnvalue==SQLITE_OK)
+		{		
+			while(sqlite3_step(selectstatement)==SQLITE_ROW)
+			{	
+				Medicine *Master=[[Medicine alloc]init]; 
+				Master.UserID= sqlite3_column_int(selectstatement, 0);
+				Master.MedicineEntry= [NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,1)];
+				Master.EntryDate= [NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,2)];
+				Master.EntryTime= [NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,3)];
+				Master.MedicineID= sqlite3_column_int(selectstatement, 4);
+				Master.Medicine_Insert_ID= [NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,5)];
+				[EntryArray addObject:Master];			
+				[Master release];	
+			}
+		}
+		sqlite3_finalize(selectstatement);
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"User settings record not found." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}	
+	
+}
+
+-(int)UpdateData:(Medicine*)MedicineRef
+{
+	int i=0;
+	@try
+	{
+		sqlite3_stmt *statement=nil;
+		NSString  *sql=nil;	
+		sql=[NSString stringWithFormat:@"update Medicine set User_ID=?,Medicine_Entry=?,EntryDate=?,EntryTime=?,Insert_Medicine_ID=? where Medicine_ID=%d",MedicineRef.MedicineID];
+		
+		if(sqlite3_prepare_v2(database, [sql UTF8String], -1, &statement, NULL)!=SQLITE_OK)
+		{
+			NSAssert1(0, @"Error: failed to prepare statement with message '%s'.", sqlite3_errmsg(database));
+		}	
+		sqlite3_bind_int(statement, 1, MedicineRef.UserID);
+		sqlite3_bind_text(statement, 2,[MedicineRef.MedicineEntry  UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 3,[MedicineRef.EntryDate UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 4,[MedicineRef.EntryTime UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 5,[MedicineRef.Medicine_Insert_ID UTF8String] , -1, SQLITE_TRANSIENT);
+		int success=sqlite3_step(statement);
+		
+		if (success == SQLITE_ERROR) {
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		i=1;
+		sqlite3_finalize(statement);
+		
+		return i;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Actor record not Inserted" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}
+	return i;
+	
+}
+
+//////////////////    Vital Table
+
+#pragma mark Vitals Table Methoda
+
+-(int)InsertVitalsDetail:(Vitals_Detail*)Data
+{
+	int i=0;
+	@try
+	{
+		sqlite3_stmt *statement=nil;
+		NSString  *sql=nil;	
+		sql=[NSString stringWithFormat:@"insert into Vitals_Detail(User_ID,BP,EntryDate,EntryTime,BloodSugar,Fasting,Other_Vitals,Pulse,Respiration,TemperatureC,TemperatureF,WeightLbs,WeightKgs) values(?,?,?,?,?,?,?,?,?,?,?,?,?)"];
+		
+		if(sqlite3_prepare_v2(database, [sql UTF8String], -1, &statement, NULL)!=SQLITE_OK)
+		{
+			NSAssert1(0, @"Error: failed to prepare statement with message '%s'.", sqlite3_errmsg(database));
+		}	
+		
+		sqlite3_bind_int(statement, 1, Data.User_ID1);
+		sqlite3_bind_text(statement, 2,[Data.BP  UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 3,[Data.EntryDate UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 4,[Data.EntryTime UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 5,[Data.BloodSugar UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 6,[Data.Fasting UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 7,[Data.Other UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 8,[Data.Pulse UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 9,[Data.Respiration UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 10,[Data.TempC UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 11,[Data.TempF UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 12,[Data.WeightLbs UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 13,[Data.WeightKgs UTF8String] , -1, SQLITE_TRANSIENT);
+		int success=sqlite3_step(statement);
+		
+		if (success == SQLITE_ERROR) {
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		i= sqlite3_last_insert_rowid(database);
+		sqlite3_finalize(statement);
+		
+		return i;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Actor record not Inserted" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}
+	return i;
+	
+}
+-(int)UpdateVitalsDetail:(Vitals_Detail*)Data
+{
+	int i=0;
+	@try
+	{
+		sqlite3_stmt *statement=nil;
+		NSString  *sql=nil;	
+		sql=[NSString stringWithFormat:@"update Vitals_Detail set User_ID=?,BP=?,EntryDate=?,EntryTime=?,BloodSugar=?,Fasting=?,Other_Vitals=?,Pulse=?,Respiration=?,TemperatureC=?,TemperatureF=?,WeightLbs=?,WeightKgs=? where Vitals_ID=%d",Data.Vitals_ID];
+		
+		if(sqlite3_prepare_v2(database, [sql UTF8String], -1, &statement, NULL)!=SQLITE_OK)
+		{
+			NSAssert1(0, @"Error: failed to prepare statement with message '%s'.", sqlite3_errmsg(database));
+		}	
+		sqlite3_bind_int(statement, 1, Data.User_ID1);
+		sqlite3_bind_text(statement, 2,[Data.BP  UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 3,[Data.EntryDate UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 4,[Data.EntryTime UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 5,[Data.BloodSugar UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 6,[Data.Fasting UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 7,[Data.Other UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 8,[Data.Pulse UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 9,[Data.Respiration UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 10,[Data.TempC UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 11,[Data.TempF UTF8String] , -1, SQLITE_TRANSIENT);
+		
+		sqlite3_bind_text(statement, 12,[Data.WeightLbs UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 13,[Data.WeightKgs UTF8String] , -1, SQLITE_TRANSIENT);
+		int success=sqlite3_step(statement);
+		
+		if (success == SQLITE_ERROR) {
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		i=1;
+		sqlite3_finalize(statement);
+		
+		return i;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Actor record not Inserted" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}
+	return i;
+	
+}
+-(void)SelectVitalsDetail:(NSString*)PassingDate AndTime:(NSString*)PassingTime andUserID:(NSInteger)User_ID
+{
+	//NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	@try
+	{
+		if(!DailyArray)
+			DailyArray=[[NSMutableArray alloc]init];	
+		
+		if([DailyArray count]>0)
+		{
+			[DailyArray removeAllObjects];
+		}	
+		sqlite3_stmt *selectstatement=nil;	
+		NSString *sql;
+		int returnvalue;
+		//	sql=[NSString stringWithFormat:@"Select User_ID,Medicine_Entry,EntryDate,EntryTime,Medicine_ID from Routine_Master where Routine_ID=%d",Entry_ID];
+		sql=[NSString stringWithFormat:@"select User_ID,BP,EntryDate,EntryTime,BloodSugar,Fasting,Other_Vitals,Pulse,Respiration,TemperatureC,TemperatureF,Vitals_ID,WeightLbs,WeightKgs from Vitals_Detail where User_ID=%d and(EntryDate='%@' and EntryTime='%@')",User_ID,PassingDate,PassingTime];
+		returnvalue = sqlite3_prepare_v2(database, [sql UTF8String], -1, &selectstatement, NULL);
+		if(returnvalue==1)
+		{
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		//int mile=set1.MaxDiatance;
+		if(returnvalue==SQLITE_OK)
+		{		
+			while(sqlite3_step(selectstatement)==SQLITE_ROW)
+			{	
+				Vitals_Detail *Master=[[Vitals_Detail alloc]init]; 
+				Master.User_ID1= sqlite3_column_int(selectstatement, 0);
+				Master.BP= [NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,1)];
+				Master.EntryDate= [NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,2)];
+				Master.EntryTime= [NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,3)];
+				Master.BloodSugar=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,4)];
+				Master.Fasting=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,5)];
+				Master.Other=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,6)];
+				Master.Pulse=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,7)];
+				Master.Respiration=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,8)];
+				Master.TempC=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,9)];
+				Master.TempF=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,10)];
+				Master.Vitals_ID= sqlite3_column_int(selectstatement, 11);
+				Master.WeightLbs=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,12)];
+				Master.WeightKgs=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,13)];
+				[DailyArray addObject:Master];			
+				[Master release];	
+			}
+		}
+		sqlite3_finalize(selectstatement);
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"User settings record not found." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}	
+	//[Pool release];
+}
+
+
+#pragma mark Routines Table Methoda
+
+-(int)InsertRoutinesDetail:(Routine_Detail*)Data
+{
+	int i=0;
+	@try
+	{
+		sqlite3_stmt *statement=nil;
+		NSString  *sql=nil;	
+		sql=[NSString stringWithFormat:@"insert into Routine_Detail(User_ID,Activity,EntryDate,EntryTime,Alcohol,Cigarrettes,Diapering,Drugs,Exercise,Feeding,Mood,Other_Routines,Sleep) values(?,?,?,?,?,?,?,?,?,?,?,?,?)"];
+		
+		if(sqlite3_prepare_v2(database, [sql UTF8String], -1, &statement, NULL)!=SQLITE_OK)
+		{
+			NSAssert1(0, @"Error: failed to prepare statement with message '%s'.", sqlite3_errmsg(database));
+		}	
+		
+		sqlite3_bind_int(statement, 1, Data.User_ID);
+		sqlite3_bind_text(statement, 2,[Data.Activity  UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 3,[Data.EntryDate UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 4,[Data.EntryTime UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 5,[Data.Alcohol UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 6,[Data.Cigarrettes UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 7,[Data.Diapering UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 8,[Data.Drugs UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 9,[Data.Exercise UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 10,[Data.Feeding UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 11,[Data.Mood UTF8String] , -1, SQLITE_TRANSIENT);
+		
+		sqlite3_bind_text(statement, 12,[Data.Other UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 13,[Data.Sleep UTF8String] , -1, SQLITE_TRANSIENT);
+	//	sqlite3_bind_text(statement, 11,[Data.Mood UTF8String] , -1, SQLITE_TRANSIENT);
+		int success=sqlite3_step(statement);
+		
+		if (success == SQLITE_ERROR) {
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		i= sqlite3_last_insert_rowid(database);
+		sqlite3_finalize(statement);
+		
+		return i;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Actor record not Inserted" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}
+	return i;
+	
+}
+-(int)UpdateRoutinesDetail:(Routine_Detail*)Data
+{
+	int i=0;
+	@try
+	{
+		sqlite3_stmt *statement=nil;
+		NSString  *sql=nil;	
+		sql=[NSString stringWithFormat:@"update Routine_Detail set User_ID=?,Activity=?,EntryDate=?,EntryTime=?,Alcohol=?,Cigarrettes=?,Diapering=?,Drugs=?,Exercise=?,Feeding=?,Mood=?,Other_Routines=?,Sleep=? where Routine_ID=%d",Data.Routine_ID];
+		
+		if(sqlite3_prepare_v2(database, [sql UTF8String], -1, &statement, NULL)!=SQLITE_OK)
+		{
+			NSAssert1(0, @"Error: failed to prepare statement with message '%s'.", sqlite3_errmsg(database));
+		}	
+		sqlite3_bind_int(statement, 1, Data.User_ID);
+		sqlite3_bind_text(statement, 2,[Data.Activity  UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 3,[Data.EntryDate UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 4,[Data.EntryTime UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 5,[Data.Alcohol UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 6,[Data.Cigarrettes UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 7,[Data.Diapering UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 8,[Data.Drugs UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 9,[Data.Exercise UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 10,[Data.Feeding UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 11,[Data.Mood UTF8String] , -1, SQLITE_TRANSIENT);
+		
+		sqlite3_bind_text(statement, 12,[Data.Other UTF8String] , -1, SQLITE_TRANSIENT);
+		sqlite3_bind_text(statement, 13,[Data.Sleep UTF8String] , -1, SQLITE_TRANSIENT);
+		
+		int success=sqlite3_step(statement);
+		
+		if (success == SQLITE_ERROR) {
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		i=1;
+		sqlite3_finalize(statement);
+		
+		return i;
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Actor record not Inserted" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}
+	return i;
+	
+}
+-(void)SelectRoutinesDetail:(NSString*)PassingDate AndTime:(NSString*)PassingTime andUserID:(NSInteger)User_ID
+{
+//SAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	@try
+	{
+		if(!HourlyDataArray)
+			HourlyDataArray=[[NSMutableArray alloc]init];	
+		
+		if([HourlyDataArray count]>0)
+		{
+			[HourlyDataArray removeAllObjects];
+		}	
+		sqlite3_stmt *selectstatement=nil;	
+		NSString *sql;
+		int returnvalue;
+		//	sql=[NSString stringWithFormat:@"Select User_ID,Medicine_Entry,EntryDate,EntryTime,Medicine_ID from Routine_Master where Routine_ID=%d",Entry_ID];
+		sql=[NSString stringWithFormat:@"select User_ID,Activity,EntryDate,EntryTime,Alcohol,Cigarrettes,Diapering,Drugs,Exercise,Feeding,Mood,Other_Routines,Sleep,Routine_ID from Routine_Detail where User_ID=%d and(EntryDate='%@' and EntryTime='%@')",User_ID,PassingDate,PassingTime];
+		returnvalue = sqlite3_prepare_v2(database, [sql UTF8String], -1, &selectstatement, NULL);
+		if(returnvalue==1)
+		{
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		//int mile=set1.MaxDiatance;
+		if(returnvalue==SQLITE_OK)
+		{		
+			while(sqlite3_step(selectstatement)==SQLITE_ROW)
+			{	
+				Routine_Detail *Master=[[Routine_Detail alloc]init]; 
+				Master.User_ID= sqlite3_column_int(selectstatement, 0);
+				Master.Activity= [NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,1)];
+				Master.EntryDate= [NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,2)];
+				Master.EntryTime= [NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,3)];
+				Master.Alcohol=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,4)];
+				Master.Cigarrettes=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,5)];
+				Master.Diapering=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,6)];
+				Master.Drugs=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,7)];
+				Master.Exercise=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,8)];
+				Master.Feeding=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,9)];
+				Master.Mood=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,10)];
+				Master.Other=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,11)];
+				Master.Sleep=[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,12)];
+				Master.Routine_ID= sqlite3_column_int(selectstatement, 13);
+				[HourlyDataArray addObject:Master];			
+				[Master release];	
+			}
+		}
+		sqlite3_finalize(selectstatement);
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"User settings record not found." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}	
+//	[Pool release];
+}
+
+
+-(void)SelectDefaultUser
+{
+	@try
+	{
+		if(!UserArray)
+			UserArray=[[NSMutableArray alloc]init];	
+		
+		if([UserArray count]>0)
+		{
+			[UserArray removeAllObjects];
+		}	
+		sqlite3_stmt *selectstatement=nil;	
+		NSString *sql;
+		int returnvalue;
+		
+		sql=@"Select User_ID,Age,BloodGroup,Diabetes_Situation,Drinking_Status,Drug_Taken,Gender,Height_Cms,Height_Inch,Smoking_Status,User_Name,Past_Name,Past_Health_Phone,Past_Identification,Past_PolicyNo,Past_Insurance_PN,Past_EmrContact,Past_Allergy_Info,Past_Surgeries,IsKid,Past,DOB,DOBYear,isdefault,Past_Medication,Medicine_ListID from User_Detail where isdefault=1";
+		returnvalue = sqlite3_prepare_v2(database, [sql UTF8String], -1, &selectstatement, NULL);
+		if(returnvalue==1)
+		{
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		if(returnvalue==SQLITE_OK)
+		{		
+			while(sqlite3_step(selectstatement)==SQLITE_ROW)
+			{	
+				NSMutableDictionary *User_Data=[[NSMutableDictionary alloc]init];
+				
+				[User_Data setValue:[NSString stringWithFormat:@"%d",sqlite3_column_int(selectstatement, 0)] forKey:@"UserID"];
+				
+				NSArray *arr=[[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,1)] componentsSeparatedByString:@"."] ;
+				if([arr count]>1)
+				{
+					[User_Data setValue:[arr objectAtIndex:0] forKey:@"Age"];
+					[User_Data setValue:[arr objectAtIndex:1] forKey:@"AgeMonth"];
+				}
+				
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,2)] forKey:@"BloodGroup"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,3)] forKey:@"Diabetes"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,4)] forKey:@"Drinking"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,5)] forKey:@"Drug"];
+				
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,6)] forKey:@"Gender"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,7)] forKey:@"HeightCMS"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,8)] forKey:@"HeightFT"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,9)] forKey:@"Smoking"];
+				
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,10)] forKey:@"UserName"];
+				
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,21)] forKey:@"DOB"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,11)] forKey:@"PastName"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,12)] forKey:@"PastPhoneNumber"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,13)] forKey:@"PastIdentification"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,15)] forKey:@"PastPhone"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,14)] forKey:@"PastPolicyNo"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,16)] forKey:@"PastEmrContact"];
+				
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,17)] forKey:@"PastAllergyInfo"];
+				
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,18)] forKey:@"PastSurgeries"];
+				[User_Data setValue:[NSString stringWithFormat:@"%d",sqlite3_column_int(selectstatement, 19)] forKey:@"IsKid"];
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,20)] forKey:@"Past"];
+				
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,22)] forKey:@"Year"];
+				[User_Data setValue:[NSString stringWithFormat:@"%d",sqlite3_column_int(selectstatement, 23)] forKey:@"Default"];
+				
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,24)] forKey:@"PastMedicationList"];
+				
+				[User_Data setValue:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,25)] forKey:@"PastMedicationListID"];
+				
+				[UserArray addObject:User_Data];			
+				[User_Data release];	
+			}
+		}
+		sqlite3_finalize(selectstatement);
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"User settings record not found." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}	
+}
+
+
+////////// Vitals and routine Calendar data
+
+
+#pragma mark Vitals and routine Calendar data
+
+
+-(void)GetVitalsCalendarData:(NSString *)ColumnName StartDate:(NSString*)PassStartDate Enddate:(NSString *)PassEndDate StartTime:(NSString *)PassStartTime EndTime:(NSString*)PassEndTime andUserID:(NSInteger)User_ID andTableName:(NSString *)TableName
+{
+	NSAutoreleasePool  *Pool=[[NSAutoreleasePool alloc]init];
+	@try
+	{
+		sqlite3_stmt *selectstatement=nil;	
+		NSString *sql;
+		int returnvalue;
+		if([PassStartDate isEqualToString:PassEndDate])
+		{
+			sql=[NSString stringWithFormat:@"Select EntryDate,EntryTime,%@ from %@ where  ((entrydate = '%@'  and EntryTime>='%@'  And   EntryTime <= '%@' )) and %@<>'' and User_ID=%d  order by EntryDate,EntryTime ",ColumnName,TableName,PassStartDate,PassStartTime,PassEndTime,ColumnName,User_ID];
+		}
+		else
+		{
+			sql=[NSString stringWithFormat:@"Select EntryDate,EntryTime,%@ from %@ where  ((entrydate = '%@'  and EntryTime>='%@' ) OR (EntryDate = '%@' And   EntryTime <= '%@') OR (EntryDate > '%@' And EntryDate < '%@' )) and %@<>'' and User_ID=%d  order by EntryDate,EntryTime ",ColumnName,TableName,PassStartDate,PassStartTime,PassEndDate,PassEndTime,PassStartDate,PassEndDate,ColumnName,User_ID];
+		}
+		returnvalue = sqlite3_prepare_v2(database, [sql UTF8String], -1, &selectstatement, NULL);
+		if(returnvalue==1)
+		{
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		NSMutableDictionary *User_Data=[[NSMutableDictionary alloc]init];
+		if(returnvalue==SQLITE_OK)
+		{		
+			while(sqlite3_step(selectstatement)==SQLITE_ROW)
+			{	
+				NSString *Str=[NSString stringWithFormat:@"%@ %@",[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,0)],[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,1)]];
+				[User_Data setObject:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,2)] forKey:Str];
+				
+				if(![WeekArray containsObject:Str])					
+					[WeekArray addObject:Str];				
+				
+			}
+			[ReportArray setObject:User_Data forKey:ColumnName]; 
+			[User_Data release];	
+		}
+		sqlite3_finalize(selectstatement);
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"User settings record not found." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}	
+	[Pool release];
+	
+}
+
+-(void)SelectWeeklyDataForMemstrual:(NSString *)StartDate PassEndDate:(NSString*)EndDate andUserID:(NSInteger)User_ID1 
+{
+	@try
+	{
+		if(!MensturalArray)
+			MensturalArray=[[NSMutableArray alloc]init];	
+		
+		if([MensturalArray count]>0)
+		{
+			[MensturalArray removeAllObjects];
+		}	
+		sqlite3_stmt *selectstatement=nil;	
+		NSString *sql;
+		int returnvalue;
+		sql=[NSString stringWithFormat:@"select User_id,startdate,enddate,daily_date,cycle_id from  Menstrual_cycle where user_id=%d and (StartDate between '%@' and '%@' or Enddate between '%@' and '%@')",User_ID1,StartDate,EndDate,StartDate,EndDate];
+		returnvalue = sqlite3_prepare_v2(database, [sql UTF8String], -1, &selectstatement, NULL);
+		if(returnvalue==1)
+		{
+			NSAssert1(0, @"Error: failed to insert into the database with message '%s'.", sqlite3_errmsg(database));
+		}
+		
+		NSMutableDictionary *User_Data=[[NSMutableDictionary alloc]init];
+		if(returnvalue==SQLITE_OK)
+		{		
+			while(sqlite3_step(selectstatement)==SQLITE_ROW)
+			{					
+				if([[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,1)] length]>0)
+				{
+					[User_Data setObject:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,1)] forKey:[NSString stringWithFormat:@"%@_Start",[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,1)]]];
+					if(![WeekArray containsObject:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,1)]])
+						[WeekArray addObject:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,1)]];
+				}
+				if([[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,2)] length]>0)
+				{
+					[User_Data setObject:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,2)] forKey:[NSString stringWithFormat:@"%@_End",[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,2)]]];
+					
+					
+					if(![WeekArray containsObject:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,2)]])
+						[WeekArray addObject:[NSString stringWithUTF8String:(char *)sqlite3_column_text(selectstatement,2)]];
+				}
+			}
+		}
+		[ReportArray setObject:User_Data forKey:@"Menstrution"]; 
+		[User_Data release];	
+		sqlite3_finalize(selectstatement);
+	}
+	@catch (NSException *e) 
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"User settings record not found." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}	
+	
+}
+
+- (void)dealloc {
+	[navigationController release];
+	[window release];
+
+	[SelectedStatus release];
+	[AddNewUserDict release];
+	[UserSettingsArray release];
+	[UserArray release];
+	[EntryArray release];
+
+	[SelectedItems release];
+	[HourlyDataArray release];
+	[MedicineArray release];
+	[MensturalArray release];
+	[tf release];
+	[alert1 release];
+	[WeekArray release];
+	[DailyArray release];
+	[DailyReportArray release];
+	[HourlyReportArray release];
+	[SelectColumnName release];
+	[SelectColumnName1 release];
+	[VitalsMasterArray release];
+	
+	/////
+	
+	[ReportStartDate release];
+	[ReportEndDate release];
+	[ReportField release];
+	
+	[super dealloc];
+}
+
+@end

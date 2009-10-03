@@ -1,0 +1,319 @@
+//
+//  CalendarTableViewCell.m
+//  HealthTracker
+//
+//  Created by MAC02 on 4/2/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import "CalendarTableViewCell.h"
+
+
+@implementation CalendarTableViewCell
+@synthesize lblName,lblNameTwo;
+@synthesize Hour1,Hour2,Hour3,Hour4,Hour5,Hour6,Hour7,Hour8,Hour9,Hour10,Hour11,Hour12,Hour13,Hour14,Hour15,Hour16,Hour17,Hour18,Hour19,Hour20,Hour21,Hour22,Hour23,Hour24;
+
+- (id)initWithFrame:(CGRect)frame reuseIdentifier:(NSString *)reuseIdentifier {
+    if (self = [super initWithFrame:frame reuseIdentifier:reuseIdentifier]) {
+		
+		UIView *myContentview=self.contentView;
+		
+		Columns = [NSMutableArray arrayWithCapacity:21];
+		[Columns retain];
+		
+		lblName=[self newLabelWithPrimaryColor:[UIColor colorWithRed:0.317 green:0.4 blue:0.56 alpha:1.0] selectedColor:[UIColor whiteColor] fontSize:11.5 bold:YES];
+		lblName.textAlignment=UITextAlignmentCenter;
+		//	lblName.textColor=[UIColor colorWithRed:0.317 green:0.4 blue:0.56 alpha:1.0];//[UIColor colorWithRed:0.65 green:0.63 blue:0.61 alpha:1.0];
+	
+		
+		
+		self.lblNameTwo=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:14 bold:YES];
+		self.lblNameTwo.numberOfLines=0;
+		self.lblNameTwo.textAlignment=UITextAlignmentCenter;
+		[myContentview addSubview:self.lblNameTwo];
+		[self.lblNameTwo release];
+		
+		[myContentview addSubview:lblName];
+		[lblName release];
+		
+		Hour1=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+		Hour1.textAlignment=UITextAlignmentCenter;
+		Hour1.numberOfLines=0;
+		[myContentview addSubview:Hour1];
+		[Hour1 release];
+		
+		Hour2=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+		Hour2.textAlignment=UITextAlignmentCenter;
+		Hour2.numberOfLines=0;
+		[myContentview addSubview:Hour2];
+		[Hour2 release];
+		
+		
+		Hour3=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+		Hour3.textAlignment=UITextAlignmentCenter;
+		Hour3.numberOfLines=0;
+		[myContentview addSubview:Hour3];
+		[Hour3 release];
+		
+		
+		Hour4=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+		Hour4.textAlignment=UITextAlignmentCenter;
+		Hour4.numberOfLines=0;
+		[myContentview addSubview:Hour4];
+		[Hour4 release];
+		
+		
+		Hour5=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+		Hour5.textAlignment=UITextAlignmentCenter;
+		Hour5.numberOfLines=0;
+		[myContentview addSubview:Hour5];
+		[Hour5 release];
+		
+		
+		Hour6=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+		Hour6.textAlignment=UITextAlignmentCenter;
+		Hour6.numberOfLines=0;
+		[myContentview addSubview:Hour6];
+		[Hour6 release];
+		
+		
+		Hour7=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+		Hour7.textAlignment=UITextAlignmentCenter;
+		Hour7.numberOfLines=0;
+		[myContentview addSubview:Hour7];
+		[Hour7 release];
+		
+		Hour8=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+		Hour8.textAlignment=UITextAlignmentCenter;
+		Hour8.numberOfLines=0;
+		[myContentview addSubview:Hour8];
+		[Hour8 release];
+		
+		Hour9=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+		Hour9.textAlignment=UITextAlignmentCenter;
+		Hour9.numberOfLines=0;
+		[myContentview addSubview:Hour9];
+		[Hour9 release];
+		
+		Hour10=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+		Hour10.textAlignment=UITextAlignmentCenter;
+		Hour10.numberOfLines=0;
+		[myContentview addSubview:Hour10];
+		[Hour10 release];
+		
+		Hour12=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+		Hour12.textAlignment=UITextAlignmentCenter;
+		Hour12.numberOfLines=0;
+		[myContentview addSubview:Hour12];
+		[Hour12 release];
+		
+		Hour13=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+		Hour13.textAlignment=UITextAlignmentCenter;
+		Hour13.numberOfLines=0;
+		[myContentview addSubview:Hour13];
+		
+		[Hour13 release];
+		
+		
+		Hour14=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+		Hour14.textAlignment=UITextAlignmentCenter;
+		Hour14.numberOfLines=0;
+		[myContentview addSubview:Hour14];
+		[Hour14 release];
+		
+		Hour11=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+		Hour11.textAlignment=UITextAlignmentCenter;
+		Hour11.numberOfLines=0;
+		[myContentview addSubview:Hour11];
+		[Hour11 release];
+		
+		Hour15=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+		Hour15.textAlignment=UITextAlignmentCenter;
+		Hour15.numberOfLines=0;
+		[myContentview addSubview:Hour15];
+		[Hour15 release];
+		
+		Hour16=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+		Hour16.textAlignment=UITextAlignmentCenter;
+		Hour16.numberOfLines=0;
+		[myContentview addSubview:Hour16];
+		[Hour16 release];
+		
+		Hour17=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+		Hour17.textAlignment=UITextAlignmentCenter;
+		Hour17.numberOfLines=0;
+		[myContentview addSubview:Hour17];
+		[Hour17 release];
+		
+		Hour18=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+		Hour18.textAlignment=UITextAlignmentCenter;
+		Hour18.numberOfLines=0;
+		[myContentview addSubview:Hour18];
+		[Hour18 release];
+		
+		Hour19=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+		Hour19.textAlignment=UITextAlignmentCenter;
+		Hour19.numberOfLines=0;
+		[myContentview addSubview:Hour19];
+		[Hour19 release];
+		
+		Hour20=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+		Hour20.textAlignment=UITextAlignmentCenter;
+		Hour20.numberOfLines=0;
+		[myContentview addSubview:Hour20];
+		[Hour20 release];
+		
+	//	Hour21=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+//		Hour21.textAlignment=UITextAlignmentCenter;
+//		Hour21.numberOfLines=0;
+//		[myContentview addSubview:Hour21];
+//		[Hour21 release];
+//		
+//		Hour22=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+//		Hour22.textAlignment=UITextAlignmentCenter;
+//		Hour22.numberOfLines=0;
+//		[myContentview addSubview:Hour22];
+//		[Hour22 release];
+//		
+//		Hour23=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+//		Hour23.textAlignment=UITextAlignmentCenter;
+//		Hour23.numberOfLines=0;
+//		[myContentview addSubview:Hour23];
+//		[Hour23 release];
+//		
+//		Hour24=[self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:12.5 bold:NO];
+//		Hour24.textAlignment=UITextAlignmentCenter;
+//		Hour24.numberOfLines=0;
+//		[myContentview addSubview:Hour24];
+//		[Hour24 release];
+		
+		
+    }
+    return self;
+}
+
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+	
+    [super setSelected:FALSE animated:animated];
+	
+    // Configure the view for the selected state
+}
+
+-(UILabel *)newLabelWithPrimaryColor:(UIColor *)primaryColor selectedColor:(UIColor *)selectedColor fontSize:(CGFloat)fontSize bold:(BOOL)bold
+{
+	UIFont *font;
+    if (bold) {
+        font = [UIFont boldSystemFontOfSize:fontSize];
+    } else {
+        font = [UIFont systemFontOfSize:fontSize];
+    }
+	
+    /*
+	 Views are drawn most efficiently when they are opaque and do not have a clear background, so set these defaults.  To show selection properly, however, the views need to be transparent (so that the selection color shows through).  This is handled in setSelected:animated:.
+	 */
+	UILabel *newLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0,0,0)];
+	newLabel.backgroundColor = [UIColor clearColor];
+	newLabel.opaque = YES;
+	newLabel.textColor = primaryColor;
+	
+	//newLabel.textColor = [UIColor colorWithRed:0.317 green:0.4 blue:0.56 alpha:1.0];
+	newLabel.highlightedTextColor = selectedColor;
+	newLabel.font = font;	
+	return newLabel;
+	
+}
+
+- (void)layoutSubviews {
+	
+    [super layoutSubviews];
+	
+	self.lblName.frame =  CGRectMake(2, self.frame.size.height/2-10, 97, 20);
+	//	self.lblNameTwo.frame =  CGRectMake(150, 4, 160,  self.frame.size.height-8);
+	
+	Hour1.frame=CGRectMake(100+3, 5, 80-3,  self.frame.size.height-8);	
+	Hour2.frame=CGRectMake(90*2+3, 5, 80-3,  self.frame.size.height-8);	
+	Hour3.frame=CGRectMake(90*3+3, 5, 80-3,  self.frame.size.height-8);	
+	Hour4.frame=CGRectMake(90*4+3, 5, 80-3,  self.frame.size.height-8);	
+	Hour5.frame=CGRectMake(90*5+3, 5, 80-3,  self.frame.size.height-8);	
+	Hour6.frame=CGRectMake(90*6+3, 5, 80-3,  self.frame.size.height-8);	
+	Hour7.frame=CGRectMake(90*7+3, 5, 80-3,  self.frame.size.height-8);
+	Hour8.frame=CGRectMake(90*8+3, 5, 80-3,  self.frame.size.height-8);	
+	Hour9.frame=CGRectMake(90*9+3, 5, 80-3,  self.frame.size.height-8);
+	
+	Hour10.frame=CGRectMake(90*10+3, 5, 80-3,  self.frame.size.height-8);	
+	Hour11.frame=CGRectMake(90*11+3, 5, 80-3,  self.frame.size.height-8);	
+	Hour12.frame=CGRectMake(90*12+3, 5, 80-3,  self.frame.size.height-8);	
+	Hour13.frame=CGRectMake(90*13+3, 5, 80-3,  self.frame.size.height-8);	
+	Hour14.frame=CGRectMake(90*14+3, 5, 80-3,  self.frame.size.height-8);	
+	Hour15.frame=CGRectMake(90*15+3, 5, 80-3,  self.frame.size.height-8);	
+	Hour16.frame=CGRectMake(90*16+3, 5, 80-3,  self.frame.size.height-8);	
+	Hour17.frame=CGRectMake(90*17+3, 5, 80-3,  self.frame.size.height-8);	
+	Hour18.frame=CGRectMake(90*18+3, 5, 80-3,  self.frame.size.height-8);	
+	Hour19.frame=CGRectMake(90*19+3, 5, 80-3,  self.frame.size.height-8);	
+	//	1445,1510,1575,164
+	Hour20.frame=CGRectMake(90*20+3, 5, 80-3,  self.frame.size.height-8);	
+	
+//	Hour1.frame=CGRectMake(130, 5, 90,  self.frame.size.height-8);	
+//	Hour2.frame=CGRectMake(110*2, 5, 90,  self.frame.size.height-8);	
+//	Hour3.frame=CGRectMake(110*3, 5, 90,  self.frame.size.height-8);	
+//	Hour4.frame=CGRectMake(110*4, 5, 100,  self.frame.size.height-8);	
+//	Hour5.frame=CGRectMake(110*5, 5, 100,  self.frame.size.height-8);	
+//	Hour6.frame=CGRectMake(110*6, 5, 100,  self.frame.size.height-8);	
+//	Hour7.frame=CGRectMake(110*7, 5, 100,  self.frame.size.height-8);
+//	Hour8.frame=CGRectMake(110*8, 5, 100,  self.frame.size.height-8);	
+//	Hour9.frame=CGRectMake(110*9, 5, 100,  self.frame.size.height-8);
+//	
+//	Hour10.frame=CGRectMake(110*10, 5, 100,  self.frame.size.height-8);	
+//	Hour11.frame=CGRectMake(110*11, 5, 100,  self.frame.size.height-8);	
+//	Hour12.frame=CGRectMake(110*12, 5, 100,  self.frame.size.height-8);	
+//	Hour13.frame=CGRectMake(110*13, 5, 100,  self.frame.size.height-8);	
+//	Hour14.frame=CGRectMake(110*14, 5, 100,  self.frame.size.height-8);	
+//	Hour15.frame=CGRectMake(110*15, 5, 100,  self.frame.size.height-8);	
+//	Hour16.frame=CGRectMake(110*16, 5, 100,  self.frame.size.height-8);	
+//	Hour17.frame=CGRectMake(110*17, 5, 100,  self.frame.size.height-8);	
+//	Hour18.frame=CGRectMake(110*18, 5, 100,  self.frame.size.height-8);	
+//	Hour19.frame=CGRectMake(110*19, 5, 100,  self.frame.size.height-8);	
+//	//	1445,1510,1575,164
+//	Hour20.frame=CGRectMake(110*20, 5, 100,  self.frame.size.height-8);
+	
+	//Hour21.frame=CGRectMake(150*21, 5, 130,  self.frame.size.height-8);
+//	Hour22.frame=CGRectMake(150*22, 5, 130,  self.frame.size.height-8);
+//	Hour23.frame=CGRectMake(150*23, 5, 130,  self.frame.size.height-8);
+//	Hour24.frame=CGRectMake(150*24, 5, 130,  self.frame.size.height-8);
+	
+}
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{	
+	Delegate=[[UIApplication sharedApplication]delegate];
+	UITouch *touch = [touches anyObject];
+	Delegate.SelectedLocation = [touch locationInView: [touch view]];
+	
+}
+- (void)dealloc {
+    [super dealloc];
+}
+
+- (void)addColumn:(CGFloat)position {
+	[Columns addObject:[NSNumber numberWithFloat:position]];
+}
+
+- (void)drawRect:(CGRect)rect { 
+	CGContextRef ctx = UIGraphicsGetCurrentContext();
+	
+	// just match the color and size of the horizontal line
+	CGContextSetRGBStrokeColor(ctx, 0.5, 0.5, 0.5, 1.0); 
+	CGContextSetLineWidth(ctx, 0.50);
+	
+	for (int i = 0; i < [Columns count]; i++) {
+		// get the position for the vertical line
+		CGFloat f = [((NSNumber*) [Columns objectAtIndex:i]) floatValue];
+		CGContextMoveToPoint(ctx, f, 0);
+		CGContextAddLineToPoint(ctx, f, self.bounds.size.height);
+	}
+	
+	CGContextStrokePath(ctx);
+	
+	[super drawRect:rect];
+} 
+@end

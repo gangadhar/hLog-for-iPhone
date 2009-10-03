@@ -1,0 +1,50 @@
+//
+//  Routine_Detail.h
+//  HealthTracker
+//
+//  Created by MAC02 on 3/31/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+
+@interface Routine_Detail : NSObject {
+
+	NSInteger User_ID;
+	NSInteger Routine_ID;
+	NSString *Activity;
+	NSString *Alcohol;
+	NSString *Cigarrettes;
+	NSString *Diapering;
+	NSString *Drugs;
+	NSString *EntryTime;
+	NSString *EntryDate;
+	NSString *Exercise;
+	NSString *Feeding;
+	
+	NSString *Mood;
+	NSString *Other;
+	NSString *Sleep;
+}
+
+@property(nonatomic,retain)NSString *Activity;
+@property(nonatomic,retain)NSString *Alcohol;
+@property(nonatomic,retain)NSString *Cigarrettes;
+@property(nonatomic,retain)NSString *Diapering;
+@property(nonatomic,retain)NSString *Drugs;
+@property(nonatomic,retain)NSString *EntryTime;
+@property(nonatomic,retain)NSString *EntryDate;
+@property(nonatomic,retain)NSString *Exercise;
+@property(nonatomic,retain)NSString *Feeding;
+@property(nonatomic,retain)NSString *Mood;
+@property(nonatomic,retain)NSString *Other;
+@property(nonatomic,retain)NSString *Sleep;
+
+@property(nonatomic,readwrite) NSInteger User_ID;
+
+@property(nonatomic,readwrite) NSInteger Routine_ID;
+
+-(void)ClearData;
+
+@end

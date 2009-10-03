@@ -1,0 +1,29 @@
+//
+//  Menstural_Cycle.h
+//  HealthTracker
+//
+//  Created by Bhoomi on 3/16/09.
+//  Copyright 2008 Elan.
+//
+
+#import <Foundation/Foundation.h>
+
+
+@interface Menstural_Cycle : NSObject 
+{
+	NSInteger Cycle_ID;
+	NSString *StartDate;
+	NSString *EndDate;
+	NSString *Daily_Date;
+	NSInteger User_ID;
+}
+
+@property(nonatomic,retain) NSString *StartDate;
+@property(nonatomic,retain) NSString *EndDate;
+@property(nonatomic,retain) NSString *Daily_Date;
+@property(nonatomic,readwrite) NSInteger Cycle_ID;
+@property(nonatomic,readwrite) NSInteger User_ID;
+
+
+-(void)ClearData;
+@end

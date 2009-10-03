@@ -1,0 +1,30 @@
+//
+//  Medicine.h
+//  HealthTracker
+//
+//  Created by MAC02 on 3/30/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+
+@interface Medicine : NSObject 
+{
+	NSInteger UserID;
+	NSString *MedicineEntry;
+	NSInteger MedicineID;
+	NSString *EntryDate;
+	NSString *EntryTime;
+	NSString *Medicine_Insert_ID;
+}
+
+@property(nonatomic,readwrite) NSInteger UserID;
+@property(nonatomic,readwrite) NSInteger MedicineID;
+@property(nonatomic,retain) NSString *MedicineEntry;
+@property(nonatomic,retain) NSString *EntryDate;
+@property(nonatomic,retain) NSString *EntryTime;
+@property(nonatomic,retain) NSString *Medicine_Insert_ID;
+
+-(void)ClearData;
+@end

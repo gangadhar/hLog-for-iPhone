@@ -1,0 +1,18 @@
+//
+//  AddFieldTableViewCell.h
+//  Roland
+//
+//  Created by MAC07 on 14/03/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+
+@interface AddFieldTableViewCell : UITableViewCell {
+	UILabel *lblName;
+}
+
+@property(nonatomic,retain) UILabel *lblName;
+- (UILabel *)newLabelWithPrimaryColor:(UIColor *)primaryColor selectedColor:(UIColor *)selectedColor fontSize:(CGFloat)fontSize bold:(BOOL)bold;
+@end

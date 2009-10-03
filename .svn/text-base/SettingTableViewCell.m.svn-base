@@ -1,0 +1,108 @@
+//
+//  SettingTableViewCell.m
+//  HealthTracker
+//
+//  Created by Bhoomi on 3/3/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+#import "SettingTableViewCell.h"
+
+
+@implementation SettingTableViewCell
+@synthesize lblName,btnDelete,txtAmount;
+- (id)initWithFrame:(CGRect)frame reuseIdentifier:(NSString *)reuseIdentifier {
+    if (self = [super initWithFrame:frame reuseIdentifier:reuseIdentifier]) {
+        // Initialization code
+		
+		
+		UIView *MycontentView =self.contentView;
+		
+		self.lblName = [self newLabelWithPrimaryColor:[UIColor colorWithRed:0.317 green:0.4 blue:0.56 alpha:1.0] selectedColor:[UIColor whiteColor] fontSize:15.0 bold:YES];
+		self.lblName.textAlignment = UITextAlignmentLeft; // default
+		lblName.textColor=[UIColor colorWithRed:0.317 green:0.4 blue:0.56 alpha:1.0];
+		lblName.numberOfLines=0;
+		//lbltitle.textColor=[UIColor blackColor];
+		[MycontentView addSubview:self.lblName];
+		[self.lblName release];
+		
+		btnDelete=[[UIImageView alloc]init];
+		[MycontentView addSubview:btnDelete];
+		[btnDelete release];
+	
+		txtAmount=[[UITextField alloc]init];
+		txtAmount.borderStyle=UITextBorderStyleRoundedRect;
+		//txtAmount.backgroundColor=[UIColor redColor];
+		txtAmount.clearButtonMode =UITextFieldViewModeWhileEditing;
+		txtAmount.keyboardType=UIKeyboardTypeNumberPad;
+		txtAmount.font=[UIFont systemFontOfSize:15];
+		[MycontentView addSubview:txtAmount];
+		[txtAmount release];
+		
+    }
+    return self;
+}
+
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+- (void)layoutSubviews {
+	
+    [super layoutSubviews];
+	CGRect contentRect = self.contentView.bounds;   
+	
+	CGFloat boundsX = contentRect.origin.x;
+	CGRect frame;
+	Delegate=[[UIApplication sharedApplication]delegate];
+	frame = CGRectMake(9, 5, 245, self.frame.size.height-8);
+	self.lblName.frame = frame;
+	
+	//frame = CGRectMake(boundsX + 260, 12, 22, 22);
+//	self.btnDelete.frame = frame;
+	if(Delegate.ISfromDefaultUser==TRUE)
+	{
+	frame = CGRectMake(boundsX + 260, self.frame.size.height/2-8, 22, 22);
+	self.btnDelete.frame = frame;
+	}
+	else
+	{
+		frame = CGRectMake(boundsX + 280, self.frame.size.height/2-8, 22, 22);
+		self.btnDelete.frame = frame;
+	}
+
+	frame = CGRectMake(boundsX + 150, 8, 70, 25);
+	self.txtAmount.frame = frame;
+
+}
+
+- (UILabel *)newLabelWithPrimaryColor:(UIColor *)primaryColor selectedColor:(UIColor *)selectedColor fontSize:(CGFloat)fontSize bold:(BOOL)bold
+{
+	
+    UIFont *font;
+    if (bold) {
+        font = [UIFont boldSystemFontOfSize:fontSize];
+    } else {
+        font = [UIFont systemFontOfSize:fontSize];
+    }	
+	UILabel *newLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+	newLabel.backgroundColor = [UIColor whiteColor];
+	newLabel.opaque = YES;
+	newLabel.textColor = primaryColor;
+	newLabel.highlightedTextColor = selectedColor;
+	newLabel.baselineAdjustment=UIBaselineAdjustmentAlignCenters;
+	newLabel.font = font;	
+	return newLabel;
+}
+
+
+- (void)dealloc {
+    [super dealloc];
+}
+
+
+@end

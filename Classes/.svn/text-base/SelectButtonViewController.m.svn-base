@@ -1,0 +1,584 @@
+//
+//  SelectButtonViewController.m
+//  HealthTracker
+//
+//  Created by MAC02 on 3/24/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import "SelectButtonViewController.h"
+
+#import "FirstViewController.h"
+
+
+
+@implementation SelectButtonViewController
+@synthesize SelectedIndex;
+/*
+ // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+        // Custom initialization
+    }
+    return self;
+}
+*/
+
+/*
+// Implement loadView to create a view hierarchy programmatically, without using a nib.
+- (void)loadView {
+}
+*/
+
+// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+- (void)viewDidLoad {
+	self.view.backgroundColor=[UIColor groupTableViewBackgroundColor];
+	tblView.delegate=self;
+	tblView.dataSource=self; 
+	appDelegate=[[UIApplication sharedApplication]delegate];
+	tblView.rowHeight=50;
+	//DateFormatter=[[NSDateFormatter alloc]init];
+	self.navigationController.navigationBar.barStyle= UIBarStyleBlackOpaque; 
+	UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
+	temporaryBarButtonItem.title = @"Back";
+	self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
+	[temporaryBarButtonItem release];
+	
+	[appDelegate SelectDefaultUser];
+	if([appDelegate.UserArray count]==0)
+	{
+		[appDelegate MakeDictForNewUser]; 
+		appDelegate.SelectedStatus=@"Add User";
+		appDelegate.iSfromAddUser=TRUE; 
+		if(!appDelegate.objFirstViewController)
+		{
+			appDelegate.objFirstViewController=[[FirstViewController alloc]initWithNibName:@"First_View" bundle:nil];
+		}
+		[self.navigationController pushViewController:appDelegate.objFirstViewController animated:YES];
+		
+	}
+	else
+	{
+		appDelegate.AddNewUserDict =[appDelegate.UserArray objectAtIndex:0];
+		appDelegate.SelectedUserID=[[appDelegate.AddNewUserDict valueForKey:@"UserID"]intValue];
+		appDelegate.IsKidOrNot=[[appDelegate.AddNewUserDict valueForKey:@"IsKid"]intValue];
+	}
+	
+	if(!appDelegate.objDailyStatusViewController)
+	{
+		appDelegate.objDailyStatusViewController=[[DailyStatusViewController alloc]initWithNibName:@"DailyStatus" bundle:nil];
+	}
+	
+	if(!appDelegate.objHourlyStatusViewController)
+	{
+		appDelegate.objHourlyStatusViewController=[[HourlyStatusViewController alloc]initWithNibName:@"HourlyStatus" bundle:nil];
+	}
+	
+	if(!appDelegate.objMedicineViewController)
+	{
+		appDelegate.objMedicineViewController=[[MedicineViewController alloc]initWithNibName:@"MedicineView" bundle:nil];
+	}
+	
+	if(!UserView)
+	{
+		UserView=[[UserViewController alloc]initWithNibName:@"UserSelect" bundle:nil];
+	}
+	
+	if(!appDelegate.objFirstViewController)
+	{
+		appDelegate.objFirstViewController=[[FirstViewController alloc]initWithNibName:@"First_View" bundle:nil];
+	}
+	
+	if(!objReport)
+	{
+		objReport=[[CalendarReportViewController alloc]initWithNibName:@"Calendar" bundle:nil];
+	}	
+	
+	if(!SelectSettingsView)
+	{
+		SelectSettingsView=[[SelectSettingsViewController alloc]initWithNibName:@"First_Settings" bundle:nil];
+	}
+	
+	if(!appDelegate.objRootViewController)
+	{
+		appDelegate.objRootViewController=[[RootViewController alloc]initWithNibName:@"RootViewController" bundle:nil];
+	}
+	
+    [super viewDidLoad];
+}
+
+
+/*
+// Override to allow orientations other than the default portrait orientation.
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+    // Return YES for supported orientations
+    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+*/
+
+
+- (void)viewWillAppear:(BOOL)animated
+{	
+	//self.navigationItem.title=@"User Menu"; 
+	[tblView scrollRectToVisible:CGRectMake(0, 0, 320, 50)  animated:YES];
+	[appDelegate SelectDefaultUser];
+	if([appDelegate.UserArray count]==0)
+	{
+		appDelegate.UserName=@"No User";
+	}
+	else
+	{
+		appDelegate.AddNewUserDict=[appDelegate.UserArray objectAtIndex:0];	
+		appDelegate.UserName=[appDelegate.AddNewUserDict valueForKey:@"UserName"];
+		appDelegate.AddNewUserDict =[appDelegate.UserArray objectAtIndex:0];
+		appDelegate.SelectedUserID=[[appDelegate.AddNewUserDict valueForKey:@"UserID"]intValue];
+		appDelegate.IsKidOrNot=[[appDelegate.AddNewUserDict valueForKey:@"IsKid"]intValue];
+		if(appDelegate.iSFirstTime==TRUE)
+		{
+			appDelegate.iSFirstTime=FALSE;
+			UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:[NSString stringWithFormat:@"Welcome %@!!!",appDelegate.UserName] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+			alert.tag=1;
+			[alert show];
+			[alert release];
+			
+		}
+	}
+	appDelegate.iSFirstTime=FALSE;
+	UILabel *label1 = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
+	label1.numberOfLines=0;
+	[label1 setFont:[UIFont boldSystemFontOfSize:17.0]];
+	[label1 setBackgroundColor:[UIColor clearColor]];
+	[label1 setTextAlignment:UITextAlignmentCenter];
+ 	[label1 setTextColor:[UIColor whiteColor]];
+	[label1 setText:[NSString stringWithFormat:@"%@ \n Health Tracker",appDelegate.UserName]];
+	self.navigationItem.titleView=label1;
+	[label1 release];
+}
+
+
+#pragma mark Table view methods
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+
+// Customize the number of rows in the table view.
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return 8 ;
+}
+
+
+// Customize the appearance of table view cells.
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    static NSString *CellIdentifier = @"Cell";
+	UITableViewCell *cell =(UITableViewCell *) [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+	if (cell == nil) {
+		cell = [[[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier] autorelease];
+	}	
+	cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
+	cell.indentationLevel = 4;
+    
+	switch (indexPath.row) {
+		case 0:
+			cell.text=@"Vitals";
+			//[cell.image autorelease];
+			cell.image=[UIImage imageNamed:@"Vitals.png"];
+			break;
+		case 1:
+			cell.text=@"Routines";
+			//[cell.image autorelease];
+			cell.image=[UIImage imageNamed:@"routine.png"];
+			break;
+		case 2:
+			cell.text=@"Medicines";
+			cell.image=[UIImage imageNamed:@"Medicine.png"];
+			break;
+		case 3:
+			cell.text=@"My Favorites";
+			cell.image=[UIImage imageNamed:@"Favorites_2.png"];
+			break;
+		case 4:
+			cell.text=@"User Profile";
+			cell.image=[UIImage imageNamed:@"User_pro.png"];
+			break;
+		case 5:
+			cell.text=@"Reports";
+			cell.image=[UIImage imageNamed:@"report_2.png"];
+			break;
+		case 6:
+			cell.text=@"Settings";
+			cell.image=[UIImage imageNamed:@"setting1.png"];
+			break;
+		case 7:
+			cell.text=@"Change Default User";
+			cell.image=[UIImage imageNamed:@"User_pro.png"];
+			break;
+		default:
+			break;
+	}
+	cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
+    return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+	[tblView deselectRowAtIndexPath:indexPath animated:YES];
+	
+	UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
+	temporaryBarButtonItem.title = @"Back";
+	self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
+	[temporaryBarButtonItem release];
+	
+	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	appDelegate.isFromEditReport=FALSE;
+	appDelegate.ISfromDefaultUser=TRUE;
+	if(appDelegate.SelectedUserID!=0)
+	{
+		appDelegate.isFromChart=FALSE;
+		if(indexPath.row==0)
+		{
+			[appDelegate.DateFormatter setDateFormat:@"MM-dd-yyyy"];
+			Date=[appDelegate.DateFormatter stringFromDate: [NSDate date]];
+			appDelegate.isfromRoot=TRUE;
+			[appDelegate.DateFormatter setDateFormat:@"HH:mm"];
+			DateTime=[appDelegate.DateFormatter stringFromDate:[NSDate date]];
+			
+			NSArray *arr=[DateTime componentsSeparatedByString:@":"];
+			Mins=@"";
+			if([arr count]>1)
+			{
+				Mins=[appDelegate CheckTIme:[[arr objectAtIndex:1]intValue]];
+			}
+			
+			[appDelegate SelectVitalsDetail:Date  AndTime:[NSString stringWithFormat:@"%@:%@",[arr objectAtIndex:0],Mins] andUserID:appDelegate.SelectedUserID];
+			
+			if([appDelegate.DailyArray count]>0)
+			{
+				appDelegate.objDailyStatusViewController.Vitals_Detailref =[appDelegate.DailyArray objectAtIndex:0];
+			}
+			else
+			{
+				if(!appDelegate.objDailyStatusViewController.Vitals_Detailref)
+				{
+					appDelegate.objDailyStatusViewController.Vitals_Detailref=[[Vitals_Detail alloc]init];
+				}
+				else
+				{
+					[appDelegate.objDailyStatusViewController.Vitals_Detailref ClearData];
+				}
+				
+				appDelegate.objDailyStatusViewController.Vitals_Detailref.User_ID1=appDelegate.SelectedUserID;
+				appDelegate.objDailyStatusViewController.Vitals_Detailref.EntryDate=Date;
+				appDelegate.objDailyStatusViewController.Vitals_Detailref.WeightLbs=[[NSUserDefaults standardUserDefaults] valueForKey:[NSString stringWithFormat:@"%d_WeightLbs",appDelegate.SelectedUserID]];
+				appDelegate.objDailyStatusViewController.Vitals_Detailref.WeightKgs=[[NSUserDefaults standardUserDefaults] valueForKey:[NSString stringWithFormat:@"%d_WeightKgs",appDelegate.SelectedUserID]];
+				appDelegate.objDailyStatusViewController.Vitals_Detailref.EntryTime=[NSString stringWithFormat:@"%@:%@",[arr objectAtIndex:0],Mins];
+				
+			}
+			[self.navigationController pushViewController:appDelegate.objDailyStatusViewController animated:YES];
+		}
+		else if(indexPath.row==1)
+		{
+			
+			[appDelegate.DateFormatter setDateFormat:@"MM-dd-yyyy"];
+			Date=[appDelegate.DateFormatter stringFromDate: [NSDate date]];
+			appDelegate.isfromRoot=TRUE;
+			[appDelegate.DateFormatter setDateFormat:@"HH:mm"];
+			DateTime=[appDelegate.DateFormatter stringFromDate:[NSDate date]];
+			
+			NSArray *arr=[DateTime componentsSeparatedByString:@":"];
+			Mins=@"";
+			if([arr count]>1)
+			{
+				Mins=[appDelegate CheckTIme:[[arr objectAtIndex:1]intValue]];
+			}
+			
+			
+			[appDelegate SelectRoutinesDetail:Date  AndTime:[NSString stringWithFormat:@"%@:%@",[arr objectAtIndex:0],Mins] andUserID:appDelegate.SelectedUserID];
+			[appDelegate selectMenstural:appDelegate.SelectedUserID  passDate:Date];
+			if([appDelegate.HourlyDataArray count]>0)
+			{
+				appDelegate.objHourlyStatusViewController.Routine_Detailrf =[appDelegate.HourlyDataArray objectAtIndex:0];
+			}
+			else
+			{
+				if(!appDelegate.objHourlyStatusViewController.Routine_Detailrf)
+				{
+					appDelegate.objHourlyStatusViewController.Routine_Detailrf=[[Routine_Detail alloc]init];
+				}
+				else
+				{
+					[appDelegate.objHourlyStatusViewController.Routine_Detailrf ClearData];
+				}
+				appDelegate.objHourlyStatusViewController.Routine_Detailrf.EntryDate=Date;
+				appDelegate.objHourlyStatusViewController.Routine_Detailrf.EntryTime=[NSString stringWithFormat:@"%@:%@",[arr objectAtIndex:0],Mins];
+				appDelegate.objHourlyStatusViewController.Routine_Detailrf.User_ID=appDelegate.SelectedUserID;
+				
+			}
+			if([appDelegate.MensturalArray count]>0)
+			{
+				appDelegate.objHourlyStatusViewController.Mensturalref=[appDelegate.MensturalArray objectAtIndex:0];
+				if([appDelegate.objHourlyStatusViewController.Mensturalref.EndDate length]>0)
+				{
+					[appDelegate.objHourlyStatusViewController.Mensturalref ClearData];
+					appDelegate.objHourlyStatusViewController.Mensturalref.User_ID=appDelegate.SelectedUserID;
+					appDelegate.objHourlyStatusViewController.Mensturalref.Daily_Date=Date;
+				}
+			}
+			else
+			{
+				if(!appDelegate.objHourlyStatusViewController.Mensturalref)
+				{
+					appDelegate.objHourlyStatusViewController.Mensturalref=[[Menstural_Cycle alloc]init];
+				}
+				else
+				{
+					[appDelegate.objHourlyStatusViewController.Mensturalref ClearData];
+				}
+				appDelegate.objHourlyStatusViewController.Mensturalref.User_ID=appDelegate.SelectedUserID;
+				appDelegate.objHourlyStatusViewController.Mensturalref.Daily_Date=Date;
+			}
+			appDelegate.SaveMenstural=FALSE; 
+			[self.navigationController pushViewController:appDelegate.objHourlyStatusViewController animated:YES];
+		}
+		else if(indexPath.row==2)
+		{
+			if(!appDelegate.objSelectOptionsViewController)
+			{
+				appDelegate.objSelectOptionsViewController=[[SelectOptionsViewController alloc]initWithNibName:@"SelectOptions" bundle:nil];
+			}
+			
+			[appDelegate.DateFormatter setDateFormat:@"MM-dd-yyyy"];
+			Date=[appDelegate.DateFormatter stringFromDate: [NSDate date]];
+			appDelegate.isfromRoot=TRUE;
+			[appDelegate.DateFormatter setDateFormat:@"HH:mm"];
+			DateTime=[appDelegate.DateFormatter stringFromDate:[NSDate date]];
+			NSArray *arr=[DateTime componentsSeparatedByString:@":"];
+			Mins=@"";
+			if([arr count]>1)
+			{
+				Mins=[appDelegate CheckTIme:[[arr objectAtIndex:1]intValue]];
+			}
+			appDelegate.DailyTag=20; 
+			appDelegate.isFromChart=TRUE; 
+			appDelegate.objSelectOptionsViewController.NavText=@"Medicine";
+			appDelegate.SelectedStatus=@"Medicine";
+			appDelegate.isFromChart=FALSE;
+			
+			[appDelegate Medicinedata:Date  ToTime:[NSString stringWithFormat:@"%@:%@",[arr objectAtIndex:0],Mins] anduserid:appDelegate.SelectedUserID]; 
+			if([appDelegate.EntryArray count]>0)
+			{
+				appDelegate.objSelectOptionsViewController.MedicineRef =[appDelegate.EntryArray objectAtIndex:0];
+				//	appDelegate.objSelectOptionsViewController.MedicineRef=self.MedicineRef;
+				appDelegate.SelectedItems=appDelegate.objSelectOptionsViewController.MedicineRef.Medicine_Insert_ID;
+			}
+			else
+			{
+				if(!appDelegate.objSelectOptionsViewController.MedicineRef)
+				{
+					appDelegate.objSelectOptionsViewController.MedicineRef=[[Medicine alloc]init];
+				}
+				else
+				{
+					[appDelegate.objSelectOptionsViewController.MedicineRef ClearData];
+					
+				}
+				appDelegate.objSelectOptionsViewController.MedicineRef.EntryDate=Date;
+				appDelegate.objSelectOptionsViewController.MedicineRef.EntryTime=[NSString stringWithFormat:@"%@:%@",[arr objectAtIndex:0],Mins];
+				appDelegate.objSelectOptionsViewController.MedicineRef.UserID=appDelegate.SelectedUserID;
+				//appDelegate.objSelectOptionsViewController.MedicineRef=self.MedicineRef;
+				appDelegate.SelectedItems=@"";
+			}
+			
+			[self.navigationController pushViewController:appDelegate.objSelectOptionsViewController animated:YES];
+		}
+		else if(indexPath.row==3)
+		{
+			///////////////   Vitals Data
+			appDelegate.isfromRoot=TRUE;
+			
+			[appDelegate.DateFormatter setDateFormat:@"MM-dd-yyyy"];
+			Date=[appDelegate.DateFormatter stringFromDate: [NSDate date]];
+			
+			[appDelegate.DateFormatter setDateFormat:@"HH:mm"];
+			DateTime=[appDelegate.DateFormatter stringFromDate:[NSDate date]];
+			NSArray *arr=[DateTime componentsSeparatedByString:@":"];
+			Mins=@"";
+			if([arr count]>1)
+			{
+				Mins=[appDelegate CheckTIme:[[arr objectAtIndex:1]intValue]];
+			}
+			
+			[appDelegate SelectVitalsDetail:Date  AndTime:[NSString stringWithFormat:@"%@:%@",[arr objectAtIndex:0],Mins] andUserID:appDelegate.SelectedUserID];
+			if([appDelegate.DailyArray count]>0)
+			{
+				UserView.Vitals_Detailref =[appDelegate.DailyArray objectAtIndex:0];
+			}
+			else
+			{
+				if(!UserView.Vitals_Detailref)
+				{
+					UserView.Vitals_Detailref=[[Vitals_Detail alloc]init];
+				}
+				else
+				{
+					[UserView.Vitals_Detailref ClearData];
+				
+				}
+				UserView.Vitals_Detailref.EntryDate=Date;
+				UserView.Vitals_Detailref.EntryTime=[NSString stringWithFormat:@"%@:%@",[arr objectAtIndex:0],Mins];
+				UserView.Vitals_Detailref.User_ID1=appDelegate.SelectedUserID;
+				UserView.Vitals_Detailref.WeightLbs=[[NSUserDefaults standardUserDefaults] valueForKey:[NSString stringWithFormat:@"%d_WeightLbs",appDelegate.SelectedUserID]];
+				UserView.Vitals_Detailref.WeightKgs=[[NSUserDefaults standardUserDefaults] valueForKey:[NSString stringWithFormat:@"%d_WeightKgs",appDelegate.SelectedUserID]];
+				
+			}
+			
+			////////// Routine Data
+			
+			[appDelegate.DateFormatter setDateFormat:@"MM-dd-yyyy"];
+			Date=[appDelegate.DateFormatter stringFromDate: [NSDate date]];
+			
+			[appDelegate.DateFormatter setDateFormat:@"HH:mm"];
+			DateTime=[appDelegate.DateFormatter stringFromDate:[NSDate date]];
+			
+			arr=[DateTime componentsSeparatedByString:@":"];
+			Mins=@"";
+			if([arr count]>1)
+			{
+				Mins=[appDelegate CheckTIme:[[arr objectAtIndex:1]intValue]];
+			}
+	
+			[appDelegate SelectRoutinesDetail:Date  AndTime:[NSString stringWithFormat:@"%@:%@",[arr objectAtIndex:0],Mins] andUserID:appDelegate.SelectedUserID];
+			[appDelegate selectMenstural:appDelegate.SelectedUserID  passDate:Date];
+			
+			if([appDelegate.HourlyDataArray count]>0)
+			{
+				UserView.Routine_Detailrf =[appDelegate.HourlyDataArray objectAtIndex:0];
+			}
+			else
+			{
+				if(!UserView.Routine_Detailrf)
+				{
+					UserView.Routine_Detailrf=[[Routine_Detail alloc]init];
+				}
+				else
+				{
+					[UserView.Routine_Detailrf ClearData];
+				}
+				UserView.Routine_Detailrf.EntryDate=Date;
+				UserView.Routine_Detailrf.EntryTime=[NSString stringWithFormat:@"%@:%@",[arr objectAtIndex:0],Mins];
+				UserView.Routine_Detailrf.User_ID=appDelegate.SelectedUserID;
+				
+			}
+			if([appDelegate.MensturalArray count]>0)
+			{
+				UserView.Mensturalref=[appDelegate.MensturalArray objectAtIndex:0];
+				if([UserView.Mensturalref.EndDate length]>0)
+				{
+					[UserView.Mensturalref ClearData];
+					UserView.Mensturalref.User_ID=appDelegate.SelectedUserID;
+					UserView.Mensturalref.Daily_Date=Date;
+				}
+			}
+			else
+			{
+				if(!UserView.Mensturalref)
+				{
+					UserView.Mensturalref=[[Menstural_Cycle alloc]init];
+				}
+				else
+				{
+					[UserView.Mensturalref ClearData];
+				}
+				UserView.Mensturalref.User_ID=appDelegate.SelectedUserID;
+				UserView.Mensturalref.Daily_Date=Date;
+				
+			}
+			appDelegate.SaveMenstural=FALSE; 
+			[self.navigationController pushViewController:UserView animated:YES];
+		}
+		else if(indexPath.row==4)
+		{
+			
+			appDelegate.AddNewUserDict =[appDelegate.UserArray objectAtIndex:0];
+			appDelegate.SelectedStatus=@"User Profile";
+			
+			appDelegate.isfromRoot=TRUE;
+			appDelegate.iSfromAddUser=TRUE; 
+			appDelegate.ISfromSettings=0;
+			[self.navigationController pushViewController:appDelegate.objFirstViewController animated:YES];
+		}
+		else if(indexPath.row==5)
+		{
+			[appDelegate.DateFormatter setDateFormat:@"MM-dd-yyyy HH:mm"];
+				
+			NSDateComponents *comps= [[[NSDateComponents alloc] init] autorelease];
+			
+			[comps setDay:-6]; //Use what you want here, set other components as needed
+			NSDate *EndDate = [[NSCalendar currentCalendar] dateByAddingComponents:comps toDate:[NSDate date] options:0];
+			DateTime= [appDelegate.DateFormatter stringFromDate: EndDate];
+			NSArray *arr=[DateTime componentsSeparatedByString:@":"];
+			Mins=@"";
+			if([arr count]>1)
+			{
+				Mins=[appDelegate CheckTIme:[[arr objectAtIndex:1]intValue]];
+			}
+			
+			appDelegate.ReportStartDate=[NSString stringWithFormat:@"%@:%@",[arr objectAtIndex:0],Mins];
+			
+			[comps setDay:0]; //Use what you want here, set other components as needed
+			EndDate = [[NSCalendar currentCalendar] dateByAddingComponents:comps toDate:[NSDate date] options:0];
+			DateTime= [appDelegate.DateFormatter stringFromDate: EndDate];
+			arr=[DateTime componentsSeparatedByString:@":"];
+			Mins=@"";
+			if([arr count]>1)
+			{
+				Mins=[appDelegate CheckTIme:[[arr objectAtIndex:1]intValue]];
+			}
+			
+			appDelegate.ReportEndDate=[NSString stringWithFormat:@"%@:%@",[arr objectAtIndex:0],Mins];			
+			appDelegate.ReportField=@"";
+			[self.navigationController pushViewController:objReport animated:YES];
+		}
+	}
+	if(indexPath.row==6)
+	{		
+		appDelegate.iSfromUsers=TRUE;
+		appDelegate.ISfromDefaultUser=TRUE;
+		[self.navigationController pushViewController:SelectSettingsView animated:YES];	
+	}
+	if(indexPath.row==7)
+	{		
+		appDelegate.iSfromUsers=TRUE;
+		appDelegate.ISfromDefaultUser=FALSE;
+		[self.navigationController pushViewController:appDelegate.objRootViewController animated:YES];	
+		
+	}
+	[Pool release];
+}
+
+
+
+- (void)didReceiveMemoryWarning {
+	// Releases the view if it doesn't have a superview.
+    [super didReceiveMemoryWarning];
+	
+	// Release any cached data, images, etc that aren't in use.
+}
+
+- (void)viewDidUnload {
+	// Release any retained subviews of the main view.
+	// e.g. self.myOutlet = nil;
+}
+
+
+- (void)dealloc {
+	
+	[tblView release];
+	[ReportselectionView release];
+	[UserView release];
+    [super dealloc];
+}
+
+
+@end

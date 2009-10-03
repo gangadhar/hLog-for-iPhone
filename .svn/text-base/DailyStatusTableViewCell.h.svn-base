@@ -1,0 +1,25 @@
+//
+//  DailyStatusTableViewCell.h
+//  HealthTracker
+//
+//  Created by Bhoomi on 3/3/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+
+@interface DailyStatusTableViewCell : UITableViewCell {
+
+	UILabel *lblName;
+	UILabel *lblNameTwo;
+	
+}
+
+@property(nonatomic,retain) UILabel *lblName;
+
+@property(nonatomic,retain) UILabel *lblNameTwo;
+
+-(UILabel *)newLabelWithPrimaryColor:(UIColor *)primaryColor selectedColor:(UIColor *)selectedColor fontSize:(CGFloat)fontSize bold:(BOOL)bold;
+
+@end

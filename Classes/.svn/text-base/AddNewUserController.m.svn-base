@@ -1,0 +1,1461 @@
+//
+//  AddNewUserController.m
+//  HealthTracker
+//
+//  Created by Bhoomi on 3/2/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+
+// Import All needed header files bellow.
+#import "AddNewUserController.h"
+#import "AddUserButtonTableViewCell.h"
+#import "AddUserTwoButtonsCell.h"
+#import "IsKidTableViewCell.h"
+#import "AddUserSegmentTableCell.h"
+#import "PastTableViewCell.h"
+#define Label_Array [NSArray arrayWithObjects: @"UserName",nil]
+#define Title_Array [NSArray arrayWithObjects: @"Name",nil]
+
+//#define Label_Array [NSArray arrayWithObjects: @"UserName",@"Year",@"AgeMonth",@"HeightCMS", @"Gender",@"BloodGroup",nil]
+//#define Title_Array [NSArray arrayWithObjects: @"Name",@"Year",@"Age",@"Height",@"Gender",@"Blood Group",nil]
+
+@implementation AddNewUserController
+@synthesize SelectedIndexRow,Name,BackUpDict;
+// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{
+	PickerView.hidden=TRUE;
+	ToolBar.hidden=TRUE;
+	DatePicker.hidden=TRUE;
+	btnSave.enabled=TRUE;
+}
+- (void)viewDidLoad {
+	tblView.delegate=self;
+	tblView.dataSource=self;
+	PickerView.delegate=self;
+	self.navigationItem.leftBarButtonItem=btnCancle;
+	if(!data)
+	{
+		data=[[NSMutableDictionary alloc]init];
+	}
+	for(int i = 1; i <18; i++)
+	{
+		NSMutableArray *fillPicker=[self FillArray:i];		
+		
+		[data setValue:fillPicker forKey:[NSString stringWithFormat:@"%d",i]];		
+	}
+	self.navigationItem.rightBarButtonItem=btnSave;
+	ToolBar.tintColor=[UIColor blackColor];
+	ToolBar.hidden=TRUE;
+	PickerView.frame=CGRectMake(0, 200, 320, 216);
+	DatePicker.frame=CGRectMake(0, 200, 320, 216);
+	ToolBar.frame=CGRectMake(0, 220, 320, 44);
+	lblData=[[UILabel alloc]init];
+	lblData.frame=CGRectMake(10,15 , 200, 20);
+	lblData.textColor=[UIColor whiteColor];
+	lblData.backgroundColor=[UIColor clearColor];
+	appDelegate=[[UIApplication sharedApplication]delegate];
+	//dateFormatter=[[NSDateFormatter alloc]init];
+	[appDelegate.DateFormatter setDateFormat:@"MM-dd-yyyy"];	
+	[DatePicker setDate:[NSDate date] animated:YES];
+	[ToolBar addSubview:lblData];
+	DatePicker.maximumDate=[NSDate date];
+	
+	UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
+	temporaryBarButtonItem.title = @"Back";
+	self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
+	[temporaryBarButtonItem release];
+
+	
+    [super viewDidLoad];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+	[tblView scrollRectToVisible:CGRectMake(0, 0, 320, 50)  animated:YES];
+	PickerView.hidden=TRUE;
+	DatePicker.hidden=TRUE;
+	ToolBar.hidden=TRUE;
+	btnSave.enabled=TRUE;
+
+//	self.navigationItem.title=appDelegate.ReportEndDate ;
+	
+	UILabel *label1 = [[UILabel alloc] initWithFrame:CGRectMake(50, 0, 220, 30)];
+	[label1 setFont:[UIFont boldSystemFontOfSize:15.0]];
+	[label1 setBackgroundColor:[UIColor clearColor]];
+	[label1 setTextAlignment:UITextAlignmentCenter];
+ 	[label1 setTextColor:[UIColor whiteColor]];
+	[label1 setText:Name];
+	self.navigationItem.titleView=label1;
+	[label1 release];
+	[tblView reloadData];
+}
+
+
+
+-(IBAction)btnCancle_clicked:(id)sender
+{
+	appDelegate.AddNewUserDict=[BackUpDict mutableCopy];
+	[self.navigationController popViewControllerAnimated:YES];
+}
+
+-(IBAction)DateChanged:(id)sender
+{
+	[BtnSelected setTitle:[NSString stringWithFormat:@"  %@",[appDelegate.DateFormatter stringFromDate:DatePicker.date]] forState:UIControlStateNormal];
+	[appDelegate.AddNewUserDict setValue:[appDelegate.DateFormatter stringFromDate:DatePicker.date] forKey:@"DOB"];
+
+	NSDateFormatter *date=[[[NSDateFormatter alloc]init]autorelease];
+	[date setDateFormat:@"YYYY"]; 
+	NSString *Year=[date stringFromDate:DatePicker.date];
+	
+	NSDate *Date= [appDelegate.DateFormatter dateFromString:[appDelegate.AddNewUserDict objectForKey:@"DOB"]];
+	int Days=[self howManyDaysHavePast:Date today:[NSDate date]];
+	int intYear= Days/365;
+	int intMonth= (Days- (intYear* 365))/30;
+	[appDelegate.AddNewUserDict setValue:Year forKey:@"Year"];
+	[appDelegate.AddNewUserDict setValue:[NSString stringWithFormat:@"%d",intYear] forKey:@"Age"];
+	[appDelegate.AddNewUserDict setValue:[NSString stringWithFormat:@"%d",intMonth] forKey:@"AgeMonth"];
+}
+
+#pragma mark Fill Picker Data 
+
+-(NSMutableArray *)FillArray:(int)i
+{   
+	
+
+	NSMutableArray *TypeArray;	
+	TypeArray=[[[NSMutableArray alloc]init]autorelease];
+
+	if(i==1)
+	{
+		////// Age Mont
+		
+		for(int i=0;i<12;i++)
+		{
+			[TypeArray addObject:[NSString stringWithFormat:@"%d",i]];
+		}
+	}
+	else if(i==2)
+	{
+		////Age Years
+		
+		for(int i=0;i<=110;i++)
+		{
+			[TypeArray addObject:[NSString stringWithFormat:@"%d",i]];
+		}
+	}
+	
+	else if(i==3)
+	{		
+		[TypeArray addObject:@"0"];
+		[TypeArray addObject:@"1"];	
+		[TypeArray addObject:@"2"];
+		[TypeArray addObject:@"3"];	
+		[TypeArray addObject:@"4"];
+		[TypeArray addObject:@"5"];	
+		[TypeArray addObject:@"6"];
+		[TypeArray addObject:@"7"];	
+		[TypeArray addObject:@"8"];
+	}
+	else if(i==15)
+	{
+		for(int i=0;i<12;i++)
+		{
+			[TypeArray addObject:[NSString stringWithFormat:@"%d",i]];
+		}
+	}
+	else if(i==4)
+	{
+		for(int i=1;i<=271;i++)
+		{
+			[TypeArray addObject:[NSString stringWithFormat:@"%d",i]];
+		}
+	}
+	
+	else if(i==5)
+	{		
+		////////Gender
+		
+		[TypeArray addObject:@"Male"];
+		[TypeArray addObject:@"Female"];		
+		
+	}
+	else if(i==6)
+	{		
+		///////Bolld Group
+		
+		[TypeArray addObject:@"O+"];
+		[TypeArray addObject:@"O-"];
+		[TypeArray addObject:@"A+"];
+		[TypeArray addObject:@"A-"];
+		[TypeArray addObject:@"B+"];
+		[TypeArray addObject:@"B-"];
+		[TypeArray addObject:@"AB+"];
+		[TypeArray addObject:@"AB-"];
+		
+	}
+	else if(i==7)
+	{
+		NSDateFormatter *date=[[[NSDateFormatter alloc]init]autorelease];
+		[date setDateFormat:@"YYYY"]; 
+		NSString *Year=[date stringFromDate:[NSDate date]];
+		for(int i=1800;i<=[Year intValue];i++)
+		{
+			[TypeArray addObject:[NSString stringWithFormat:@"%d",i]];
+		}
+	}
+	else if(i==16)
+	{
+		for(int i=0;i<=15;i++)
+		{
+			[TypeArray addObject:[NSString stringWithFormat:@"%d",i]];
+		}
+	}
+	else if(i==8)
+	{
+		for(int i=1;i<=150;i++)
+		{
+			[TypeArray addObject:[NSString stringWithFormat:@"%d",i]];
+		}
+	}
+	else if(i==17)
+	{
+		for(int i=0;i<100;i++)
+		{
+			[TypeArray addObject:[NSString stringWithFormat:@"%01d",i]];
+		}
+	}
+	else if(i==10)
+	{		
+		////// Diabetes
+		
+		[TypeArray addObject:@"Yes"];
+		[TypeArray addObject:@"No"];		
+
+	}
+	else if(i==11)
+	{	
+		///// Smoking
+		
+		[TypeArray addObject:@"Daily"];
+		[TypeArray addObject:@"1-2 times a week"];		
+			
+		[TypeArray addObject:@"None at all"];	
+		[TypeArray addObject:@"Other"];	
+	}
+	else if(i==12)
+	{
+		/////Drinking 
+		
+		[TypeArray addObject:@"Daily"];
+		[TypeArray addObject:@"1-2 times a week"];	
+		[TypeArray addObject:@"Social drinker"];	
+		[TypeArray addObject:@"None at all"];	
+		[TypeArray addObject:@"Other"];	
+	}
+	
+	else if(i==13)
+	{
+		/////Drinking 
+		
+		[TypeArray addObject:@"Yes"];
+		[TypeArray addObject:@"No"];		
+		
+	}
+	
+	else if(i==14)
+	{
+		[TypeArray addObject:@"None"];
+		[TypeArray addObject:@"Heart Attack"];
+		[TypeArray addObject:@"Stroke"];
+		[TypeArray addObject:@"Other"];	
+	}
+	return TypeArray;
+}
+
+-(int)howManyDaysHavePast:(NSDate*)lastDate today:(NSDate*)today {
+	NSDate *startDate = lastDate;
+	NSDate *endDate = today;
+	NSCalendar *gregorian = [[[NSCalendar alloc]
+							 initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
+	unsigned int unitFlags = NSDayCalendarUnit;
+	NSDateComponents *components = [gregorian components:unitFlags
+												fromDate:startDate
+												  toDate:endDate options:0];
+	int days = [components day];
+	return days;
+}
+//// //An event when user clicks on Done button.
+-(IBAction)BtnDone_clicked:(id)sender
+{
+	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	if(SelectedTag!=9)
+	{
+		
+		
+		if(SelectedTag==2)
+		{
+			strRestaurantTypeSecond=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",1]]  objectAtIndex:[PickerView selectedRowInComponent:1]];
+			
+			strRestaurantType=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:[PickerView selectedRowInComponent:0]];
+			
+		}
+		else if(SelectedTag==3)
+		{
+			strRestaurantTypeSecond=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",15]] objectAtIndex:[PickerView selectedRowInComponent:1]];
+			
+			strRestaurantType=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:[PickerView selectedRowInComponent:0]];
+		}
+		else if(SelectedTag==8)
+		{
+			strRestaurantTypeSecond=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",17]] objectAtIndex:[PickerView selectedRowInComponent:1]];
+			
+			strRestaurantType=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:[PickerView selectedRowInComponent:0]];
+		}
+		else
+		{
+			strRestaurantType=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:[PickerView selectedRowInComponent:0]];
+		}
+		PickerView.hidden=TRUE;
+		ToolBar.hidden=TRUE;
+		if(SelectedTag==2)
+		{
+			[appDelegate.AddNewUserDict setValue:strRestaurantTypeSecond forKey:@"AgeMonth"];
+			[appDelegate.AddNewUserDict setValue:strRestaurantType forKey:@"Age"];
+		}
+		if(SelectedTag==3)
+		{
+			[appDelegate.AddNewUserDict setValue:[NSString stringWithFormat:@"%@' %@\"",strRestaurantType,strRestaurantTypeSecond]  forKey:@"HeightFT"];
+			int CMS= [appDelegate ConvertIntoCms:[NSString stringWithFormat:@"%@' %@\"",strRestaurantType,strRestaurantTypeSecond]];
+			
+			[appDelegate.AddNewUserDict setValue:[NSString stringWithFormat:@"%d",CMS] forKey:@"HeightCMS"];
+		}
+		if(SelectedTag==4) 
+		{
+			[appDelegate.AddNewUserDict setValue:strRestaurantType forKey:@"HeightCMS"];
+			NSString *Feet=[appDelegate ConvertFeets:[strRestaurantType doubleValue]];
+			
+			[appDelegate.AddNewUserDict setValue:Feet  forKey:@"HeightFT"];
+			
+			}
+		if(SelectedTag==5)
+		{
+			[appDelegate.AddNewUserDict setValue:strRestaurantType forKey:@"Gender"];
+		}
+		if(SelectedTag==6)
+		{
+			[appDelegate.AddNewUserDict setValue:strRestaurantType forKey:@"BloodGroup"];
+		}
+		if(SelectedTag==7)
+		{
+			[appDelegate.AddNewUserDict setValue:strRestaurantType forKey:@"Year"];
+			if([[appDelegate.AddNewUserDict objectForKey:@"DOB"]length]!=0)
+			{
+				
+				NSDate *Date= [appDelegate.DateFormatter dateFromString:[appDelegate.AddNewUserDict objectForKey:@"DOB"]];
+				int Days=[self howManyDaysHavePast:Date today:[NSDate date]];
+				int intYear= Days/365;
+				int intMonth= (Days- (intYear* 365))/30;
+				
+				[appDelegate.AddNewUserDict setValue:[NSString stringWithFormat:@"%d",intYear] forKey:@"Age"];
+				[appDelegate.AddNewUserDict setValue:[NSString stringWithFormat:@"%d",intMonth] forKey:@"AgeMonth"];
+			}
+			else
+			{
+				NSDateFormatter *date=[[[NSDateFormatter alloc]init]autorelease];
+				[date setDateFormat:@"YYYY"]; 
+				NSString *Year=[date stringFromDate:[NSDate date]];
+				int IntYear=[Year intValue]-[strRestaurantType intValue];
+				
+				[appDelegate.AddNewUserDict setValue:[NSString stringWithFormat:@"%d",IntYear] forKey:@"Age"];
+				[appDelegate.AddNewUserDict setValue:[NSString stringWithFormat:@"%d",0] forKey:@"AgeMonth"];
+			}
+		}
+		if(SelectedTag==8)
+		{
+			[appDelegate.AddNewUserDict setValue:[NSString stringWithFormat:@"%@.%@",strRestaurantType,strRestaurantTypeSecond] forKey:@"WeightKG"];
+			NSString *ConvertPound=[NSString stringWithFormat:@"%@.%@",strRestaurantType,strRestaurantTypeSecond];
+			[appDelegate.AddNewUserDict setValue:[NSString stringWithFormat:@"%.1f",([ConvertPound doubleValue]*2.2)] forKey:@"WeightLBS"];
+		}
+		if(SelectedTag==9)
+		{
+			[appDelegate.AddNewUserDict setValue:strRestaurantType forKey:@"DOB"];
+		}
+		if(SelectedTag==10)
+		{
+			[appDelegate.AddNewUserDict setValue:strRestaurantType forKey:@"Diabetes"];
+		}
+		if(SelectedTag==11)
+		{
+			if([strRestaurantType isEqualToString:@"Other"])
+			{
+				
+				if(!UserTextEntryView)
+				{
+					UserTextEntryView=[[UserTextEntryViewController alloc]initWithNibName:@"TextEntry" bundle:nil];
+				}
+				UserTextEntryView.selectedIndex=11;
+							
+				UserTextEntryView.selectedName=@"Smoking";
+				BOOL Check=[[data objectForKey:[NSString stringWithFormat:@"%d",appDelegate.DailyTag]] containsObject:[appDelegate.AddNewUserDict valueForKey:@"Smoking"]];
+				if(Check)
+				{
+					UserTextEntryView.TextData=@"";	
+				}
+				else
+					UserTextEntryView.TextData=[appDelegate.AddNewUserDict valueForKey:@"Smoking"];
+				[self.navigationController pushViewController:UserTextEntryView animated:YES];
+			}
+			else
+				[appDelegate.AddNewUserDict setValue:strRestaurantType forKey:@"Smoking"];
+		}
+		if(SelectedTag==12)
+		{
+			if([strRestaurantType isEqualToString:@"Other"])
+			{
+				if(!UserTextEntryView)
+				{
+					UserTextEntryView=[[UserTextEntryViewController alloc]initWithNibName:@"TextEntry" bundle:nil];
+				}
+				UserTextEntryView.selectedIndex=12;
+				
+				UserTextEntryView.selectedName=@"Drinking";
+				BOOL Check=[[data objectForKey:[NSString stringWithFormat:@"%d",appDelegate.DailyTag]] containsObject:[appDelegate.AddNewUserDict valueForKey:@"Drinking"]];
+				if(Check)
+				{
+					UserTextEntryView.TextData=@"";	
+				}
+				else
+					UserTextEntryView.TextData=[appDelegate.AddNewUserDict valueForKey:@"Drinking"];
+				[self.navigationController pushViewController:UserTextEntryView animated:YES];
+			}
+			else
+				[appDelegate.AddNewUserDict setValue:strRestaurantType forKey:@"Drinking"];
+		}
+		if(SelectedTag==13)
+		{
+			[appDelegate.AddNewUserDict setValue:strRestaurantType forKey:@"Drug"];
+		}
+		if(SelectedTag==14)
+		{	
+			if([strRestaurantType isEqualToString:@"Other"])
+			{
+				if(!UserTextEntryView)
+				{
+					UserTextEntryView=[[UserTextEntryViewController alloc]initWithNibName:@"TextEntry" bundle:nil];
+				}
+				UserTextEntryView.selectedIndex=14;
+				
+				UserTextEntryView.selectedName=@"Past";
+				BOOL Check=[[data objectForKey:[NSString stringWithFormat:@"%d",appDelegate.DailyTag]] containsObject:[appDelegate.AddNewUserDict valueForKey:@"Past"]];
+				if(Check)
+				{
+					UserTextEntryView.TextData=@"";	
+				}
+				else
+					UserTextEntryView.TextData=[appDelegate.AddNewUserDict valueForKey:@"Past"];
+				[self.navigationController pushViewController:UserTextEntryView animated:YES];
+			}
+			else
+				[appDelegate.AddNewUserDict setValue:strRestaurantType forKey:@"Past"];
+		}
+	}
+	else
+	{
+		[self DateChanged:nil];
+		DatePicker.hidden=TRUE;
+		ToolBar.hidden=TRUE;
+		PickerView.hidden=TRUE;
+	}
+	[tblView reloadData];
+	btnSave.enabled=TRUE;
+	[Pool release];
+}
+
+/////// //An event when user clicks on Save button.
+-(IBAction)btnSave_clicked:(id)sender
+{
+	ISFromSave=1;
+	
+	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	PickerView.hidden=TRUE;
+	DatePicker.hidden=TRUE;
+	ToolBar.hidden=TRUE;
+	if([[appDelegate.AddNewUserDict valueForKey:@"UserName"] length]>0 )//&& [[appDelegate.AddNewUserDict objectForKey:@"Age"] length]>0 && [[appDelegate.AddNewUserDict objectForKey:@"HeightCMS"] length]>0 && [[appDelegate.AddNewUserDict objectForKey:@"HeightFT"] length]>0 && [[appDelegate.AddNewUserDict objectForKey:@"Gender"] length]>0 && [[appDelegate.AddNewUserDict objectForKey:@"BloodGroup"] length]>0 && [[appDelegate.AddNewUserDict objectForKey:@"Year"] length]>0 
+	{
+		
+		if([[appDelegate.AddNewUserDict valueForKey:@"Age"]intValue] <= 3)
+		{
+			[appDelegate.AddNewUserDict setValue:@"1"  forKey:@"IsKid"];
+		}
+		int insert;
+		if([[appDelegate.AddNewUserDict valueForKey:@"UserID"]intValue] == 0)
+		{
+			insert= [appDelegate InsertUser:appDelegate.AddNewUserDict];
+			[appDelegate.AddNewUserDict setValue:[NSString stringWithFormat:@"%d",insert]  forKey:@"UserID"];
+			
+			[[NSUserDefaults standardUserDefaults] setValue:@"" forKey:[NSString stringWithFormat:@"%d_WeightLbs",insert]];
+			[[NSUserDefaults standardUserDefaults] synchronize];
+			
+			[[NSUserDefaults standardUserDefaults] setValue:@"" forKey:[NSString stringWithFormat:@"%d_WeightKgs",insert]];
+			[[NSUserDefaults standardUserDefaults] synchronize];
+			
+			[appDelegate InsertUserDailyHourly_Data:insert]; 
+		}
+		else
+		{
+			insert=[appDelegate UpdateUser:appDelegate.AddNewUserDict];
+		}
+		if(insert>0)
+		{
+			[appDelegate SelectDefaultUser];
+			if([appDelegate.UserArray count]==0)
+			{
+				[appDelegate.AddNewUserDict setValue:@"1"  forKey:@"Default"];
+				[appDelegate DefaultSet:[[appDelegate.AddNewUserDict objectForKey:@"UserID"]intValue]];
+			}
+			if([[appDelegate.AddNewUserDict valueForKey:@"Default"]intValue] == 1)
+			{
+				
+				[appDelegate UpdateDefaultUser: [[appDelegate.AddNewUserDict valueForKey:@"UserID"]intValue]];
+			}
+			BackUpDict=[appDelegate.AddNewUserDict mutableCopy];
+		//	if(SelectedIndexRow==2)
+//			{
+//				UIAlertView *alertView=[[UIAlertView alloc]initWithTitle:@"" message:@"Health care provider details saved successfully!"  delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+//				alertView.tag=1;
+//				[alertView show];
+//				[alertView release];
+//			}
+//			else if(SelectedIndexRow==0)
+//			{
+//				UIAlertView *alertView=[[UIAlertView alloc]initWithTitle:@"" message:@"Personal information saved successfully!"  delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+//				alertView.tag=1;
+//				[alertView show];
+//				[alertView release];
+//			}
+//			else if(SelectedIndexRow==1)
+//			{
+//				UIAlertView *alertView=[[UIAlertView alloc]initWithTitle:@"" message:@"Medical history saved successfully!"  delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+//				alertView.tag=1;
+//				[alertView show];
+//				[alertView release];
+//			}
+//			else
+//			{
+//				UIAlertView *alertView=[[UIAlertView alloc]initWithTitle:@"" message:@"Insurance information saved successfully!"  delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+//				alertView.tag=1;
+//				[alertView show];
+//				[alertView release];
+//			}
+			
+			[self.navigationController popViewControllerAnimated:YES];
+		}
+		else
+		{
+			UIAlertView *alertView=[[UIAlertView alloc]initWithTitle:@"" message:@"Error!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+			[alertView show];
+			[alertView release];
+		}
+	}
+	else
+	{
+		NSString *notFilled=@"";
+		NSString *nfield=@"";
+		count=0;
+		for(int i=1;i<=[Label_Array count] ;i++)
+		{
+			NSLog([appDelegate.AddNewUserDict valueForKey:[Label_Array objectAtIndex:i-1]]);
+			if([[appDelegate.AddNewUserDict valueForKey:[Label_Array objectAtIndex:i-1]] isEqualToString:@""])
+			{
+				
+				nfield=[NSString stringWithFormat:@"%@%@",nfield,@"\n"];
+				if(count==0)
+				{
+					notFilled = [NSString stringWithFormat:@"- %@",[Title_Array objectAtIndex:i-1]];
+				}
+				else
+				{
+					
+					notFilled = [NSString stringWithFormat:@"%@\n- %@    ",notFilled, [Title_Array objectAtIndex:i-1]];
+				}
+				count++;
+			}
+		}
+		UIButton *btn=[[UIButton buttonWithType:UIButtonTypeRoundedRect] retain];
+		btn.enabled=FALSE;
+		UILabel *lblData1=[[UILabel alloc]init];
+		if(count==1)
+		{
+			nfield=@"\n";
+			btn.frame=CGRectMake(9, 43, 265, 30);
+			lblData1.frame=CGRectMake(10, 0, 240, 27);
+		}
+		else if(count==2)
+		{
+			nfield=@"\n";
+			btn.frame=CGRectMake(9, 39, 265, 40);
+			lblData1.frame=CGRectMake(10, 0, 240, 40);
+		}
+		else
+		{
+			btn.frame=CGRectMake(9, 39, 265, count*24);
+			lblData1.frame=CGRectMake(10, 1, 230, count*24-2);
+		}
+		
+		lblData1.text=notFilled;
+		lblData1.numberOfLines=0;
+		lblData1.textAlignment=UITextAlignmentLeft;
+		[btn addSubview:lblData1];
+		UIAlertView *alertView=[[UIAlertView alloc]initWithTitle:@"Required field" message:nfield delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alertView addSubview:btn];
+		[lblData1 release];
+		[btn release];
+		[alertView show];
+		[alertView release];
+	}
+	[Pool release];
+}
+
+/*
+// Override to allow orientations other than the default portrait orientation.
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+    // Return YES for supported orientations
+    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+*/
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+	if(alertView.tag==1)
+	{
+		[self.navigationController popViewControllerAnimated:YES];
+	}
+}
+
+#pragma mark Table view methods
+
+-(int)GetPickerRow:(NSString *)String component:(NSInteger)Tag
+{
+	NSString *str2;
+	
+	str2=String;
+	
+	NSMutableArray *abc=[data valueForKey:[NSString stringWithFormat:@"%d",Tag]];
+	int Row=0;
+	for(Row=0; Row<[abc count];Row++)
+	{
+		NSString *str1=[abc objectAtIndex:Row];
+		
+		if([str1 isEqualToString:str2])
+		{
+			
+			return Row;
+		}
+	}
+	return 0;
+}
+
+-(CGFloat)findHeightForCell:(NSString *)text
+{
+	CGFloat		result = 40.0f;
+	CGFloat		width = 0;
+	//CGFloat		tableViewWidth;
+	//CGRect		bounds = [UIScreen mainScreen].bounds;
+	
+
+		//tableViewWidth = bounds.size.width;
+
+	
+	width = 175;
+	// fudge factor
+	if (text)
+	{
+		CGSize		textSize = { width, 20000.0f };		// width and height of text area
+		CGSize		size = [text sizeWithFont:[UIFont boldSystemFontOfSize:14.0f] constrainedToSize:textSize lineBreakMode:UILineBreakModeCharacterWrap];
+		
+		size.height += 25.0f;			// top and bottom margin
+		result = MAX(size.height, 40.0f);	// at least one row		
+	}
+	else
+		
+	{
+		return 40;
+	}
+	return result;	
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	if(SelectedIndexRow==0)
+	{
+		if(indexPath.row==0)
+		{
+			return [self findHeightForCell:[appDelegate.AddNewUserDict valueForKey:@"UserName"]]; 
+		}
+		else
+		{
+			return 40;
+		}
+	}
+	else if(SelectedIndexRow==1)
+	{
+		return 40;
+	}
+	else if(SelectedIndexRow==2)
+	{
+		if(indexPath.row==0)
+		{
+			return [self findHeightForCell:[appDelegate.AddNewUserDict objectForKey:@"PastName"]]; 
+		}
+		else
+		{
+			return [self findHeightForCell:[appDelegate.AddNewUserDict objectForKey:@"PastPhoneNumber"]]; 
+		}
+	}
+	else if(SelectedIndexRow==3)
+	{
+		if(indexPath.row==0)
+		{
+			return [self findHeightForCell:[appDelegate.AddNewUserDict objectForKey:@"PastIdentification"]]; 
+		}
+		else if(indexPath.row==1)
+		{
+			return [self findHeightForCell:[appDelegate.AddNewUserDict objectForKey:@"PastPolicyNo"]]; 
+		}
+		else if(indexPath.row==2)
+		{
+			return [self findHeightForCell:[appDelegate.AddNewUserDict objectForKey:@"PastPhone"]]; 
+		}
+		else if(indexPath.row==3)
+		{
+			return [self findHeightForCell:[appDelegate.AddNewUserDict objectForKey:@"PastEmrContact"]]; 
+		}
+	}
+	
+		return 40;
+	
+}
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+	
+	if(SelectedIndexRow==0)
+	{
+		if([appDelegate.SelectedStatus isEqualToString:@"User Profile"] && appDelegate.iSfromUsers==FALSE)
+		{
+			return 4;
+		}
+		else
+			return 5;
+	}
+	else if(SelectedIndexRow==1)
+	{
+		return 5;
+	}
+	else if(SelectedIndexRow==2)
+	{
+		return 2;
+	}
+	else if(SelectedIndexRow==3)
+	{
+		return 4;
+	}
+	return 0;
+	
+}
+
+
+// Customize the appearance of table view cells.
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if(SelectedIndexRow==0)
+	{		
+		static NSString *CellIdentifier1 = @"Cell1";
+		static NSString *CellIdentifier = @"Cell";
+		static NSString *CellIdentifier4 = @"Cell4";
+		static NSString *CellIdentifier6 = @"Cell6";
+		AddNewUserTableCell *cell1;
+		AddUserButtonTableViewCell *cell;
+		AddUserSegmentTableCell  *cell4;
+		IsKidTableViewCell *cell6; 
+		
+		switch (indexPath.row)
+		{
+			case 0:
+				cell1 = (AddNewUserTableCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier1];
+				if (cell1 == nil) {
+					cell1 = [[[AddNewUserTableCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier1] autorelease];
+				}
+				cell1.lblName.text=@"Name";
+				cell1.txtDeatils.text=[appDelegate.AddNewUserDict valueForKey:@"UserName"];
+			
+				cell1.txtDeatils.tag=1;
+			
+				cell1.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
+				return cell1;
+				
+			case 1:
+				cell = (AddUserButtonTableViewCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+				if (cell == nil) {
+					cell = [[[AddUserButtonTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier] autorelease];
+				}
+				[cell.BtnSelect addTarget:self action:@selector(ClickButton:) forControlEvents:UIControlEventTouchUpInside];
+				
+				cell.lblName.text=@"Date of Birth";
+				if([[appDelegate.AddNewUserDict valueForKey:@"DOB"] length]==0)
+					[cell.BtnSelect setTitle:@"  Please Choose"  forState:UIControlStateNormal];
+				else
+					[cell.BtnSelect setTitle:[NSString stringWithFormat:@"  %@",[appDelegate.AddNewUserDict valueForKey:@"DOB"]] forState:UIControlStateNormal];
+				cell.BtnSelect.tag=9;
+				return cell;
+				
+			//case 2:
+//				cell = (AddUserButtonTableViewCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+//				if (cell == nil) {
+//					cell = [[[AddUserButtonTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier] autorelease];
+//				}
+//				[cell.BtnSelect addTarget:self action:@selector(ClickButton:) forControlEvents:UIControlEventTouchUpInside];
+//				
+//				cell.lblName.text=@"Height";
+//				if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Height"] isEqualToString:@"Inches"])
+//				{
+//					if([[appDelegate.AddNewUserDict valueForKey:@"HeightFT"]length ]==0)
+//						[cell.BtnSelect setTitle:@"  Select"  forState:UIControlStateNormal];
+//					else
+//						[cell.BtnSelect setTitle:[NSString stringWithFormat:@"  %@",[appDelegate.AddNewUserDict valueForKey:@"HeightFT"]] forState:UIControlStateNormal];
+//					cell.BtnSelect.tag=3;
+//				}
+//				else
+//				{
+//					if([[appDelegate.AddNewUserDict valueForKey:@"HeightCMS"]length ]==0)
+//						[cell.BtnSelect setTitle:@"  Select"  forState:UIControlStateNormal];
+//					else
+//						[cell.BtnSelect setTitle:[NSString stringWithFormat:@"  %@",[appDelegate.AddNewUserDict valueForKey:@"HeightCMS"]] forState:UIControlStateNormal];
+//					cell.BtnSelect.tag=4;
+//				}
+//				return cell;
+				
+			case 2:
+				cell4 = (AddUserSegmentTableCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier4];
+				if (cell4 == nil) {
+					cell4 = [[[AddUserSegmentTableCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier4] autorelease];
+				}
+				[cell4.BtnSelect  addTarget:self action:@selector(MaleFemale:) forControlEvents:UIControlEventValueChanged];
+				
+				cell4.lblName.text=@"Gender";
+				cell4.BtnSelect.tag=5;
+				[cell4.BtnSelect setTitle:@"Male"  forSegmentAtIndex:0];
+
+				[cell4.BtnSelect setTitle:@"Female"  forSegmentAtIndex:1];
+
+				if([[appDelegate.AddNewUserDict valueForKey:@"Gender"] length]==4)
+					cell4.BtnSelect.selectedSegmentIndex=0;
+				else
+					cell4.BtnSelect.selectedSegmentIndex=1;
+				return cell4;
+			case 3:
+				cell = (AddUserButtonTableViewCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+				if (cell == nil) {
+					cell = [[[AddUserButtonTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier] autorelease];
+				}
+				[cell.BtnSelect addTarget:self action:@selector(ClickButton:) forControlEvents:UIControlEventTouchUpInside];
+				
+				cell.lblName.text=@"Blood Group";
+				if([[appDelegate.AddNewUserDict valueForKey:@"BloodGroup"] length]==0)
+					[cell.BtnSelect setTitle:@"  Please Choose"  forState:UIControlStateNormal];
+				else
+					[cell.BtnSelect setTitle:[NSString stringWithFormat:@"  %@",[appDelegate.AddNewUserDict valueForKey:@"BloodGroup"]] forState:UIControlStateNormal];
+				cell.BtnSelect.tag=6;
+				return cell;
+			case 4:
+				cell6 = (IsKidTableViewCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier6];
+				if (cell6 == nil) {
+					cell6 = [[[IsKidTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier6] autorelease];
+				}
+				[cell6.SwIsKid addTarget:self action:@selector(ClickedDeafult:) forControlEvents:UIControlEventValueChanged];
+				
+				cell6.lblName.text=@"Default User?";
+				if([[appDelegate.AddNewUserDict valueForKey:@"Default"] intValue]==0)
+					[cell6.SwIsKid setOn:FALSE];
+				else
+					[cell6.SwIsKid setOn:TRUE];
+				cell6.SwIsKid.tag=20;
+				return cell6;
+			default:
+				break;
+		}
+	}
+   else if(SelectedIndexRow==1)
+   {
+	   static NSString *CellIdentifier2 = @"Cell2";
+	   static NSString *CellIdentifier5 = @"Cell5";
+	   AddUserButtonTableViewCell *cell2;
+	   IsKidTableViewCell *cell5; 
+	   
+	   switch (indexPath.row) {
+		   case 0:
+			   cell5 = (IsKidTableViewCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier5];
+			   if (cell5 == nil) {
+				   cell5 = [[[IsKidTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier5] autorelease];
+			   }
+			   [cell5.SwIsKid addTarget:self action:@selector(Clicked:) forControlEvents:UIControlEventValueChanged];
+			   
+			   cell5.lblName.text=@"Diabetes";
+			   if([[appDelegate.AddNewUserDict valueForKey:@"Diabetes"] intValue]==0)
+				   [cell5.SwIsKid setOn:FALSE];
+			   else
+				   [cell5.SwIsKid setOn:TRUE];
+			   cell5.SwIsKid.tag=10;
+			   return cell5;
+		   case 1:
+			   cell2 = (AddUserButtonTableViewCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier2];
+			   if (cell2 == nil) {
+				   cell2 = [[[AddUserButtonTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier2] autorelease];
+			   }
+			   [cell2.BtnSelect addTarget:self action:@selector(ClickButton:) forControlEvents:UIControlEventTouchUpInside];
+			   
+			   cell2.lblName.text=@"Smoking";
+			   if([[appDelegate.AddNewUserDict valueForKey:@"Smoking"] length]==0)
+				   [cell2.BtnSelect setTitle:@"  Please Choose"  forState:UIControlStateNormal];
+			   else
+				   [cell2.BtnSelect setTitle:[NSString stringWithFormat:@"  %@",[appDelegate.AddNewUserDict valueForKey:@"Smoking"]] forState:UIControlStateNormal];
+			   cell2.BtnSelect.tag=11;
+			   return cell2;
+		   case 2:
+			   cell2 = (AddUserButtonTableViewCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier2];
+			   if (cell2 == nil) {
+				   cell2 = [[[AddUserButtonTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier2] autorelease];
+			   }
+			   [cell2.BtnSelect addTarget:self action:@selector(ClickButton:) forControlEvents:UIControlEventTouchUpInside];
+			   
+			   cell2.lblName.text=@"Drinking";
+			   if([[appDelegate.AddNewUserDict valueForKey:@"Drinking"] length]==0)
+				   [cell2.BtnSelect setTitle:@"  Please Choose"  forState:UIControlStateNormal];
+			   else
+				   [cell2.BtnSelect setTitle:[NSString stringWithFormat:@"  %@",[appDelegate.AddNewUserDict valueForKey:@"Drinking"]] forState:UIControlStateNormal];
+			   cell2.BtnSelect.tag=12;
+			   return cell2;
+		   case 3:
+			   cell5 = (IsKidTableViewCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier5];
+			   if (cell5 == nil) {
+				   cell5 = [[[IsKidTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier5] autorelease];
+			   }
+			   [cell5.SwIsKid addTarget:self action:@selector(Clicked:) forControlEvents:UIControlEventValueChanged];
+			   
+			   cell5.lblName.text=@"Drug Intake";
+			   if([[appDelegate.AddNewUserDict valueForKey:@"Drug"] intValue]==0)
+				   [cell5.SwIsKid setOn:FALSE];
+			   else
+				   [cell5.SwIsKid setOn:TRUE];
+			   cell5.SwIsKid.tag=13;
+			   return cell5;
+		   case 4:
+			   cell2 = (AddUserButtonTableViewCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier2];
+			   if (cell2 == nil) {
+				   cell2 = [[[AddUserButtonTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier2] autorelease];
+			   }
+			   [cell2.BtnSelect addTarget:self action:@selector(ClickButton:) forControlEvents:UIControlEventTouchUpInside];
+			   
+			   cell2.lblName.text=@"Past";
+			   if([[appDelegate.AddNewUserDict valueForKey:@"Past"] length]==0)
+				   [cell2.BtnSelect setTitle:@"  Please Choose"  forState:UIControlStateNormal];
+			   else
+				   [cell2.BtnSelect setTitle:[NSString stringWithFormat:@"  %@",[appDelegate.AddNewUserDict valueForKey:@"Past"]] forState:UIControlStateNormal];
+			   cell2.BtnSelect.tag=14;
+			   return cell2;
+			   
+	   }
+   }
+   else if(SelectedIndexRow==2)
+   {
+	   static NSString *CellIdentifier7 = @"Cell7";
+	   
+	   AddNewUserTableCell *cell7 = (AddNewUserTableCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier7];
+	   if (cell7 == nil) {
+		   cell7 = [[[AddNewUserTableCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier7] autorelease];
+	   }
+	   //	cell.txtDeatils.enabled=FALSE;
+	   switch (indexPath.row) {
+		   case 0:
+			   cell7.lblName.text=@"Name";
+			   //	cell.txtDeatils.placeholder=@"Enter Past Name";
+			   cell7.txtDeatils.text=[appDelegate.AddNewUserDict valueForKey:@"PastName"];
+			   cell7.txtDeatils.tag=16;
+			   break;
+		   case 1:
+			   cell7.lblName.text=@"Phone Number";
+			   //	cell.txtDeatils.placeholder=@"Enter Phone Number";
+			   cell7.txtDeatils.text=[appDelegate.AddNewUserDict valueForKey:@"PastPhoneNumber"];
+			   cell7.txtDeatils.tag=17;
+			   break;
+		   default:
+			   break;
+	   }
+	   cell7.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
+	   return cell7;
+	}
+   else if(SelectedIndexRow==3)
+   {
+	   static NSString *CellIdentifier8= @"Cell8";
+	   
+	   PastTableViewCell *cell8 = (PastTableViewCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier8];
+	   if (cell8 == nil) {
+		   cell8 = [[[PastTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier8] autorelease];
+	   }
+	   //cell1.txtDeatils.enabled=FALSE;
+	   switch (indexPath.row) {
+		   case 0:
+			   cell8.lblName.text=@"Identification";
+			   //	cell1.txtDeatils.placeholder=@"Enter Identification";
+			   cell8.txtDeatils.text=[appDelegate.AddNewUserDict valueForKey:@"PastIdentification"];
+			   cell8.txtDeatils.tag=18;
+			   break;
+		   case 1:
+			   cell8.lblName.text=@"Policy Number";
+			   //	cell1.txtDeatils.placeholder=@"Enter Policy Number";
+			   cell8.txtDeatils.text=[appDelegate.AddNewUserDict valueForKey:@"PastPolicyNo"];
+			   cell8.txtDeatils.tag=19;
+			   break;
+		   case 2:
+			   cell8.lblName.text=@"Phone Number";
+			   //8cell1.txtDeatils.placeholder=@"Enter Phone number";
+			   cell8.txtDeatils.text=[appDelegate.AddNewUserDict valueForKey:@"PastPhone"];
+			   cell8.txtDeatils.tag=20;
+			   break;
+		   case 3:
+			   cell8.lblName.text=@"Emergency Contact";
+			   //	cell1.txtDeatils.placeholder=@"Enter Emr. Contact";
+			   cell8.txtDeatils.text=[appDelegate.AddNewUserDict valueForKey:@"PastEmrContact"];
+			   cell8.txtDeatils.tag=21;
+			   break;
+		   default:
+			   break;
+	   }
+	   cell8.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
+	   return cell8;
+	   
+   }
+	return @"";
+}
+-(IBAction)ClickedDeafult:(id)sender
+{
+	UISwitch *switchCon=(UISwitch *)sender;
+	
+	if(switchCon.on==NO)
+	{
+		[appDelegate.AddNewUserDict setObject:@"0"  forKey:@"Default"];
+	}
+	else
+	{
+		[appDelegate.AddNewUserDict setObject:@"1"  forKey:@"Default"];
+	}
+}
+
+-(IBAction)MaleFemale:(id)sender
+{
+	UISegmentedControl *switchCon=(UISegmentedControl *)sender;
+	if(switchCon.selectedSegmentIndex==0)
+	{
+		[appDelegate.AddNewUserDict setValue:@"Male"  forKey:@"Gender"];
+	}
+	else
+	{
+		[appDelegate.AddNewUserDict setValue:@"Female"  forKey:@"Gender"];
+	}
+}
+//An event when user clicks on Is Kid Toogle button.
+-(IBAction)Clicked:(id)sender
+{
+	UISwitch *switchCon=(UISwitch *)sender;
+	if(switchCon.tag==13)
+	{
+		if(switchCon.on==NO)
+		{
+			[appDelegate.AddNewUserDict setValue:@"0"  forKey:@"Drug"];
+			appDelegate.IsKidOrNot=0;
+		}
+		else
+		{
+			[appDelegate.AddNewUserDict setValue:@"1"  forKey:@"Drug"];
+			appDelegate.IsKidOrNot=1;
+		}
+	}
+	else
+	{
+		if(switchCon.on==NO)
+		{
+			[appDelegate.AddNewUserDict setValue:@"0"  forKey:@"Diabetes"];
+			appDelegate.IsKidOrNot=0;
+		}
+		else
+		{
+			[appDelegate.AddNewUserDict setValue:@"1"  forKey:@"Diabetes"];
+			appDelegate.IsKidOrNot=1;
+		}
+	}
+	[tblView reloadData];
+}
+
+//// Call when click on any cell which contain picker.
+
+-(IBAction)ClickButton:(id)sender
+{
+	NSLog(@"Add 1");
+	BtnSelected=(UIButton *)sender;
+	SelectedTag=BtnSelected.tag;
+	DatePicker.hidden=TRUE;
+	PickerView.hidden=TRUE;
+	ToolBar.hidden=TRUE;
+	btnSave.enabled=FALSE; 
+	if(SelectedTag!=9)
+	{
+		PickerView.hidden=FALSE;
+		ToolBar.hidden=FALSE;
+		[PickerView reloadAllComponents];
+	}
+	if(SelectedTag==2)
+	{
+		lblData.text=@"Select Age";
+		int row=[self GetPickerRow:[appDelegate.AddNewUserDict valueForKey:@"Age"] component:SelectedTag];
+		[PickerView selectRow:row inComponent:0 animated:NO];
+		 row=[self GetPickerRow:[appDelegate.AddNewUserDict valueForKey:@"AgeMonth"] component:1];
+		[PickerView selectRow:row inComponent:1 animated:NO];
+	}
+	if(SelectedTag==3)
+	{
+		lblData.text=@"Select Height in Feet/Inch";
+		if([[appDelegate.AddNewUserDict valueForKey:@"HeightFT"] length]==0)
+		{
+			[PickerView selectRow:0 inComponent:0 animated:NO];
+			[PickerView selectRow:0 inComponent:1 animated:NO];
+		}
+		else
+		{
+			NSArray *arr=[[appDelegate.AddNewUserDict valueForKey:@"HeightFT"] componentsSeparatedByString:@"' "]; 
+			int row=[self GetPickerRow:[arr objectAtIndex:0] component:SelectedTag];
+			[PickerView selectRow:row inComponent:0 animated:NO];
+			
+			NSString *Str=[arr objectAtIndex:1];
+			Str=[Str stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+			row=[self GetPickerRow:Str component:15];
+			[PickerView selectRow:row inComponent:1 animated:NO];
+			
+		}
+		
+	}
+	if(SelectedTag==4)
+	{
+		lblData.text=@"Select Height in Cms";
+		
+		int row=[self GetPickerRow:[appDelegate.AddNewUserDict valueForKey:@"HeightCMS"] component:SelectedTag];
+		[PickerView selectRow:row inComponent:0 animated:NO];
+	}
+	if(SelectedTag==5)
+	{
+		lblData.text=@"Select Gender";
+		int row=[self GetPickerRow:[appDelegate.AddNewUserDict valueForKey:@"Gender"] component:SelectedTag];
+		[PickerView selectRow:row inComponent:0 animated:NO];
+	}
+	if(SelectedTag==6)
+	{
+		lblData.text=@"Select Blood Group";
+		int row=[self GetPickerRow:[appDelegate.AddNewUserDict valueForKey:@"BloodGroup"] component:SelectedTag];
+		[PickerView selectRow:row inComponent:0 animated:NO];
+	}
+	if(SelectedTag==7)
+	{
+		lblData.text=@"Select Year";
+		int row;
+		if([[appDelegate.AddNewUserDict valueForKey:@"Year"] length]>0)
+			row=[self GetPickerRow:[appDelegate.AddNewUserDict valueForKey:@"Year"] component:SelectedTag];
+		else
+			row=[self GetPickerRow:@"1950" component:SelectedTag];	
+		[PickerView selectRow:row inComponent:0 animated:NO];
+	
+	}
+	if(SelectedTag==8)
+	{
+		lblData.text=@"Select Weight In Kgs";
+		if([[appDelegate.AddNewUserDict valueForKey:@"WeightKG"] length]==0)
+		{
+			[PickerView selectRow:0 inComponent:0 animated:NO];
+			[PickerView selectRow:0 inComponent:1 animated:NO];
+		}
+		else
+		{
+			NSArray *arr=[[appDelegate.AddNewUserDict valueForKey:@"WeightKG"] componentsSeparatedByString:@"."]; 
+			int row=[self GetPickerRow:[arr objectAtIndex:0] component:SelectedTag];
+			[PickerView selectRow:row inComponent:0 animated:NO];
+			
+			row=[self GetPickerRow:[arr objectAtIndex:1] component:17];
+			[PickerView selectRow:row inComponent:1 animated:NO];
+			
+		}
+	}
+	if(SelectedTag==9)
+	{
+		DatePicker.hidden=FALSE;
+		if([[appDelegate.AddNewUserDict valueForKey:@"DOB"] length]==0)
+		{
+			[DatePicker setDate:[NSDate date] animated:YES];
+		}
+		else
+		{
+			[appDelegate.DateFormatter setDateFormat:@"MM-dd-yyyy"];
+			[DatePicker setDate:[appDelegate.DateFormatter dateFromString:[appDelegate.AddNewUserDict valueForKey:@"DOB"] ]];
+	
+		}
+		ToolBar.hidden=FALSE;
+		lblData.text=@"Select DOB";
+	}
+	if(SelectedTag==10)
+	{
+		lblData.text=@"Select Diabetes";
+		int row=[self GetPickerRow:[appDelegate.AddNewUserDict valueForKey:@"Diabetes"] component:SelectedTag];
+		[PickerView selectRow:row inComponent:0 animated:YES];
+	}
+	if(SelectedTag==11)
+	{
+		lblData.text=@"Select Smoking";
+		int row=[self GetPickerRow:[appDelegate.AddNewUserDict valueForKey:@"Smoking"] component:SelectedTag];
+		[PickerView selectRow:row inComponent:0 animated:YES];
+	}
+	if(SelectedTag==12)
+	{
+		lblData.text=@"Select Drinking";
+		int row=[self GetPickerRow:[appDelegate.AddNewUserDict valueForKey:@"Drinking"] component:SelectedTag];
+		[PickerView selectRow:row inComponent:0 animated:YES];
+	}
+	if(SelectedTag==13)
+	{
+		lblData.text=@"Select Drug Intake";
+			int row=[self GetPickerRow:[appDelegate.AddNewUserDict valueForKey:@"Drug"] component:SelectedTag];
+			[PickerView selectRow:row inComponent:0 animated:YES];
+	}
+	if(SelectedTag==14)
+	{
+		lblData.text=@"Select Past";
+			int row=[self GetPickerRow:[appDelegate.AddNewUserDict valueForKey:@"Past"] component:SelectedTag];
+			[PickerView selectRow:row inComponent:0 animated:YES];
+	}
+	
+}
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+
+	[tblView deselectRowAtIndexPath:indexPath animated:YES];
+	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	ISFromSave=2;
+	if(SelectedIndexRow==0)
+	{
+		if(indexPath.row==0)
+		{
+			AddNewUserTableCell *cell=(AddNewUserTableCell *)[tableView cellForRowAtIndexPath:indexPath];
+			if(!UserTextEntryView)
+			{
+				UserTextEntryView=[[UserTextEntryViewController alloc]initWithNibName:@"TextEntry" bundle:nil];
+			}
+			UserTextEntryView.selectedIndex=cell.txtDeatils.tag;
+			UserTextEntryView.selectedName=cell.lblName.text;
+			UserTextEntryView.TextData=cell.txtDeatils.text;
+			[self.navigationController pushViewController:UserTextEntryView animated:YES];
+		}
+	}
+	else if(SelectedIndexRow==2)
+	{		
+		AddNewUserTableCell  *cell=(AddNewUserTableCell *)[tableView cellForRowAtIndexPath:indexPath];
+		if(!UserTextEntryView)
+		{
+			UserTextEntryView=[[UserTextEntryViewController alloc]initWithNibName:@"TextEntry" bundle:nil];
+		}
+		UserTextEntryView.selectedIndex=cell.txtDeatils.tag;
+		NSString *Data=cell.lblName.text;
+		Data=[Data stringByReplacingOccurrencesOfString:@"Number" withString:@"No."];
+		UserTextEntryView.selectedName=Data;
+		UserTextEntryView.TextData=cell.txtDeatils.text;
+		[self.navigationController pushViewController:UserTextEntryView animated:YES];
+	}
+	else if(SelectedIndexRow==3)
+	{		
+		PastTableViewCell *cell=(PastTableViewCell *)[tableView cellForRowAtIndexPath:indexPath];
+		if(!UserTextEntryView)
+		{
+			UserTextEntryView=[[UserTextEntryViewController alloc]initWithNibName:@"TextEntry" bundle:nil];
+		}
+		UserTextEntryView.selectedIndex=cell.txtDeatils.tag;
+		NSString *Data=cell.lblName.text;
+		Data=[Data stringByReplacingOccurrencesOfString:@"Number" withString:@"No."];
+		UserTextEntryView.selectedName=Data;
+		UserTextEntryView.TextData=cell.txtDeatils.text;
+		[self.navigationController pushViewController:UserTextEntryView animated:YES];
+	}
+	[Pool release];
+}
+
+#pragma mark pickerView
+
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pV
+{
+	if(SelectedTag==2 || SelectedTag==3 ||  SelectedTag==8)
+	{
+		return 2;
+	}
+	else
+		return 1;
+}
+
+- (NSInteger)pickerView:(UIPickerView *)pV numberOfRowsInComponent:(NSInteger)component
+{	
+	
+	if(SelectedTag==2)
+	{
+		if(component==1)
+		{
+			//NSMutableArray *abc1=[data objectForKey:[NSString stringWithFormat:@"%d",1]] ;
+			return [[data objectForKey:[NSString stringWithFormat:@"%d",1]]  count];
+		}
+		else
+		{
+		//	NSMutableArray *abc=[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] ;
+			return [[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] count];
+		}
+		
+	}
+	else if(SelectedTag==3)
+	{
+		if(component==0)
+		{
+			//NSMutableArray *abc1=[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] ;
+			return [[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] count];
+		}
+		else
+		{
+		//	NSMutableArray *abc=[data objectForKey:[NSString stringWithFormat:@"%d",15]] ;
+			return [[data objectForKey:[NSString stringWithFormat:@"%d",15]] count];
+		}
+		
+	}
+	else if(SelectedTag==8)
+	{
+		if(component==1)
+		{
+			//NSMutableArray *abc1=[data objectForKey:[NSString stringWithFormat:@"%d",17]] ;
+			return [[data objectForKey:[NSString stringWithFormat:@"%d",17]]  count];
+		}
+		else
+		{
+			//NSMutableArray *abc=[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] ;
+			return [[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] count];
+		}
+		
+	}
+	else
+	{
+		//	return 1;
+		//NSMutableArray *abc=[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] ;
+		return [[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] count];
+	}
+}
+
+- (NSString *)pickerView:(UIPickerView *)pV titleForRow:(NSInteger)row forComponent:(NSInteger)component
+{
+	//NSMutableArray *abc;
+	if(SelectedTag==2)
+	{
+		if(component==1)
+		{
+			//NSMutableArray *abc1=[data objectForKey:[NSString stringWithFormat:@"%d",1]] ;
+			NSString *strRestaurantType1=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",1]] objectAtIndex:row];
+			if(row==0 || row==1)
+			{
+				return  [NSString stringWithFormat:@"%@ Month" ,strRestaurantType1];
+			}
+			else
+			return  [NSString stringWithFormat:@"%@ Months" ,strRestaurantType1];
+		}
+		else
+		{
+			//abc=[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] ;
+			NSString *strRestaurantType1=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:row];
+			if(row==0 || row==1)
+			{
+				return  [NSString stringWithFormat:@"%@ Year" ,strRestaurantType1];
+			}
+			return  [NSString stringWithFormat:@"%@ Years" ,strRestaurantType1];
+		}
+		
+	}
+	else if(SelectedTag==3)
+	{
+		if(component==1)
+		{
+		//NSMutableArray *abc1=[data objectForKey:[NSString stringWithFormat:@"%d",15]] ;
+			NSString *strRestaurantType1=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",15]] objectAtIndex:row];
+			if(row==0 || row==1)
+			{
+				return  [NSString stringWithFormat:@"%@ Inch" ,strRestaurantType1];
+			}
+			return [NSString stringWithFormat:@"%@ Inches",strRestaurantType1];
+		}
+		else
+		{
+		//	abc=[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] ;
+			NSString *strRestaurantType1=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:row];
+			return  [NSString stringWithFormat:@"%@ Feet" ,strRestaurantType1];
+		}
+	}
+	else if(SelectedTag==8)
+	{
+		if(component==1)
+		{
+			NSString *strRestaurantType1=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",17]] objectAtIndex:row];
+			return [NSString stringWithFormat:@"%@ G",strRestaurantType1];
+		}
+		else
+		{
+			NSString *strRestaurantType1=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:row];
+			return [NSString stringWithFormat:@"%@ KG",strRestaurantType1];
+		}
+	}
+	else
+	{
+		NSString *strRestaurantType1=(NSString *)[[data objectForKey:[NSString stringWithFormat:@"%d",SelectedTag]] objectAtIndex:row];
+		return strRestaurantType1;
+	}
+}
+
+
+- (void)didReceiveMemoryWarning {
+	
+    [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
+    // Release anything that's not essential, such as cached data
+}
+
+
+- (void)dealloc {
+	
+	[tblView release];
+	[PickerView release];
+	[data release];
+	
+	[SelectedText release];
+	[BtnSelected release];
+	[BtnDone release];
+	[btnSave release];
+	[DatePicker release];
+	[ToolBar release];
+	[appDelegate release];
+//	[PastDataView release];
+	[lblData release];
+	[UserTextEntryView release];
+///	[dateFormatter release];
+    [super dealloc];
+}
+
+
+
+@end

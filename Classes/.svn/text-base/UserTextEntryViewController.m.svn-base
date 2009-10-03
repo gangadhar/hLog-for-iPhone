@@ -1,0 +1,316 @@
+//
+//  UserTextEntryViewController.m
+//  HealthTracker
+//  Created by Bhoomi on 3/9/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+// Import All needed header files bellow.
+#import "UserTextEntryViewController.h"
+
+
+@implementation UserTextEntryViewController
+
+// Fields or variables or tools whose property has been declared must be Synthesize here...
+@synthesize selectedName,selectedIndex,TextData; 
+/*
+// The designated initializer. Override to perform setup that is required before the view is loaded.
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+        // Custom initialization
+    }
+    return self;
+}
+*/
+
+/*
+// Implement loadView to create a view hierarchy programmatically, without using a nib.
+- (void)loadView {
+}
+*/
+-(void)viewDidAppear:(BOOL)animated
+{
+	if(selectedIndex==17 || selectedIndex== 20 || selectedIndex ==21 || selectedIndex==11  || selectedIndex== 12 || selectedIndex ==14)
+	{
+		[txtField becomeFirstResponder];
+	}
+	else
+	{
+		[txtView becomeFirstResponder];
+	}
+}
+-(void)viewWillDisappear:(BOOL)animated
+{
+	if(selectedIndex==17 || selectedIndex== 20 || selectedIndex ==21 ||selectedIndex==11  || selectedIndex== 12 || selectedIndex ==14)
+	{
+		[txtField resignFirstResponder];
+	}
+	else
+	{
+		[txtView resignFirstResponder];
+	}
+	
+	
+}
+- (void)viewWillAppear:(BOOL)animated
+{
+	if(selectedIndex==17  || selectedIndex== 20 || selectedIndex ==21 || selectedIndex==11  || selectedIndex== 12 || selectedIndex ==14)
+	{
+		if(selectedIndex==17  || selectedIndex== 20 || selectedIndex ==21)
+			txtField.keyboardType=UIKeyboardTypeNumberPad;
+		else
+			txtField.keyboardType=UIKeyboardTypeDefault;
+		txtField.placeholder=selectedName;
+		txtField.hidden=FALSE;
+		Cell2.hidden=FALSE;
+		txtView.hidden=TRUE;
+		Cell1.hidden=TRUE;
+		txtField.text=TextData;
+		[self.view bringSubviewToFront:Cell2];
+		[self.view bringSubviewToFront:txtField];
+	}
+	else
+	{
+	
+		txtView.keyboardType=UIKeyboardTypeDefault;
+		txtField.hidden=TRUE;
+		Cell2.hidden=TRUE;
+		txtView.hidden=FALSE;
+		Cell1.hidden=FALSE;
+		txtView.text=TextData;
+	}
+	
+	//selectedName=[selectedName stringByReplacingOccurrencesOfString:@"Number" withString:@"No"];
+	[label1 setText:[NSString stringWithFormat:@"Edit %@",selectedName]];
+	self.navigationItem.titleView=label1;
+	
+}
+// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+- (void)viewDidLoad 
+{
+	txtView.text=@"";
+	appDelegate=[[UIApplication sharedApplication]delegate];
+	self.view.backgroundColor=[UIColor groupTableViewBackgroundColor];
+	self.navigationItem.leftBarButtonItem=btnCancel;
+	self.navigationItem.rightBarButtonItem=btnDone;
+	txtView.delegate=self;
+	txtField.delegate=self;
+	txtView.returnKeyType=UIReturnKeyDone;
+	txtView.autocorrectionType=UITextAutocorrectionTypeNo;
+	label1 = [[UILabel alloc] initWithFrame:CGRectMake(50, 0, 220, 30)];
+	[label1 setFont:[UIFont boldSystemFontOfSize:15.0]];
+	[label1 setBackgroundColor:[UIColor clearColor]];
+	[label1 setTextAlignment:UITextAlignmentCenter];
+ 	[label1 setTextColor:[UIColor whiteColor]];
+	Cell2.frame=CGRectMake(8, 74, 305, 50);
+	txtField.frame=CGRectMake(15, 75, 290, 45);
+	txtField.font=[UIFont systemFontOfSize:19];
+//	Cell1.frame=CGRectMake(15, 10, 305, 182);
+    [super viewDidLoad];
+}
+-(BOOL)keyboardInput:(id)k shouldInsertText:(id)i isMarkedText:(int)b 
+{
+	char s=[i characterAtIndex:0];
+	if(s!=10)
+	{
+		if(selectedIndex==17 || selectedIndex== 20 || selectedIndex ==21)
+		{
+			int len=[txtField.text length];
+			if(selectedIndex==17 || selectedIndex== 20 || selectedIndex ==21)
+			{
+				if(len<12)
+				{	
+					return YES;
+				}
+				else
+				{
+					return NO;
+				}
+			}
+		}
+		else if(selectedIndex==11  || selectedIndex== 12 || selectedIndex ==14)
+		{
+			int len=[txtField.text length];
+			
+				if(len<25)
+				{	
+					return YES;
+				}
+				else
+				{
+					return NO;
+				}
+			
+		}
+		else
+		{
+			int len=[txtView.text length];
+			if(selectedIndex==1 || selectedIndex==16)
+			{
+				if(len<100)
+				{	
+					return YES;
+				}
+				else
+				{
+					return NO;
+				}
+			}
+			else if(selectedIndex==23 || selectedIndex==24 || selectedIndex==18)
+			{
+				if(len<50)
+				{	
+					return YES;
+				}
+				else
+				{
+					return NO;
+				}
+			}
+			
+			else if(selectedIndex==19)
+			{
+				if(len<25)
+				{	
+					return YES;
+				}
+				else
+				{
+					return NO;
+				}
+			}
+			else if(selectedIndex==22 )
+			{
+				if(len<50)
+				{	
+					return YES;
+				}
+				else
+				{
+					return NO;
+				}
+			}
+		}
+	}
+	else
+	{
+		[self StoreData];
+		return NO;
+	}
+	return YES;
+}
+-(void)StoreData
+{
+	NSAutoreleasePool *POOL=[[NSAutoreleasePool alloc]init];
+	NSCharacterSet *set = [NSCharacterSet characterSetWithCharactersInString:@" "];
+	
+	
+	if(selectedIndex==17 || selectedIndex== 20 || selectedIndex ==21 || selectedIndex==12 || selectedIndex==11 || selectedIndex ==14)
+	{
+		txtField.text=[txtField.text stringByTrimmingCharactersInSet:set];
+		if(selectedIndex==17)
+		{
+			[appDelegate.AddNewUserDict setValue:txtField.text forKey:@"PastPhoneNumber"];
+		}
+		else if(selectedIndex==20)
+		{
+			[appDelegate.AddNewUserDict setValue:txtField.text forKey:@"PastPhone"];
+		}
+		else if(selectedIndex==21)
+		{
+			[appDelegate.AddNewUserDict setValue:txtField.text forKey:@"PastEmrContact"];
+		}
+		else if(selectedIndex==11)
+		{
+			[appDelegate.AddNewUserDict setValue:txtField.text forKey:@"Smoking"];
+		}
+		else if(selectedIndex==12)
+		{
+			[appDelegate.AddNewUserDict setValue:txtField.text forKey:@"Drinking"];
+		}
+		else if(selectedIndex==14)
+		{
+			[appDelegate.AddNewUserDict setValue:txtField.text forKey:@"Past"];
+		}
+	}
+	else
+	{
+		txtView.text =[txtView.text stringByTrimmingCharactersInSet:set];
+		if(selectedIndex==1)
+		{
+			[appDelegate.AddNewUserDict setValue:txtView.text forKey:@"UserName"];
+		}
+		else if(selectedIndex==16)
+		{
+			[appDelegate.AddNewUserDict setValue:txtView.text forKey:@"PastName"];
+		}
+		
+		else if(selectedIndex==18)
+		{
+			[appDelegate.AddNewUserDict setValue:txtView.text forKey:@"PastIdentification"];
+		}
+		else if(selectedIndex==19)
+		{
+			[appDelegate.AddNewUserDict setValue:txtView.text forKey:@"PastPolicyNo"];
+		}
+		
+		else if(selectedIndex==22)
+		{
+			[appDelegate.AddNewUserDict setValue:txtView.text forKey:@"PastMedicationList"];
+		}
+		else if(selectedIndex==23)
+		{
+			[appDelegate.AddNewUserDict setValue:txtView.text forKey:@"PastAllergyInfo"];
+		}
+		else if(selectedIndex==24)
+		{
+			[appDelegate.AddNewUserDict setValue:txtView.text forKey:@"PastSurgeries"];
+		}
+		
+	}
+	[POOL release];
+	[self.navigationController popViewControllerAnimated:YES];
+}
+
+//An event when user clicks on Done button.
+-(IBAction)Done:(id)sender
+{
+	
+	[self StoreData];
+	
+}
+
+//An event when user clicks on Cancel button.
+-(IBAction)Cancel:(id)sender
+{
+	[self.navigationController popViewControllerAnimated:YES];
+}
+/*
+// Override to allow orientations other than the default portrait orientation.
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+    // Return YES for supported orientations
+    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+*/
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
+    // Release anything that's not essential, such as cached data
+}
+
+
+- (void)dealloc {
+	
+	[txtView release];
+	[btnCancel release];
+	[btnDone release];
+	[selectedName release];
+	[appDelegate release];
+	[TextData release];
+	[label1 release];
+	
+    [super dealloc];
+}
+
+
+@end

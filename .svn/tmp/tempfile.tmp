@@ -1,0 +1,220 @@
+//
+//  HealthTrackerAppDelegate.h
+//  HealthTracker
+//
+//  Created by Bhoomi on 28/02/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+#import "sqlite3.h"
+
+#import "User_Settings.h"
+//#import "DailyData.h"
+//#import "HourlyData.h"
+#import "Menstural_Cycle.h"
+#import "Vitals_Detail.h"
+#import "Medicine.h"
+#import "Routine_Detail.h"
+// Defining Interface  with needed Protocol (if any).
+// Protocols generally define inside '< >'bracates.
+
+@class DailyStatusViewController;
+@class HourlyStatusViewController; 
+@class SettingsViewController;
+@class SelectOptionsViewController;
+@class MedicineViewController;
+
+@class DailyHourlyTextEntryViewController;
+@class FirstViewController;
+@class RootViewController;
+@interface HealthTrackerAppDelegate : NSObject <UIApplicationDelegate>{
+    
+    UIWindow *window;
+    UINavigationController *navigationController;
+	UITextField *tf;
+	UIAlertView *alert1;
+	sqlite3 *database;
+	
+	NSMutableDictionary *AddNewUserDict;
+	NSMutableArray *UserSettingsArray;
+	NSMutableArray *UserArray; 
+	NSMutableArray *EntryArray;
+	NSMutableArray *HourlyDataArray; 
+	NSMutableArray *MedicineArray;
+	NSMutableArray *MensturalArray;
+	NSMutableArray *WeekArray;
+	NSMutableArray *DailyArray;
+	NSMutableArray *DailyReportArray;
+	NSMutableArray *HourlyReportArray;
+	NSMutableArray *VitalsMasterArray;
+	NSMutableDictionary *ReportArray;
+	NSDateFormatter *DateFormatter;
+	int SelectedUserID;
+	int DailyTag;
+	
+	int IsKidOrNot;
+	BOOL SaveMenstural;
+	int PassCodeOnOff;
+	BOOL isfromRoot;
+	BOOL isDailyReport;
+	int isFromChart;
+	BOOL iSfromAddUser;
+	/////
+	BOOL iSfromUsers;
+	BOOL iSFirstTime;
+	int ISfromSettings;
+	BOOL isFromReport;
+	BOOL isFromEditReport;
+	BOOL ISfromDefaultUser;
+	NSString *ReportStartDate;
+	NSString *ReportEndDate;
+	NSString *ReportField;
+	NSString *SelectedItems;
+	NSString *SelectColumnName;
+	NSString *SelectColumnName1;
+	NSString *SelectedStatus;
+	NSString *UserName;
+	NSString *SelectedReportField;
+	CGPoint SelectedLocation;
+	
+	DailyStatusViewController* objDailyStatusViewController;
+	HourlyStatusViewController *objHourlyStatusViewController;
+	
+	
+	SettingsViewController *objSettingsViewController;
+	SelectOptionsViewController *objSelectOptionsViewController;
+	MedicineViewController *objMedicineViewController;
+
+	DailyHourlyTextEntryViewController *objDailyHourlyTextEntryViewController;
+	FirstViewController *objFirstViewController;
+	RootViewController *objRootViewController;
+	
+}
+
+@property(nonatomic,retain) DailyStatusViewController *objDailyStatusViewController;
+@property(nonatomic,retain) HourlyStatusViewController *objHourlyStatusViewController;
+@property(nonatomic,retain) SettingsViewController *objSettingsViewController;
+@property(nonatomic,retain) SelectOptionsViewController *objSelectOptionsViewController;
+@property(nonatomic,retain) MedicineViewController *objMedicineViewController;
+@property(nonatomic,retain) RootViewController *objRootViewController;
+@property(nonatomic,retain) DailyHourlyTextEntryViewController *objDailyHourlyTextEntryViewController;
+@property(nonatomic,retain) FirstViewController *objFirstViewController;
+
+@property(nonatomic,retain) NSDateFormatter *DateFormatter;
+@property(nonatomic,retain) NSString *ReportStartDate;
+@property(nonatomic,retain) NSString *ReportEndDate;
+@property(nonatomic,retain) NSString *ReportField;
+@property(nonatomic,retain) NSString *SelectedItems;
+@property(nonatomic,retain) NSString *SelectColumnName;
+@property(nonatomic,retain) NSString *SelectColumnName1;
+@property(nonatomic,retain) NSString *SelectedStatus;
+@property(nonatomic,retain) NSString *UserName;
+@property(nonatomic,retain) NSString *SelectedReportField;
+// Defining Property as per fields, tools, variables and objects.
+@property (nonatomic,readwrite) CGPoint SelectedLocation;
+@property(nonatomic,readwrite) int isFromChart;
+@property(nonatomic,readwrite) int ISfromSettings;
+@property(nonatomic,readwrite) BOOL iSfromUsers;
+@property(nonatomic,readwrite) BOOL iSfromAddUser;
+@property(nonatomic,readwrite) BOOL isDailyReport;
+@property(nonatomic,readwrite) BOOL isfromRoot;
+@property(nonatomic,readwrite) BOOL SaveMenstural;
+@property(nonatomic,readwrite) BOOL iSFirstTime;
+@property(nonatomic,readwrite) int SelectedUserID;
+@property(nonatomic,readwrite) BOOL isFromReport;
+@property(nonatomic,readwrite) int PassCodeOnOff;
+@property(nonatomic,readwrite) int DailyTag;
+@property(nonatomic,readwrite) BOOL isFromEditReport;
+@property(nonatomic,readwrite) int IsKidOrNot;
+@property(nonatomic,readwrite) BOOL ISfromDefaultUser;
+//@property(nonatomic,retain) NSMutableDictionary *StoreInformation;
+@property (nonatomic, retain) IBOutlet UIWindow *window;
+@property (nonatomic, retain) IBOutlet UINavigationController *navigationController;
+
+@property(nonatomic,retain) NSMutableDictionary *AddNewUserDict;
+@property(nonatomic,retain) NSMutableDictionary *ReportArray;
+@property(nonatomic,retain) NSMutableArray *UserSettingsArray;
+@property(nonatomic,retain) NSMutableArray  *UserArray; 
+@property(nonatomic,retain) NSMutableArray  *EntryArray;
+@property(nonatomic,retain) NSMutableArray *VitalsMasterArray;
+@property(nonatomic,retain) NSMutableArray *WeekArray;
+@property(nonatomic,retain) NSMutableArray *DailyArray;
+@property(nonatomic,retain) NSMutableArray *HourlyDataArray;
+@property(nonatomic,retain) NSMutableArray *MedicineArray;
+@property(nonatomic,retain) NSMutableArray *MensturalArray;
+@property(nonatomic,retain) NSMutableArray *HourlyReportArray;
+@property(nonatomic,retain) NSMutableArray *DailyReportArray;
+
+
+// Declaration of all Public methods that are going to implement inside implementation file, need to declare here.
+
+-(void)MakeDictForNewUser;
+-(void)createEditableCopyOfDatabaseIfNeeded;
+-(int)InsertUser:(NSMutableDictionary *)UserDictionary;
+-(int)UpdateUser:(NSMutableDictionary *)UserDictionary;
+-(int)InsertUserDailyHourly_Data:(NSInteger)Insert_User_Id;
+-(void)SelectUserSettings:(NSInteger)Insert_User_Id; 
+-(void)SelectsUsers;
+-(void)EntryName:(NSInteger)Entry_ID;
+
+-(int)UpdateUserData:(NSInteger)Insert_User_Id DailyData:(NSString *)data ColumnName:(NSString *)Name;
+
+-(NSString *)SelectMedicine:(NSInteger)MedicineID;
+-(int)InsertMedicine:(NSString *)MedicineName;
+-(int)UpdateMedicine:(NSString *)MedicineName andID:(NSInteger)Medicine_ID;
+-(void)SelectMedicineID:(NSInteger)UserID;
+-(void)SelectMedicineNames;
+-(int)DeleteEntry:(NSString *)TableName ColumnName:(NSString *)PrimaryName PrimaryID:(NSInteger)ID;
+
+-(void)selectMenstural:(NSInteger)User_ID passDate:(NSString *)Daily_Date;
+-(int)InsertMenstural:(Menstural_Cycle *)Menstural;
+-(int)UpdateMenstural:(Menstural_Cycle *)Menstural;
+-(int)DeleteMenstura:(NSInteger)Cycle_ID;
+-(int)DeleteAllCategoriesData:(NSString *)TableName IDname:(NSString *)Name DeleteID:(NSInteger)IdDelete;
+-(void)termCondition;
+
+
+-(BOOL)IsMedicineExist:(NSString*)MedicineName;
+-(void)SelectReportData:(NSString*)CoulumnName FromDate:(NSString*)StartDate ToDate:(NSString*)EndDate andUserID:(NSInteger)User_ID1; 
+-(void)SelectHourlyReportData:(NSString*)CoulumnName FromDate:(NSString*)StartDate andUserID:(NSInteger)User_ID1;
+
+
+/////////////// New Databse Changes
+
+-(void)SelectVitalsInfo:(NSInteger) User_ID;
+
+-(void)SelectRoutineInfo:(NSInteger) User_ID;
+
+-(void)RoutineName:(NSInteger)Entry_ID;
+-(int)InsertMedicinedata:(Medicine *)MedicineRef;
+-(void)Medicinedata:(NSString*)EntryDate ToTime:(NSString *)EntryTime anduserid:(NSInteger)User_ID;
+-(int)UpdateData:(Medicine*)MedicineRef;
+
+///////////////// Enter, Select and Update Vitals Data
+
+-(int)InsertVitalsDetail:(Vitals_Detail*)Data;
+-(int)UpdateVitalsDetail:(Vitals_Detail*)Data;
+-(void)SelectVitalsDetail:(NSString*)PassingDate AndTime:(NSString*)PassingTime andUserID:(NSInteger)User_ID;
+
+
+///////////////// Enter, Select and Update Routines Data
+
+-(int)InsertRoutinesDetail:(Routine_Detail*)Data;
+-(int)UpdateRoutinesDetail:(Routine_Detail*)Data;
+-(void)SelectRoutinesDetail:(NSString*)PassingDate AndTime:(NSString*)PassingTime andUserID:(NSInteger)User_ID;
+-(int)UpdateDefaultUser:(NSInteger)User_ID;
+
+-(void)SelectDefaultUser;
+-(int)DefaultSet:(NSInteger)User_ID;
+
+
+////////// Vitals and routine Calendar data
+
+-(void)GetVitalsCalendarData:(NSString *)ColumnName StartDate:(NSString*)PassStartDate Enddate:(NSString *)PassEndDate StartTime:(NSString *)PassStartTime EndTime:(NSString*)PassEndTime andUserID:(NSInteger)User_ID andTableName:(NSString *)TableName;
+-(void)SelectWeeklyDataForMemstrual:(NSString *)StartDate PassEndDate:(NSString*)EndDate andUserID:(NSInteger)User_ID1;
+
+//-(void)GetReportData:(NSInteger)User_ID andLimit:(NSInteger)StartLimit andEndLimit:(NSInteger)EndLimit StartDate:(NSString*)PassStartDate Enddate:(NSString *)PassEndDate StartTime:(NSString *)PassStartTime EndTime:(NSString*)PassEndTime;
+-(NSString *)CheckTIme:(int)Minutes;
+@end
+

@@ -1,0 +1,352 @@
+//
+//  RootViewController.m
+//  HealthTracker
+//
+//  Created by Bhoomi on 28/02/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+
+// Import All needed header files bellow.
+#import "RootViewController.h"
+#import "HealthTrackerAppDelegate.h"
+#import "SettingTableViewCell.h"
+
+@implementation RootViewController
+
+#pragma mark View
+- (void)viewDidLoad {
+	
+	//btnAdd=[[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addProfile:)];
+	
+	self.navigationItem.leftBarButtonItem=nil;
+	selectedImage = [UIImage imageNamed:@"checked.png"];
+	unselectedImage = [UIImage imageNamed:@"unchecked.png"];
+	tblView.delegate=self;
+	tblView.dataSource=self;
+	tblView.rowHeight=50;
+	appDelegate=[[UIApplication sharedApplication]delegate];
+	lblUser=[[UILabel alloc]init];
+	lblUser.backgroundColor=[UIColor clearColor];
+	lblUser.frame=CGRectMake(110, 200, 120, 50);
+	lblUser.textColor=[UIColor lightGrayColor];
+	lblUser.font=[UIFont boldSystemFontOfSize:20];
+	lblUser.textAlignment=UITextAlignmentCenter;
+	[tblView addSubview:lblUser];
+	UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
+	temporaryBarButtonItem.title = @"Back";
+	self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
+	[temporaryBarButtonItem release];
+    [super viewDidLoad];
+}
+
+- (void)viewWillAppear:(BOOL)animated 
+{
+	
+	[tblView scrollRectToVisible:CGRectMake(0, 0, 320, 50)  animated:YES];
+	[appDelegate SelectsUsers];
+	self.navigationItem.title=@"Users";
+	if(appDelegate.ISfromDefaultUser==FALSE)
+	{
+<<<<<<< .mine
+		[self populateSelectedArray];
+		self.navigationItem.rightBarButtonItem=btnSave;
+=======
+		[self populateSelectedArray];
+>>>>>>> .r1145
+	}
+	else
+		self.navigationItem.rightBarButtonItem=btnAdd;
+	if([appDelegate.UserArray count]>0)
+	{
+		lblUser.text=@"";
+	}
+	else
+	{
+		lblUser.text=@"No Users";
+		[tblView bringSubviewToFront:lblUser];
+	}
+	[tblView reloadData];
+	
+	[super viewWillAppear:animated];
+}
+
+
+
+- (void)viewDidAppear:(BOOL)animated {
+	
+	self.view.frame=CGRectMake(0, 0, 320, 416);
+	tblView.allowsSelectionDuringEditing=TRUE;
+    [super viewDidAppear:animated];
+}
+
+
+- (void)viewWillDisappear:(BOOL)animated {
+	
+	[super viewWillDisappear:animated];
+}
+
+/*
+ - (void)viewDidDisappear:(BOOL)animated {
+ [super viewDidDisappear:animated];
+ }
+ */
+
+
+#pragma mark memorywarning
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
+    // Release anything that's not essential, such as cached data
+}
+
+
+#pragma mark Table view methods
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+
+// Customize the number of rows in the table view.
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return [appDelegate.UserArray count] ;
+}
+
+- (void)populateSelectedArray
+{
+	if(!selectedArray)
+		selectedArray=[[NSMutableArray alloc ]init];
+	if([selectedArray count]>0)
+	{
+		[selectedArray removeAllObjects];
+	}
+	
+	for(int i=0;i<[appDelegate.UserArray count];i++)
+	{
+		
+		NSDictionary *Dict=[appDelegate.UserArray objectAtIndex:i];
+		//	BOOL result = [arr2 containsObject:[Dict valueForKey:@"UserID"]];
+		if(appDelegate.SelectedUserID == [[Dict valueForKey:@"UserID"]intValue])
+		{
+			[selectedArray addObject:[NSNumber numberWithBool:YES]];
+		}
+		else
+		{
+			
+			[selectedArray addObject:[NSNumber numberWithBool:NO]];
+		}
+	}
+	
+	
+}
+// Customize the appearance of table view cells.
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+	
+	if(appDelegate.ISfromDefaultUser==TRUE)
+	{
+		static NSString *CellIdentifier = @"Cell";
+		UITableViewCell *cell =(UITableViewCell *) [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+		if (cell == nil) {
+			cell = [[[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier] autorelease];
+		}	
+		cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
+		cell.indentationLevel = 0;
+		cell.font=[UIFont boldSystemFontOfSize:15];
+		
+		cell.textColor= [UIColor colorWithRed:0.317 green:0.4 blue:0.56 alpha:1.0];
+		
+		
+		NSDictionary *Dict=[appDelegate.UserArray objectAtIndex:indexPath.row];
+		cell.text=[Dict valueForKey:@"UserName"];
+		return cell;
+	}
+	else
+	{
+		static NSString *CellIdentifier1 = @"Cell1";
+		SettingTableViewCell *cell1 =(SettingTableViewCell *) [tableView dequeueReusableCellWithIdentifier:CellIdentifier1];
+		if (cell1 == nil) {
+			cell1 = [[[SettingTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier1] autorelease];
+		}	
+		cell1.accessoryType=UITableViewCellAccessoryNone;
+		NSNumber *selected = [selectedArray objectAtIndex:[indexPath row]];
+		cell1.btnDelete.image = ([selected boolValue]) ? selectedImage : unselectedImage;
+		cell1.txtAmount.hidden=TRUE;
+		NSDictionary *Dict=[appDelegate.UserArray objectAtIndex:indexPath.row];
+		cell1.lblName.text=[Dict valueForKey:@"UserName"];
+		return cell1;
+	}
+}
+
+<<<<<<< .mine
+-(IBAction)btnSave_Click:(id)sender
+{
+	//NSString *SelectedItmes=@"";
+	if(!arr1)
+		arr1=[[NSMutableArray alloc]init];
+	if([arr1 count]>0)
+	{
+		[arr1 removeAllObjects];
+	}
+	
+	for(int i=0;i<[appDelegate.UserArray count];i++)
+	{
+		if([[selectedArray objectAtIndex:i]intValue]==1)
+		{
+			NSDictionary *Dict=[appDelegate.UserArray objectAtIndex:i];
+			[arr1 addObject:[Dict valueForKey:@"UserID"]];
+		}		
+	}
+	
+	
+	[appDelegate DefaultSet:[[arr1 objectAtIndex:0]intValue]];
+	[appDelegate UpdateDefaultUser:[[arr1 objectAtIndex:0]intValue]];
+	[self.navigationController popViewControllerAnimated:YES];
+}
+
+=======
+-(IBAction)btnSave_Click:(id)sender
+{
+	
+}
+
+>>>>>>> .r1145
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+	[tblView deselectRowAtIndexPath:indexPath animated:YES];
+
+	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	if(appDelegate.ISfromDefaultUser==TRUE)
+	{
+		appDelegate.AddNewUserDict =[appDelegate.UserArray objectAtIndex:indexPath.row];
+		appDelegate.SelectedStatus=@"Edit User";
+		appDelegate.iSfromAddUser=TRUE; 
+		if(!appDelegate.objFirstViewController)
+		{
+			appDelegate.objFirstViewController=[[FirstViewController alloc]initWithNibName:@"First_View" bundle:nil];
+		}
+		[self.navigationController pushViewController:appDelegate.objFirstViewController animated:YES];
+	}
+	else
+	{
+		//[selectedArray replaceObjectAtIndex:[indexPath row] withObject:[NSNumber numberWithBool:!selected]];
+		for(int i=0;i<[selectedArray count];i++)
+		{
+				[selectedArray replaceObjectAtIndex:i withObject:[NSString stringWithFormat:@"%d",0]];
+		}
+		[selectedArray replaceObjectAtIndex:indexPath.row withObject:[NSString stringWithFormat:@"%d",1]];
+		[tableView reloadData];
+	}
+	[Pool release];
+}
+
+- (UITableViewCellAccessoryType)tableView:(UITableView *)tv accessoryTypeForRowWithIndexPath:(NSIndexPath *)indexPath {
+    // Show the disclosure indicator if editing.
+<<<<<<< .mine
+	if(appDelegate.ISfromDefaultUser==TRUE)
+		return (self.editing) ? UITableViewCellAccessoryNone : UITableViewCellAccessoryDetailDisclosureButton;
+	else
+		return (self.editing) ? UITableViewCellAccessoryNone : UITableViewCellAccessoryNone;
+	
+=======
+	if(appDelegate.SaveMenstural==TRUE)
+		return (self.editing) ? UITableViewCellAccessoryNone : UITableViewCellAccessoryDetailDisclosureButton;
+	else
+		return (self.editing) ? UITableViewCellAccessoryNone : UITableViewCellAccessoryNone;
+
+>>>>>>> .r1145
+}
+
+-(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+	UITableViewCell  *cell=(UITableViewCell *)[tableView cellForRowAtIndexPath:indexPath];
+	cell.accessoryType=UITableViewCellAccessoryNone;
+    if (editingStyle == UITableViewCellEditingStyleDelete) 
+	{	
+		ROW=indexPath.row;
+		UIActionSheet *action=[[UIActionSheet alloc]initWithTitle:@"Are you sure to delete this user?" delegate:self cancelButtonTitle:@"No" destructiveButtonTitle:@"Delete User" otherButtonTitles:nil];
+		action.actionSheetStyle=UIActionSheetStyleDefault;
+		[action showInView:self.view.superview.superview];
+		[action release];
+	}   
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+	if(buttonIndex==0)
+	{
+		NSDictionary *Dict=[appDelegate.UserArray objectAtIndex:ROW];
+		appDelegate.SelectedUserID=[[Dict objectForKey:@"UserID"]intValue];
+		[appDelegate DeleteAllCategoriesData:@"Vitals_Detail"  IDname:@"User_ID" DeleteID:appDelegate.SelectedUserID]; 
+		[appDelegate DeleteAllCategoriesData:@"Routine_Detail"  IDname:@"User_ID" DeleteID:appDelegate.SelectedUserID]; 
+		[appDelegate DeleteAllCategoriesData:@"User_Settings"  IDname:@"User_ID" DeleteID:appDelegate.SelectedUserID]; 
+		[appDelegate DeleteAllCategoriesData:@"Menstrual_Cycle"  IDname:@"User_ID" DeleteID:appDelegate.SelectedUserID]; 
+		[appDelegate DeleteAllCategoriesData:@"User_Detail"  IDname:@"User_ID" DeleteID:appDelegate.SelectedUserID]; 
+		[appDelegate DeleteAllCategoriesData:@"Medicine"  IDname:@"User_ID" DeleteID:appDelegate.SelectedUserID]; 
+		[appDelegate SelectsUsers];
+		if([appDelegate.UserArray count]>0)
+		{
+			lblUser.text=@"";
+		}
+		else
+		{
+			lblUser.text=@"No Users";
+			[tblView bringSubviewToFront:lblUser];
+		}
+		[tblView reloadData];
+	}
+	
+}
+
+- (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath 
+{ 
+	
+	UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
+	temporaryBarButtonItem.title = @"Back";
+	self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
+	[temporaryBarButtonItem release];
+	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	appDelegate.AddNewUserDict =[appDelegate.UserArray objectAtIndex:indexPath.row];
+	appDelegate.SelectedStatus=@"Edit User";
+	
+	appDelegate.iSfromAddUser=TRUE; 
+	if(!appDelegate.objFirstViewController)
+	{
+		appDelegate.objFirstViewController=[[FirstViewController alloc]initWithNibName:@"First_View" bundle:nil];
+	}
+	[self.navigationController pushViewController:appDelegate.objFirstViewController animated:YES];
+	[Pool release];
+	
+}
+#pragma mark Button Click methods
+
+//// Call when click on add new user button
+
+-(IBAction)addProfile:(id)sender;
+{
+	[appDelegate MakeDictForNewUser]; 
+	appDelegate.SelectedStatus=@"Add User";
+	UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
+	temporaryBarButtonItem.title = @"Back";
+	self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
+	[temporaryBarButtonItem release];
+	appDelegate.iSfromAddUser=TRUE; 
+	if(!appDelegate.objFirstViewController)
+	{
+		appDelegate.objFirstViewController=[[FirstViewController alloc]initWithNibName:@"First_View" bundle:nil];
+	}
+	[self.navigationController pushViewController:appDelegate.objFirstViewController animated:YES];
+	
+	
+}
+
+- (void)dealloc {
+	[btnAdd release];
+	
+	[tblView release];
+	[SettingsCon release];
+	
+	[super dealloc];
+}
+
+@end
+

@@ -1,0 +1,52 @@
+//
+//  LadiesDatePickerController.h
+//  HealthTracker
+//
+//  Created by Bhoomi on 3/14/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+// Import All needed header files bellow.
+#import <UIKit/UIKit.h>
+#import "Menstural_Cycle.h"
+#import "HealthTrackerAppDelegate.h"
+
+// Defining Interface  with needed Protocol (if any).
+// Protocols generally define inside '< >'bracates.
+@interface LadiesDatePickerController : UIViewController <UITextFieldDelegate>
+{
+	
+	/* 
+	 Tools That you have used in xib file, need to bind with its controller file.
+	 This is done by Declaring tool with IBOutlet as Prefix.
+	 
+	 Tools That you haven't used in xib but used in controller file, need not to bind with xib,
+	 such tools do not have IBOutlet as Prefix.
+	 
+	 Declaration of all global variables and objects also here.
+	 */
+	
+	IBOutlet UIBarButtonItem *btnSave;
+	IBOutlet UITextField *txtStartDate;
+	IBOutlet UITextField *txtEndDate;
+	IBOutlet UIDatePicker *DatePicker;
+	
+	int SelectedTag;
+//	NSDateFormatter *DateFormatter;
+	UILabel *lblData;
+	IBOutlet UIBarButtonItem *btnDone;
+	IBOutlet UIToolbar *ToolBar;
+	Menstural_Cycle *Mensturalref;
+	HealthTrackerAppDelegate *appDelegate;
+	NSString *StartDate;
+	NSString *EndDate;
+}
+
+// Defining Property as per fields, tools, variables and objects.
+@property(nonatomic,retain) Menstural_Cycle *Mensturalref;
+
+// Declaration of all Public methods that are going to implement inside implementation file, need to declare here.
+-(IBAction)dateChanged:(id)sender;
+-(IBAction)Save_Clecked:(id)sender;
+-(IBAction)btnDone_Clicked:(id)sender;
+@end

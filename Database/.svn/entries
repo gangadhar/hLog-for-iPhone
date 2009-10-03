@@ -1,0 +1,54 @@
+8
+
+dir
+884
+svn://macuser@svr01/iPhone/HealthTracker/Database
+svn://macuser@svr01
+
+
+
+2009-04-14T06:27:05.963441Z
+884
+macuser
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+9936fe41-bedb-244f-bfd8-30a263b95f5e
+
+healthtracker.sqlite
+file
+1148
+
+
+
+2009-04-21T10:43:50.000000Z
+2097fff1f76be8ee89b08c4bc3245bb9
+2009-04-21T11:11:01.907650Z
+1148
+macuser
+has-props
+
+healthtracker_Current.sqlite
+file
+
+
+
+
+2009-04-14T06:27:52.000000Z
+54bb2618473c108d4d8f91901c6cdfcc
+2009-04-14T06:27:05.963441Z
+884
+macuser
+has-props
+

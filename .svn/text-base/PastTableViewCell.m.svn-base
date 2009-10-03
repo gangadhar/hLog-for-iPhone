@@ -1,0 +1,93 @@
+//
+//  PastTableViewCell.m
+//  HealthTracker
+//
+//  Created by Bhoomi on 3/3/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+#import "PastTableViewCell.h"
+
+
+@implementation PastTableViewCell
+@synthesize lblName,txtDeatils;
+- (id)initWithFrame:(CGRect)frame reuseIdentifier:(NSString *)reuseIdentifier {
+    if (self = [super initWithFrame:frame reuseIdentifier:reuseIdentifier]) {
+       	UIView *MycontentView =self.contentView;
+		
+		self.lblName = [self newLabelWithPrimaryColor:[UIColor colorWithRed:0.317 green:0.4 blue:0.56 alpha:1.0] selectedColor:[UIColor whiteColor] fontSize:13 bold:YES];
+		self.lblName.textAlignment = UITextAlignmentRight; // default
+		//lblName.textColor=[UIColor colorWithRed:0.317 green:0.4 blue:0.56 alpha:1.0];
+		
+		[MycontentView addSubview:self.lblName];
+		[self.lblName release];
+		
+	//	txtDeatils=[[UITextField alloc]initWithFrame:CGRectMake(0, 0, 0, 0)];
+//		txtDeatils.font=[UIFont systemFontOfSize:14];
+//		txtDeatils.clearsContextBeforeDrawing=TRUE;
+//		
+//		txtDeatils.autocorrectionType=UITextAutocorrectionTypeNo;
+//		txtDeatils.returnKeyType=UIReturnKeyDone;
+//		txtDeatils.borderStyle=UITextBorderStyleNone;
+//	//	txtDeatils.borderStyle=UITextBorderStyleRoundedRect;
+//		txtDeatils.clearButtonMode=UITextFieldViewModeWhileEditing;
+//		txtDeatils.autocapitalizationType=TRUE;
+//		txtDeatils.contentVerticalAlignment=UIControlContentVerticalAlignmentCenter;
+//		txtDeatils.textAlignment=UITextAlignmentLeft;	
+//		[MycontentView addSubview:txtDeatils];
+//		[self.txtDeatils release];
+		
+		txtDeatils = [self newLabelWithPrimaryColor:[UIColor blackColor] selectedColor:[UIColor whiteColor] fontSize:14 bold:YES];
+		txtDeatils.textAlignment = UITextAlignmentLeft; // default
+		//lblName.textColor=[UIColor colorWithRed:0.317 green:0.4 blue:0.56 alpha:1.0];
+		txtDeatils.numberOfLines=0;
+		[MycontentView addSubview:txtDeatils];
+		[txtDeatils release];
+		
+		
+    }
+    return self;
+}
+
+
+- (void)layoutSubviews {
+	
+    [super layoutSubviews];
+	CGRect contentRect = self.contentView.bounds;   
+	
+	CGFloat boundsX = contentRect.origin.x;
+	self.lblName.frame =  CGRectMake(4, 7, 140, 30);
+	self.txtDeatils.frame = CGRectMake(boundsX + 150, 5, 135, self.frame.size.height-8);
+	
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+	
+    [super setSelected:selected animated:animated];
+	
+    // Configure the view for the selected state
+}
+
+- (UILabel *)newLabelWithPrimaryColor:(UIColor *)primaryColor selectedColor:(UIColor *)selectedColor fontSize:(CGFloat)fontSize bold:(BOOL)bold
+{	
+    UIFont *font;
+    if (bold) {
+        font = [UIFont boldSystemFontOfSize:fontSize];
+    } else {
+        font = [UIFont systemFontOfSize:fontSize];
+    }	
+	UILabel *newLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+	newLabel.backgroundColor = [UIColor whiteColor];
+	newLabel.opaque = YES;
+	newLabel.textColor = primaryColor;
+	newLabel.highlightedTextColor = selectedColor;
+	newLabel.font = font;	
+	return newLabel;
+}
+
+- (void)dealloc {
+    [super dealloc];
+}
+
+
+@end

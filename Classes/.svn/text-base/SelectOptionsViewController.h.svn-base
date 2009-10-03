@@ -1,0 +1,85 @@
+//
+//  SelectOptionsViewController.h
+//  HealthTracker
+//  Created by Bhoomi on 3/3/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+// Import All needed header files bellow.
+#import <UIKit/UIKit.h>
+#import "HealthTrackerAppDelegate.h"
+#import "MedicationEntryViewController.h"
+
+#import "SelectMedicineSettingsController.h"
+#import "Medicine.h"
+#import "DailyHourlyTextEntryViewController.h"
+#import "Routine_Detail.h"
+
+// Defining Interface  with needed Protocol (if any).
+// Protocols generally define inside '< >'bracates.
+@interface SelectOptionsViewController : UIViewController <UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate,UIPickerViewDelegate> 
+{
+	
+	/* 
+	 Tools That you have used in xib file, need to bind with its controller file.
+	 This is done by Declaring tool with IBOutlet as Prefix.
+	 
+	 Tools That you haven't used in xib but used in controller file, need not to bind with xib,
+	 such tools do not have IBOutlet as Prefix.
+	 
+	 Declaration of all global variables and objects also here.
+	 */
+	IBOutlet UIToolbar *ToolBar;
+	IBOutlet UITableView *tblView;
+	NSMutableDictionary *data;
+	NSMutableArray *selectedArray;
+	NSMutableArray *selectedArrayData;
+	UIImage *selectedImage;
+	UILabel *lblData;
+	UIImage *unselectedImage;
+	IBOutlet UIBarButtonItem *btnSave;
+	NSArray *array;
+	IBOutlet UIBarButtonItem *btnCancle;
+	IBOutlet UIBarButtonItem *btnDone;
+	HealthTrackerAppDelegate *appDelegate;
+	IBOutlet UIToolbar *toolBar;
+	MedicationEntryViewController *MedicationEntryView;
+	IBOutlet UIDatePicker *DatePicker;
+	NSMutableArray *arr1;
+	NSString *NavText;
+	NSArray *MedicineArray;
+	IBOutlet UIBarButtonItem *btnSettings;
+	SelectMedicineSettingsController *SelectMedicineSettings;
+	UINavigationController *SettingsCon;
+	Medicine *MedicineRef;
+	Routine_Detail *Routine_Detailref;
+	IBOutlet UIBarButtonItem *btnEdit;
+	BOOL ISEdit;
+	NSMutableArray *arr3;
+//	int SelectedTag;
+	int FirstValue[4];
+	UITextField *SelectedText;
+	IBOutlet UIPickerView *PickerView;
+	int SelectedTag;
+//	NSMutableArray *TypeArray;	
+	
+}
+
+@property(nonatomic,retain) Medicine *MedicineRef;
+
+// Defining Property as per fields, tools, variables and objects.
+@property(nonatomic,retain) NSString *NavText;
+
+@property(nonatomic,retain)Routine_Detail *Routine_Detailref;
+
+// Declaration of all Public methods that are going to implement inside implementation file, need to declare here.
+-(NSMutableArray *)FillArray:(int)i;
+-(IBAction)Cancle:(id)sender;
+-(IBAction)Save:(id)sender;
+-(IBAction)btnSettings_click:(id)sender;
+- (void)populateSelectedArray;
+-(IBAction)btnDone_Clicked:(id)sender;
+-(IBAction)btnMedidcine:(id)sender;
+-(IBAction)btnEdit_Click:(id)sender;
+-(int)GetPickerRow:(NSString *)String component:(NSInteger)Tag;
+@end

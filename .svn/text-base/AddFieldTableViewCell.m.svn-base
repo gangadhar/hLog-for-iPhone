@@ -1,0 +1,71 @@
+//
+//  AddFieldTableViewCell.m
+//  Roland
+//
+//  Created by MAC07 on 14/03/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import "AddFieldTableViewCell.h"
+
+
+@implementation AddFieldTableViewCell
+@synthesize lblName;
+
+- (id)initWithFrame:(CGRect)frame reuseIdentifier:(NSString *)reuseIdentifier {
+    if (self = [super initWithFrame:frame reuseIdentifier:reuseIdentifier]) {
+        
+		UIView *MycontentView =self.contentView;
+		self.lblName = [self newLabelWithPrimaryColor:[UIColor colorWithRed:0.317 green:0.4 blue:0.56 alpha:1.0] selectedColor:[UIColor blackColor] fontSize:14.0 bold:NO];
+		self.lblName.textAlignment = UITextAlignmentLeft; // default		
+		self.lblName.textColor=[UIColor blackColor];		
+		[MycontentView addSubview:self.lblName];
+		[self.lblName release];
+    }
+    return self;
+}
+
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+
+    [super setSelected:selected animated:animated];
+    // Configure the view for the selected state
+}
+
+- (void)layoutSubviews {
+	
+    [super layoutSubviews];
+	CGRect contentRect = self.contentView.bounds; 	
+	CGFloat boundsX = contentRect.origin.x;
+	CGRect frame;
+	lblName.numberOfLines =0;
+	lblName.lineBreakMode=UILineBreakModeCharacterWrap;
+	frame = CGRectMake(boundsX+10, 8, self.frame.size.width-60, self.frame.size.height-12 );
+	self.lblName.frame = frame;
+}
+- (UILabel *)newLabelWithPrimaryColor:(UIColor *)primaryColor selectedColor:(UIColor *)selectedColor fontSize:(CGFloat)fontSize bold:(BOOL)bold
+{	
+    UIFont *font;
+    if (bold) {
+        font = [UIFont boldSystemFontOfSize:fontSize];
+    } else {
+        font = [UIFont systemFontOfSize:fontSize];
+    }	
+	UILabel *newLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+	newLabel.backgroundColor = [UIColor whiteColor];
+	newLabel.opaque = YES;
+	newLabel.textColor = primaryColor;
+	newLabel.highlightedTextColor = selectedColor;
+	newLabel.font = font;	
+	return newLabel;
+}
+
+- (void)dealloc {
+    [super dealloc];
+}
+
+
+
+
+
+@end

@@ -1,0 +1,64 @@
+//
+//  UserViewController.h
+//  HealthTracker
+//
+//  Created by Bhoomi on 3/30/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+#import "AddNewUserController.h"
+#import "HealthTrackerAppDelegate.h"
+#import "Vitals_Detail.h"
+#import "Routine_Detail.h"
+#import "Menstural_Cycle.h"
+
+#import "DailyHourlyTextEntryViewController.h"
+#import "SelectOptionsViewController.h"
+#import "LadiesDatePickerController.h"
+#import "SettingsViewController.h"
+@interface UserViewController : UIViewController <UITableViewDelegate,UITableViewDataSource,UIPickerViewDelegate>{
+
+	IBOutlet UITableView *tblView;
+	IBOutlet UIBarButtonItem *btnSave;
+	
+	HealthTrackerAppDelegate *appDelegate;
+	Vitals_Detail *Vitals_Detailref;
+	Routine_Detail *Routine_Detailrf;
+	Menstural_Cycle *Mensturalref;
+	NSMutableArray *VitalsArray;
+	NSMutableArray *RoutinesArray;
+	NSString *DailySettings;
+	IBOutlet UIPickerView *PickerView;
+	IBOutlet UIDatePicker *DatePicker;
+	IBOutlet UIToolbar *ToolBar;
+	IBOutlet UIBarButtonItem *btnDone;
+	
+	int SelectedTag;
+	UILabel *lblData;
+	//SelectOptionsViewController *SelectOptionsView;
+	LadiesDatePickerController *LadiesDatePicker;
+//	NSDateFormatter *DateFormatter;
+	NSMutableDictionary *data;
+	UIBarButtonItem *temporaryBarButtonItem;
+	IBOutlet UIBarButtonItem *btnVitals;
+	IBOutlet UIBarButtonItem *btnRoutines;
+	//SettingsViewController *SettingsView;
+	UINavigationController *SettingsCon2;
+	UINavigationController *SettingsCon;
+	IBOutlet UIToolbar *ToolBar1;
+	//NSMutableArray *TypeArray;
+	NSArray	*arr1;
+}
+@property (nonatomic,retain) Vitals_Detail *Vitals_Detailref;
+@property (nonatomic,retain) Routine_Detail *Routine_Detailrf;
+@property (nonatomic,retain) Menstural_Cycle *Mensturalref;
+-(IBAction)btnSave_Clicked:(id)sender;
+-(IBAction)btnDone_CLicked:(id)sender;
+-(IBAction)btnVitals_CLicked:(id)sender;
+-(IBAction)btnRoutines_CLicked:(id)sender;
+-(NSMutableArray *)FillArray:(int)i;
+-(int)GetPickerRow:(NSString *)String component:(NSInteger)Tag;
+-(int)ConvertIntoCms:(NSString *)Feets;
+-(NSString*)ConvertFeets:(double)INCMS;
+@end

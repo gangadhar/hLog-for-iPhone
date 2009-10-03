@@ -1,0 +1,355 @@
+//
+//  MedicineViewController.m
+//  HealthTracker
+//
+//  Created by Bhoomi on 3/30/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import "MedicineViewController.h"
+#import "AddFieldTableViewCell.h"
+#import "DailyStatusTableViewCell.h"
+#import "AddUserButtonTableViewCell.h" 
+@implementation MedicineViewController
+@synthesize MedicineRef;
+/*
+ // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+        // Custom initialization
+    }
+    return self;
+}
+*/
+
+/*
+// Implement loadView to create a view hierarchy programmatically, without using a nib.
+- (void)loadView {
+}
+*/
+
+-(IBAction)Cancel_Click:(id)sender
+{
+	[self.MedicineRef release];
+	[self.navigationController popViewControllerAnimated:YES];
+}
+
+
+// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+- (void)viewDidLoad {
+
+	self.navigationItem.title=@"Medicine Entry";
+	tblView.delegate=self;
+	tblView.dataSource=self;
+	tblView.rowHeight=40;
+
+	self.navigationItem.rightBarButtonItem=btnSave;
+    appDeleagte=[[UIApplication sharedApplication]delegate];
+	[DatePicker setDate:[NSDate date] animated:YES];
+	
+	DatePicker.frame=CGRectMake(0, 200, 320, 216);
+	ToolBar.frame=CGRectMake(0, 200, 320, 44);
+	ToolBar.tintColor=[UIColor blackColor];
+	lblData=[[UILabel alloc]init];
+	lblData.frame=CGRectMake(10,15 , 250, 20);
+	lblData.textColor=[UIColor whiteColor];
+	lblData.backgroundColor=[UIColor clearColor];
+	DatePicker.maximumDate=[NSDate date];
+	[super viewDidLoad];
+}
+
+-(IBAction)btnDone_Clicked:(id)sender
+{
+	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	
+	DatePicker.hidden=TRUE;
+	ToolBar.hidden=TRUE;
+	
+	//[appDeleagte.DateFormatter setDateFormat:@"MM-dd-yyyy HH:mm"];
+	NSString *Date=[appDeleagte.DateFormatter stringFromDate: DatePicker.date];
+	
+	arr1=[Date componentsSeparatedByString:@" "];
+	
+	NSString *DateTime=[arr1 objectAtIndex:1];
+	Date=[arr1 objectAtIndex:0];
+	if(!([Date isEqualToString:self.MedicineRef.EntryDate] && [DateTime isEqualToString:self.MedicineRef.EntryTime]))
+	
+	{
+		[appDeleagte Medicinedata:Date  ToTime:DateTime anduserid:appDeleagte.SelectedUserID]; 
+		if([appDeleagte.EntryArray count]>0)
+		{
+			self.MedicineRef =[appDeleagte.EntryArray objectAtIndex:0];
+		}
+		else
+		{
+			if(!self.MedicineRef)
+			{
+				self.MedicineRef=[[Medicine alloc]init];
+				
+			}
+			else
+			{
+				[self.MedicineRef ClearData];				
+			}
+			
+			self.MedicineRef.EntryDate= Date;
+			self.MedicineRef.EntryTime=DateTime;
+			self.MedicineRef.UserID=appDeleagte.SelectedUserID;
+		}
+		[tblView reloadData];
+	}
+	
+	[Pool release];	
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+	if(section==1)
+	{
+		return @"Select Medicine";
+	}
+	else
+	{
+		return @"";
+	}
+}
+-(CGFloat)findHeightForCell:(NSString *)text
+{
+	CGFloat		result = 40.0f;
+	CGFloat		width = 0;
+	//CGFloat		tableViewWidth;
+	//CGRect		bounds = [UIScreen mainScreen].bounds;
+	
+
+		//tableViewWidth = bounds.size.width;
+	
+	width = 260;
+	// fudge factor
+	if (text)
+	{
+		CGSize		textSize = { width, 20000.0f };		// width and height of text area
+		CGSize		size = [text sizeWithFont:[UIFont boldSystemFontOfSize:14.0f] constrainedToSize:textSize lineBreakMode:UILineBreakModeCharacterWrap];
+		
+		size.height += 25.0f;			// top and bottom margin
+		result = MAX(size.height, 40.0f);	// at least one row		
+	}
+	else
+		
+	{
+		return 40;
+	}
+	return result;	
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	if(indexPath.section==0)
+	{
+		return 40;
+	}
+	else
+	{
+		return [self findHeightForCell:self.MedicineRef.MedicineEntry]; 
+		
+	}
+}
+
+-(IBAction)btnSave_Clicked:(id)sender
+{
+	if([self.MedicineRef.MedicineEntry  length]>0)
+	{
+		int result;
+		if(self.MedicineRef.MedicineID==0)
+		{
+			result= [appDeleagte InsertMedicinedata:self.MedicineRef]; 
+		}
+		else
+		{
+			result=	[appDeleagte UpdateData:self.MedicineRef]; 
+		}
+		if(result>0)
+		{
+			//UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Medicine data saved successfully!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+//			alert.tag=5;
+//			[alert show];
+//			[alert release];
+			[self.navigationController popViewControllerAnimated:YES];
+		}
+		appDeleagte.isDailyReport=TRUE;
+	}
+	else		
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Please enter the medicine entry!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		alert.tag=10;
+		[alert show];
+		[alert release];
+	}
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+	if(alertView.tag==5)
+	{
+		
+			[self.navigationController popViewControllerAnimated:YES];
+	}
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+	//self.view.frame=CGRectMake(0, 0, 320, 416);
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+	if(interfaceOrientation==UIInterfaceOrientationPortrait)
+		self.view.frame=CGRectMake(0, 0, 320, 416);
+	return YES;
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+	//self.navigationItem.title=[NSString stringWithFormat:@"%@-Medicine",appDeleagte.UserName];
+//	[[UIDevice currentDevice] setOrientation:UIInterfaceOrientationPortrait];
+	
+	DatePicker.hidden=TRUE;
+	ToolBar.hidden=TRUE; 
+	MedicineName=@"";
+	
+	[tblView reloadData];
+}
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 2;
+}
+
+
+// Customize the number of rows in the table view.
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section 
+{
+	return 1;
+}
+
+// Customize the appearance of table view cells.
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+	if(indexPath.section==0)
+	{
+		static NSString *CellIdentifier = @"Cell";
+		AddUserButtonTableViewCell  *cell = (AddUserButtonTableViewCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+		if (cell == nil) {
+			cell = [[[AddUserButtonTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier] autorelease];
+		}
+		[cell.BtnSelect addTarget:self action:@selector(ClickButton:) forControlEvents:UIControlEventTouchUpInside];
+		cell.lblName.frame =  CGRectMake(2, 5, 140, 30);
+		cell.BtnSelect.frame =  CGRectMake(150, 5, 140, 30 );
+		cell.lblName.text=@"Date & Time";
+		[cell.BtnSelect setTitle:[NSString stringWithFormat:@"  %@ %@",self.MedicineRef.EntryDate,self.MedicineRef.EntryTime] forState:UIControlStateNormal];
+		return cell;
+	}
+	else
+	{		
+		static NSString *CellIdentifier1 = @"Cell1";
+		AddFieldTableViewCell *cell1 = (AddFieldTableViewCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier1];
+		if (cell1 == nil) {
+			cell1 = [[[AddFieldTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier1] autorelease];
+		}
+		cell1.lblName.text=self.MedicineRef.MedicineEntry;
+		cell1.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
+		return cell1; 
+	}
+}
+
+-(IBAction)ClickButton:(id)sender
+{
+	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];	
+	DatePicker.hidden=FALSE;
+	[appDeleagte.DateFormatter setDateFormat:@"MM-dd-yyyy HH:mm"];
+	if([self.MedicineRef.EntryDate length]==0)
+	{
+		[DatePicker setDate:[NSDate date] animated:YES];
+	}
+	else
+	{
+		[DatePicker setDate:[appDeleagte.DateFormatter dateFromString: [NSString stringWithFormat:@"%@ %@",self.MedicineRef.EntryDate,self.MedicineRef.EntryTime]]];
+	}
+	ToolBar.hidden=FALSE;
+	lblData.text=@"Select Date and Time";	
+	[Pool release];
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	[tblView deselectRowAtIndexPath:indexPath animated:YES];
+	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+		if(indexPath.section==0)
+		{
+			DatePicker.hidden=FALSE;
+			[appDeleagte.DateFormatter setDateFormat:@"MM-dd-yyyy HH:mm"];
+			if([self.MedicineRef.EntryDate length]==0)
+			{
+				[DatePicker setDate:[NSDate date] animated:YES];
+			}
+			else
+			{
+				[DatePicker setDate:[appDeleagte.DateFormatter dateFromString: [NSString stringWithFormat:@"%@ %@",self.MedicineRef.EntryDate,self.MedicineRef.EntryTime]]];
+			}
+			
+			ToolBar.hidden=FALSE;
+			lblData.text=@"Select Date and Time";
+		}
+		else
+		{
+			if(!appDeleagte.objSelectOptionsViewController)
+			{
+				appDeleagte.objSelectOptionsViewController=[[SelectOptionsViewController alloc]initWithNibName:@"SelectOptions" bundle:nil];
+			}
+			appDeleagte.DailyTag=20; 
+			appDeleagte.isFromChart=TRUE; 
+			appDeleagte.objSelectOptionsViewController.NavText=@"Medicine";
+			appDeleagte.SelectedStatus=@"Medicine";
+			appDeleagte.objSelectOptionsViewController.MedicineRef=self.MedicineRef;
+			appDeleagte.SelectedItems=self.MedicineRef.Medicine_Insert_ID;
+			[self.navigationController pushViewController:appDeleagte.objSelectOptionsViewController animated:YES];
+		}
+		
+	[Pool release];
+	
+}
+/*
+// Override to allow orientations other than the default portrait orientation.
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+    // Return YES for supported orientations
+    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+*/
+
+- (void)didReceiveMemoryWarning {
+	// Releases the view if it doesn't have a superview.
+    [super didReceiveMemoryWarning];
+	
+	// Release any cached data, images, etc that aren't in use.
+}
+
+- (void)viewDidUnload {
+	// Release any retained subviews of the main view.
+	// e.g. self.myOutlet = nil;
+}
+
+
+- (void)dealloc {
+	
+	[tblView release];
+	[btnSave release];
+	//[DateFormatter release];
+	[DatePicker release];
+	[ToolBar release];
+	[lblData release];
+//	[SelectOptionsView release];
+	[MedicineRef release];
+	[btnDone release];
+	
+    [super dealloc];
+}
+
+
+@end

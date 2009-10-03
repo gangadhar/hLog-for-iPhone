@@ -1,0 +1,167 @@
+//
+//  FirstViewController.m
+//  HealthTracker
+//
+//  Created by MAC02 on 3/30/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import "FirstViewController.h"
+
+
+@implementation FirstViewController
+
+/*
+ // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+        // Custom initialization
+    }
+    return self;
+}
+*/
+
+/*
+// Implement loadView to create a view hierarchy programmatically, without using a nib.
+- (void)loadView {
+}
+*/
+
+
+// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+- (void)viewDidLoad 
+{
+	self.navigationItem.title=@"Health Tracker";
+	tblView.delegate=self;
+	tblView.dataSource=self;
+	self.navigationController.navigationBar.barStyle= UIBarStyleBlackOpaque; 
+	tblView.rowHeight=50;
+	appDelegate=[[UIApplication sharedApplication]delegate];
+	UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
+	temporaryBarButtonItem.title = @"Back";
+	self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
+	[temporaryBarButtonItem release];
+	
+    [super viewDidLoad];
+}
+
+
+- (void)viewWillAppear:(BOOL)animated
+{
+	if(appDelegate.iSFirstTime==TRUE)
+	{
+		if([[appDelegate.AddNewUserDict valueForKey:@"UserID"]intValue] == 0)
+		{
+			self.navigationItem.hidesBackButton=TRUE;
+		}
+		else
+		{
+			self.navigationItem.hidesBackButton=FALSE;
+		}
+	}
+	else
+		self.navigationItem.hidesBackButton=FALSE;
+	self.navigationItem.title=appDelegate.SelectedStatus;
+}
+
+#pragma mark Table view methods
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+
+// Customize the number of rows in the table view.
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return 4;
+}
+
+
+// Customize the appearance of table view cells.
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    static NSString *CellIdentifier = @"Cell";
+	UITableViewCell *cell =(UITableViewCell *) [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+	if (cell == nil) {
+		cell = [[[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier] autorelease];
+	}	
+	cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
+	cell.indentationLevel = 1;
+	cell.textColor=[UIColor colorWithRed:0.317 green:0.4 blue:0.56 alpha:1.0];
+	switch (indexPath.row) {
+	   case 0:
+		   cell.text=@"Personal Information";
+		   break;
+	   case 1:
+		   cell.text=@"Medical History";
+		   break;
+	   case 2:
+		   cell.text=@"Health Care Providers";
+		   break;
+	   case 3:
+		   cell.text=@"Insurance Information";
+		   break;
+		default:
+		   break;
+   }
+	cell.accessoryType=UITableViewCellAccessoryDisclosureIndicator;
+	return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+	[tblView deselectRowAtIndexPath:indexPath animated:YES];
+	
+	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	if([[appDelegate.AddNewUserDict valueForKey:@"UserID"]intValue]==0 && (indexPath.row==1 || indexPath.row==2 || indexPath.row==3))
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Fill the details in personal information first!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		[alert show];
+		[alert release];
+	}
+	else
+	{
+		if(!AddNewUser)
+		{
+			AddNewUser=[[AddNewUserController alloc]initWithNibName:@"AddNewUser" bundle:nil];
+		}
+		AddNewUser.SelectedIndexRow=indexPath.row;
+		UITableViewCell *cell=(UITableViewCell *)[tableView cellForRowAtIndexPath:indexPath];
+		AddNewUser.Name=cell.text; 
+		AddNewUser.BackUpDict=[appDelegate.AddNewUserDict mutableCopy];
+		[self.navigationController pushViewController:AddNewUser animated:YES];
+	}
+	[Pool release];
+}
+
+/*
+// Override to allow orientations other than the default portrait orientation.
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+    // Return YES for supported orientations
+    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+*/
+
+- (void)didReceiveMemoryWarning {
+	// Releases the view if it doesn't have a superview.
+    [super didReceiveMemoryWarning];
+	
+	// Release any cached data, images, etc that aren't in use.
+}
+
+- (void)viewDidUnload {
+	// Release any retained subviews of the main view.
+	// e.g. self.myOutlet = nil;
+}
+
+
+- (void)dealloc {
+	
+	[tblView release];
+	//[SelectButtonView release];
+	//[SelectSettingsView release];
+	
+    [super dealloc];
+}
+
+
+@end

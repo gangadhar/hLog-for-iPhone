@@ -1,0 +1,22 @@
+//
+//  AddNewUserTableCell.h
+//  HealthTracker
+//
+//  Created by Bhoomi on 02/03/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+
+@interface AddNewUserTableCell : UITableViewCell {
+	UILabel *lblName;
+	UILabel *txtDeatils;
+}
+
+@property(nonatomic,retain) UILabel *lblName;
+
+@property(nonatomic,retain)  UILabel *txtDeatils;
+
+- (UILabel *)newLabelWithPrimaryColor:(UIColor *)primaryColor selectedColor:(UIColor *)selectedColor fontSize:(CGFloat)fontSize bold:(BOOL)bold;
+@end

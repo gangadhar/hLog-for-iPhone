@@ -1,0 +1,49 @@
+//
+//  SelectButtonViewController.h
+//  HealthTracker
+//
+//  Created by MAC02 on 3/24/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+#import "DailyStatusViewController.h"
+#import "HourlyStatusViewController.h"
+#import "HealthTrackerAppDelegate.h"
+
+#import "ReportselectionViewController.h"
+#import "SelectSettingsViewController.h"
+
+#import "Medicine.h"
+#import "MedicineViewController.h"
+#import "Vitals_Detail.h"
+#import "Routine_Detail.h"
+#import "UserViewController.h"
+#import "CalendarReportViewController.h"
+#import "FirstViewController.h"
+#import "RootViewController.h"
+
+@interface SelectButtonViewController : UIViewController <UITableViewDelegate,UITableViewDataSource>{
+
+	IBOutlet UITableView *tblView;
+//	DailyStatusViewController *DailyStatusView;
+//	HourlyStatusViewController *HourlyStatusView;
+	HealthTrackerAppDelegate *appDelegate;
+	int SelectedIndex;
+	ReportselectionViewController *ReportselectionView;
+//	MedicationEntryViewController *MedicationEntryView;
+	//MedicineViewController *MedicineView;
+	UserViewController *UserView;
+	SelectSettingsViewController *SelectSettingsView;
+	FirstViewController  *objAddUser;
+	CalendarReportViewController *objReport;	
+	NSString *Date;
+	NSString *DateTime;
+	NSString *Mins;
+	FirstViewController *ObjFirstViewController;
+
+}
+
+@property(nonatomic,readwrite) int SelectedIndex; 
+
+@end

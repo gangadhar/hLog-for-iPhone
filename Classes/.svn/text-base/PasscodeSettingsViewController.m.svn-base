@@ -1,0 +1,273 @@
+//
+//  PasscodeSettingsViewController.m
+//  HealthTracker
+//
+//  Created by Bhoomi on 3/17/09.
+//  Copyright 2009 __Elan.
+//
+
+#import "PasscodeSettingsViewController.h"
+#import "IsKidTableViewCell.h"
+
+@implementation PasscodeSettingsViewController
+
+/*
+// The designated initializer. Override to perform setup that is required before the view is loaded.
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+        // Custom initialization
+    }
+    return self;
+}
+*/
+
+/*
+// Implement loadView to create a view hierarchy programmatically, without using a nib.
+- (void)loadView {
+}
+*/
+
+
+// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+- (void)viewDidLoad
+{
+	self.navigationItem.title=@"Passcode";
+	self.navigationController.navigationBar.hidden=FALSE;
+	self.navigationController.navigationBar.barStyle= UIBarStyleBlackOpaque;
+	btnCancel=[[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel)];
+	tblView.delegate=self;
+	tblView.dataSource=self;
+    [super viewDidLoad];
+}
+
+-(IBAction)cancel
+{
+//	[self.navigationController dismissModalViewControllerAnimated:YES];
+	[self.navigationController popViewControllerAnimated:YES];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+	[tblView reloadData];
+}
+
+/*
+// Override to allow orientations other than the default portrait orientation.
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+    // Return YES for supported orientations
+    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+*/
+#pragma mark Table view methods
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 2;
+}
+
+
+// Customize the number of rows in the table view.
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return 1 ;
+}
+
+
+// Customize the appearance of table view cells.
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+	if(indexPath.section==0)
+	{
+		static NSString *CellIdentifier = @"Cell";
+		
+		IsKidTableViewCell *cell = (IsKidTableViewCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+		if (cell == nil) {
+			cell = [[[IsKidTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier] autorelease];
+		}
+		cell.lblName.text=@"Turn Passcode ON/OFF";	
+		if([[[NSUserDefaults standardUserDefaults] valueForKey:@"Passcode"]intValue]==0)
+		{
+			[cell.SwIsKid setOn:FALSE]; 
+		}
+		else
+		{
+			[cell.SwIsKid setOn:TRUE]; 
+		}
+		[cell.SwIsKid addTarget:self action:@selector(Clicked:) forControlEvents:UIControlEventValueChanged];		
+	    return cell;
+	}
+	else
+	{
+		static NSString *CellIdentifier1 = @"Cell1";
+		UITableViewCell *cell1 = [tableView dequeueReusableCellWithIdentifier:CellIdentifier1];
+		if (cell1 == nil) {
+			cell1 = [[[UITableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier1] autorelease];
+		}
+		cell1.text = @"Change Passcode";
+		cell1.textColor=[UIColor colorWithRed:0.317 green:0.4 blue:0.56 alpha:1.0];
+		cell1.textAlignment=UITextAlignmentCenter;
+		return cell1;
+	}
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+	[tblView deselectRowAtIndexPath:indexPath animated:YES];
+	if(indexPath.section==1)
+	{
+		UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
+		temporaryBarButtonItem.title = @"Back";
+		self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
+		[temporaryBarButtonItem release];
+		
+		if([[NSUserDefaults standardUserDefaults] valueForKey:@"PasscodeNo"]!=nil)
+		{
+			if(!PasscodeSettingsView)
+			{
+				PasscodeSettingsView=[[EnterPasscodeViewController alloc]initWithNibName:@"Passcode" bundle:nil];
+			}
+			PasscodeSettingsView.Flag=YES;
+			[self.navigationController pushViewController:PasscodeSettingsView animated:YES];
+		}
+		else
+		{
+			UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Set a passcode first!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+			alert.tag=2;
+			[alert show];
+			[alert release];
+		}
+	}
+}
+
+
+
+#pragma mark Button Click methods
+-(IBAction)Clicked:(id)sender
+{
+	UISwitch *switchCon=(UISwitch *)sender;
+	if(switchCon.on==NO)
+	{
+				[self termCondition];
+	}
+	else
+	{
+		UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
+		temporaryBarButtonItem.title = @"Back";
+		self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
+		[temporaryBarButtonItem release];
+		if(!PasscodeSettingsView)
+		{
+			PasscodeSettingsView=[[EnterPasscodeViewController alloc]initWithNibName:@"Passcode" bundle:nil];
+		}
+		PasscodeSettingsView.Flag=NO;
+		[self.navigationController pushViewController:PasscodeSettingsView animated:YES];
+	}
+}
+-(void)termCondition
+{
+	
+	
+	tf=[[UITextField alloc]initWithFrame:CGRectMake(12,55, 260, 30)];
+	tf.contentMode=UIViewContentModeCenter;
+	tf.font=[UIFont systemFontOfSize:15.5];
+	tf.secureTextEntry=YES; 
+	[tf setDelegate:self];
+	tf.autocorrectionType=UITextAutocorrectionTypeNo;
+	tf.font=[UIFont systemFontOfSize:21];
+	tf.returnKeyType=UIReturnKeyDone;
+	tf.clearButtonMode = UITextFieldViewModeWhileEditing;
+	tf.keyboardType=UIKeyboardTypeNumberPad;
+	tf.borderStyle=UITextBorderStyleRoundedRect;
+	tf.placeholder=@"Enter Passcode";	
+	
+	alert1=[[UIAlertView alloc]initWithTitle:tf.placeholder message:@"\n\n" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+	
+	alert1.frame=CGRectMake(10, 10, 280, 250);
+	[alert1 addSubview:tf];
+	
+	
+	[alert1 bringSubviewToFront:tf];
+	CGAffineTransform myTransform = CGAffineTransformMakeTranslation(0.0, 100.0);
+	[alert1 setTransform:myTransform];
+	[alert1 show];
+	alert1.tag=1;
+	[tf becomeFirstResponder];	
+	
+	[alert1 release];	
+	
+	
+}
+-(BOOL)keyboardInput:(id)k shouldInsertText:(id)i isMarkedText:(int)b 
+{
+	char s=[i characterAtIndex:0];
+	if(s!=10)
+	{
+		int len=[tf.text length];
+		if(len<4)
+		{	
+			return YES;
+		}
+		else
+		{
+			return NO;
+		}
+	}
+	return NO;
+}		
+
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+	
+	if(alertView.tag==1)
+	{
+	if(buttonIndex == 0){		
+		
+		
+		NSString *Passcode=[[NSUserDefaults standardUserDefaults] valueForKey:@"PasscodeNo"];
+		if([Passcode isEqualToString:tf.text])
+		{
+			[[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithFormat:@"%d",0] forKey:@"Passcode"];
+			[[NSUserDefaults standardUserDefaults] synchronize];
+			[[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"PasscodeNo"];
+			[[NSUserDefaults standardUserDefaults] synchronize];
+		}
+		else
+		{
+			UIAlertView *alert3=[[UIAlertView alloc]initWithTitle:@"" message:@"You entered a wrong passcode. Please Enter a correct one!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+			alert3.tag=5;
+			[alert3 show];
+			[alert3 release];
+			//You entered a wrong passcode. Please Enter a correct one!
+		
+		}
+		
+	}
+	}
+	if(alertView.tag==5)
+	{
+			tf.text=@"";
+			[self termCondition]; 
+	}
+}
+
+-(IBAction)btnSave_click:(id)Sender
+{	
+	[self.navigationController dismissModalViewControllerAnimated:YES];
+}
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
+    // Release anything that's not essential, such as cached data
+}
+
+
+- (void)dealloc {
+	
+	[tblView release];
+	[btnSave release];
+	[PasscodeSettingsView release];
+	[tf release];
+	[alert1 release];
+	[btnCancel release];
+	
+    [super dealloc];
+}
+
+
+@end

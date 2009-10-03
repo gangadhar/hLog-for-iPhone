@@ -1,0 +1,72 @@
+//
+//  Routine_Detail.m
+//  HealthTracker
+//
+//  Created by MAC02 on 3/31/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import "Routine_Detail.h"
+
+
+@implementation Routine_Detail
+@synthesize Routine_ID,Activity,Alcohol,Cigarrettes,Diapering,Drugs,EntryDate,EntryTime,Exercise,Feeding,Mood,Other,Sleep,User_ID;  
+
+-(id)init
+{
+	Routine_ID=0;
+	User_ID=0;
+	Activity=@"";
+	Alcohol=@"";
+	Cigarrettes=@"";
+	Diapering=@"";
+	Drugs=@"";
+	EntryDate=@"";
+	EntryTime=@"";
+	Exercise=@"";
+	Feeding=@"";
+	Mood=@"";
+	Other=@"";
+	Sleep=@"";
+
+	return self;
+}
+
+
+-(void)ClearData
+{
+	Routine_ID=0;
+	User_ID=0;
+	Activity=@"";
+	Alcohol=@"";
+	Cigarrettes=@"";
+	Diapering=@"";
+	Drugs=@"";
+	EntryDate=@"";
+	EntryTime=@"";
+	Exercise=@"";
+	Feeding=@"";
+	Mood=@"";
+	Other=@"";
+	Sleep=@"";
+}
+
+
+- (void)dealloc {
+	
+	[EntryDate release];
+	[EntryTime release];
+	[Activity release];
+	[Alcohol release];
+	[Cigarrettes release];
+	[Diapering release];
+	[Drugs release];
+	[Exercise release];
+	[Feeding release];
+	[Mood release];
+	[Other release];
+	[Sleep release];
+	[super dealloc];
+}
+
+@end

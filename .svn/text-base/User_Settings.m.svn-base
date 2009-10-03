@@ -1,0 +1,35 @@
+//
+//  User_Settings.m
+//  HealthTracker
+//
+//  Created by Bhoomi on 3/10/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+// Import All needed header files bellow.
+#import "User_Settings.h"
+
+
+@implementation User_Settings
+
+// Fields or variables or tools whose property has been declared must be Synthesize here...
+@synthesize User_Id,DailyEntryDetail,HourlyEntryDetail,MedicineEntryDetail; 
+-(id)init
+{
+	DailyEntryDetail=@"";
+	HourlyEntryDetail=@"";
+	MedicineEntryDetail=@"";
+	User_Id=0;
+	return self;
+}
+
+
+- (void)dealloc {
+	[DailyEntryDetail release];
+	[HourlyEntryDetail release];
+	[MedicineEntryDetail release];
+	[super dealloc];
+}
+
+
+@end

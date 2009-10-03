@@ -1,0 +1,22 @@
+//
+//  FirstViewController.h
+//  HealthTracker
+//
+//  Created by MAC02 on 3/30/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+#import "HealthTrackerAppDelegate.h"
+#import "AddNewUserController.h" 
+
+@interface FirstViewController : UIViewController <UITableViewDelegate,UITableViewDataSource>{
+
+	IBOutlet UITableView *tblView;
+	AddNewUserController *AddNewUser;
+	HealthTrackerAppDelegate *appDelegate;
+
+}
+
+@end

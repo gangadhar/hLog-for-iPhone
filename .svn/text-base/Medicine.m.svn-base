@@ -1,0 +1,46 @@
+//
+//  Medicine.m
+//  HealthTracker
+//
+//  Created by MAC02 on 3/30/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import "Medicine.h"
+
+
+@implementation Medicine
+@synthesize UserID,MedicineID,MedicineEntry,EntryDate,EntryTime,Medicine_Insert_ID;
+
+-(id)init
+{
+	MedicineEntry=@"";
+	EntryDate=@"";
+	EntryTime=@"";
+	MedicineID=0;
+	UserID=0;
+	Medicine_Insert_ID=@"";
+	return self;
+}
+
+
+-(void)ClearData
+{
+	MedicineEntry=@"";
+	EntryDate=@"";
+	EntryTime=@"";
+	MedicineID=0;
+	UserID=0;
+	Medicine_Insert_ID=@"";
+}
+
+- (void)dealloc {
+	
+	[EntryDate release];
+	[EntryTime release];
+	[MedicineEntry  release];
+	[Medicine_Insert_ID release];
+	[super dealloc];
+}
+
+@end

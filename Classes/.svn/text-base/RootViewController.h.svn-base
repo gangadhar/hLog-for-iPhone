@@ -1,0 +1,53 @@
+//
+//  RootViewController.h
+//  HealthTracker
+//
+//  Created by Bhoomi on 28/02/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+//#import "RootViewCell.h"
+#import "AddNewUserController.h"
+#import "HealthTrackerAppDelegate.h"
+#import "FirstViewController.h"
+
+// Defining Interface  with needed Protocol (if any).
+// Protocols generally define inside '< >'bracates.
+@interface RootViewController : UIViewController<UITableViewDelegate,UITableViewDataSource,UIActionSheetDelegate>
+{
+	
+	/* 
+	 Tools That you have used in xib file, need to bind with its controller file.
+	 This is done by Declaring tool with IBOutlet as Prefix.
+	 
+	 Tools That you haven't used in xib but used in controller file, need not to bind with xib,
+	 such tools do not have IBOutlet as Prefix.
+	 
+	 Declaration of all global variables and objects also here.
+	 */
+	
+	IBOutlet UITableView *tblView;
+	IBOutlet UIBarButtonItem *btnAdd;
+
+	HealthTrackerAppDelegate *appDelegate;
+	UINavigationController *SettingsCon;
+
+	BOOL IsEdit;
+	int ROW;
+	AddNewUserController *objAddUser;
+	UILabel *lblUser;
+	NSMutableArray  *selectedArray;
+	UIImage *selectedImage;
+	UIImage *unselectedImage;
+	NSMutableArray *arr1;
+	IBOutlet UIBarButtonItem *btnSave;
+}
+
+
+// Declaration of all Public methods that are going to implement inside implementation file, need to declare here.
+
+-(IBAction)addProfile:(id)sender;
+-(IBAction)btnSave_Click:(id)sender;
+- (void)populateSelectedArray;
+@end

@@ -1,0 +1,27 @@
+//
+//  ToogleTableViewCell.h
+//  HealthTracker
+//
+//  Created by Bhoomi on 3/4/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+
+@interface ToogleTableViewCell : UITableViewCell {
+
+	//UILabel *lblName;
+	UISegmentedControl *SegMent;
+	UIButton *btnNext;
+	UIButton *btnPrev;
+}
+
+//@property(nonatomic,retain) UILabel *lblName;
+
+@property(nonatomic,retain) UISegmentedControl *SegMent;
+@property(nonatomic,retain) UIButton *btnNext;
+@property(nonatomic,retain) UIButton *btnPrev;
+- (UILabel *)newLabelWithPrimaryColor:(UIColor *)primaryColor selectedColor:(UIColor *)selectedColor fontSize:(CGFloat)fontSize bold:(BOOL)bold;
+
+@end

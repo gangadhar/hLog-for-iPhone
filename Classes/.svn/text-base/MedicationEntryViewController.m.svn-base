@@ -1,0 +1,176 @@
+//
+//  MedicationEntryViewController.m
+//  HealthTracker
+//  Created by Bhoomi on 3/3/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+// Import All needed header files bellow.
+#import "MedicationEntryViewController.h"
+
+
+@implementation MedicationEntryViewController
+@synthesize Data1,MED_ID;
+/*
+// The designated initializer. Override to perform setup that is required before the view is loaded.
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+        // Custom initialization
+    }
+    return self;
+}
+*/
+
+//An event when user clicks on Save button.
+-(IBAction)Save:(id)sender
+{
+	
+	NSCharacterSet *set = [NSCharacterSet characterSetWithCharactersInString:@" "];
+	txtMedicine.text =[txtMedicine.text stringByTrimmingCharactersInSet:set];
+	if([txtMedicine.text length]>0)
+	{			
+		[txtMedicine resignFirstResponder];
+		if(MED_ID>0)
+		{
+			[appDelegate UpdateMedicine:txtMedicine.text  andID:MED_ID];
+		}
+		else
+		{
+			BOOL ISMedicineExist=[appDelegate IsMedicineExist:[txtMedicine.text lowercaseString]];
+			if(ISMedicineExist==FALSE)
+			{
+				
+				int lastID=	[appDelegate InsertMedicine:txtMedicine.text]; 
+				if(lastID>0)
+				{
+					[appDelegate SelectUserSettings:appDelegate.SelectedUserID];
+					if([appDelegate.UserSettingsArray count]==1)
+					{
+						User_Settings *Data=[appDelegate.UserSettingsArray objectAtIndex:0];
+						if([Data.MedicineEntryDetail length]>0)
+						{
+							NSString *SelectedItems=Data.MedicineEntryDetail;
+							SelectedItems=[NSString stringWithFormat:@"%@,%d",SelectedItems,lastID];
+							
+							[appDelegate UpdateUserData:appDelegate.SelectedUserID DailyData:SelectedItems ColumnName:@"MedicineEntryDetail"];
+						}
+						else
+						{
+							NSString *SelectedItems;
+							SelectedItems=[NSString stringWithFormat:@"%d",lastID];
+							
+							[appDelegate UpdateUserData:appDelegate.SelectedUserID DailyData:SelectedItems ColumnName:@"MedicineEntryDetail"];
+						}
+					}
+				}
+			}
+			else
+			{
+				UIAlertView *Alert=[[UIAlertView alloc]initWithTitle:@"" message:@"This medicine is already existing in the list!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+				Alert.tag=1;
+				[Alert show];
+				[Alert release];
+			}
+		}
+		appDelegate.DailyTag=20;
+		[self.navigationController popViewControllerAnimated:YES];
+	}
+	else
+	{
+	
+	}
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+	if(alertView.tag==1)
+	{
+		[self.navigationController popViewControllerAnimated:YES];
+	}
+}
+
+-(BOOL)keyboardInput:(id)k shouldInsertText:(id)i isMarkedText:(int)b 
+{
+	char s=[i characterAtIndex:0];
+	if(s!=10)
+	{
+		int len=[txtMedicine.text length];
+		
+		if(len<100)
+		{	
+			return YES;
+		}
+		else
+		{
+			return NO;
+		}
+		return YES;
+	}
+	else
+	{
+		[self Save:nil];
+	}
+	return NO;
+}
+
+
+//An event when user clicks on Cancel button.
+-(IBAction)Cancel:(id)sender
+{
+	[txtMedicine resignFirstResponder];
+	[self.navigationController popViewControllerAnimated:YES];
+}
+/*
+// Implement loadView to create a view hierarchy programmatically, without using a nib.
+- (void)loadView {
+}
+*/
+
+
+// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+- (void)viewDidLoad 
+{
+	self.navigationItem.title=@"Enter Medicine";
+	self.view.backgroundColor=[UIColor groupTableViewBackgroundColor];
+	self.navigationItem.rightBarButtonItem=btnSave;
+	self.navigationItem.leftBarButtonItem=btnCancel;
+	appDelegate=[[UIApplication sharedApplication]delegate];
+	txtMedicine.delegate=self;
+    [super viewDidLoad];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+	txtMedicine.text=Data1;
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+	[txtMedicine becomeFirstResponder];
+}
+/*
+// Override to allow orientations other than the default portrait orientation.
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+    // Return YES for supported orientations
+    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+*/
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
+    // Release anything that's not essential, such as cached data
+}
+
+
+- (void)dealloc {
+	
+	[txtMedicine release];
+	[btnSave release];
+	[btnCancel release];
+	[appDelegate release];
+	
+    [super dealloc];
+}
+
+
+@end

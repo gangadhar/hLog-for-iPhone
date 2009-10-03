@@ -1,0 +1,75 @@
+//
+//  HourlyStatusViewController.h
+//  HealthTracker
+//  Created by Bhoomi on 3/3/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+// Import All needed header files bellow.#import <UIKit/UIKit.h>
+#import "SettingsViewController.h"
+#import "HealthTrackerAppDelegate.h"
+#import "SelectOptionsViewController.h"
+
+#import "DailyHourlyTextEntryViewController.h"
+#import "LadiesDatePickerController.h"
+#import "Menstural_Cycle.h"
+#import "Routine_Detail.h"
+
+// Defining Interface  with needed Protocol (if any).
+// Protocols generally define inside '< >'bracates.
+@interface HourlyStatusViewController : UIViewController <UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate,UIPickerViewDelegate,UIActionSheetDelegate> {
+
+	/* 
+	 Tools That you have used in xib file, need to bind with its controller file.
+	 This is done by Declaring tool with IBOutlet as Prefix.
+	 
+	 Tools That you haven't used in xib but used in controller file, need not to bind with xib,
+	 such tools do not have IBOutlet as Prefix.
+	 
+	 Declaration of all global variables and objects also here.
+	 */
+	
+	IBOutlet UITableView *tblHourly;
+	IBOutlet UIBarButtonItem *btnSettings;
+	IBOutlet UIBarButtonItem *btnSave;
+	UINavigationController *SettingsCon;
+	
+	HealthTrackerAppDelegate *appDeleagte;
+	//SelectOptionsViewController *SelectOptionsView;
+	IBOutlet UIToolbar *toolBar;
+	UITextField *SelectedText;
+//	NSMutableArray *SettingsArray;
+//	NSDateFormatter *DateFormatter;
+	IBOutlet UIDatePicker *DatePicker;
+	IBOutlet UIToolbar *ToolBar;
+	UILabel *lblData;
+	IBOutlet UIBarButtonItem *btnDone;
+	
+//	DailyHourlyTextEntryViewController *DailyHourlyTextEntryView;
+	IBOutlet UIPickerView *PickerView;
+	int SelectedTag;
+	NSMutableDictionary *data;
+	IBOutlet UIBarButtonItem *btnDelete;
+	UILabel *lblHeader;
+	IBOutlet UIButton *btnDelete1;
+	IBOutlet UIView *viewFooter;
+	LadiesDatePickerController *LadiesDatePicker;
+	Menstural_Cycle *Mensturalref;
+	Routine_Detail *Routine_Detailrf;
+	UIBarButtonItem *temporaryBarButtonItem;
+	//NSMutableArray *TypeArray;
+	NSArray	*arr1;
+}
+
+// Defining Property as per fields, tools, variables and objects.
+
+@property (nonatomic,retain) Menstural_Cycle *Mensturalref;
+@property (nonatomic,retain) Routine_Detail *Routine_Detailrf;
+// Declaration of all Public methods that are going to implement inside implementation file, need to declare here.
+-(IBAction)btnDone_Clicked:(id)sender;
+-(IBAction)btnDelete_clicked:(id)sender;
+-(IBAction)btnSave_clicked:(id)sender;
+-(IBAction)btnSettings_clicked:(id)sender;
+-(int)GetPickerRow:(NSString *)String component:(NSInteger)Tag;
+-(NSMutableArray *)FillArray:(int)i;
+@end

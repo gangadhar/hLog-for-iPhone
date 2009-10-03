@@ -1,0 +1,32 @@
+//
+//  AddUserTwoButtonsCell.h
+//  HealthTracker
+//
+//  Created by Bhoomi on 3/3/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+
+@interface AddUserTwoButtonsCell : UITableViewCell {
+
+	UILabel *lblName;
+	UIButton *BtnSelect;
+	UILabel *lblNameTwo;
+	UIButton *BtnSelectTwo;
+	
+}
+
+@property(nonatomic,retain) UILabel *lblName;
+@property(nonatomic,retain) UIButton *BtnSelect;
+@property(nonatomic,retain) UILabel *lblNameTwo;
+@property(nonatomic,retain) UIButton *BtnSelectTwo;
+-(UILabel *)newLabelWithPrimaryColor:(UIColor *)primaryColor selectedColor:(UIColor *)selectedColor fontSize:(CGFloat)fontSize bold:(BOOL)bold;
+
+
+
+	
+
+
+@end

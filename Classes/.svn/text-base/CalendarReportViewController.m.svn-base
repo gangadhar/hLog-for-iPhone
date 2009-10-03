@@ -1,0 +1,521 @@
+//
+//  CalendarReportViewController.m
+//  HealthTracker
+//
+//  Created by Bhoomi on 4/1/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import "CalendarReportViewController.h"
+#import "AddUserButtonTableViewCell.h"
+#import "SettingTableViewCell.h"
+
+#define Field_Array [NSArray arrayWithObjects: @"BP",@"Blood Sugar",@"Temperature",@"Fasting Blood Sugar", @"Pulse",@"Respiration",@"Weight",@"Height",@"Other-Vitals",@"Sleep", @"Exercise",@"Mood",@"Activity",@"Diapering", @"Feeding",@"Alcohol",@"Cigarettes",@"Drugs",@"Menstrution",@"Other-Routines",@"Medicine",nil]
+#define Field_Table_Array [NSArray arrayWithObjects: @"BP",@"BloodSugar",@"TemperatureF",@"Fasting", @"Pulse",@"Respiration",@"WeightKgs",@"HeightCms",@"Other_Vitals",@"Sleep", @"Exercise",@"Mood",@"Activity",@"Diapering", @"Feeding",@"Alcohol",@"Cigarrettes",@"Drugs",@"Menstrution",@"Other_Routines",@"Medicine_Entry",nil]
+
+@implementation CalendarReportViewController
+
+/*
+ // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
+        // Custom initialization
+    }
+    return self;
+}
+*/
+
+/*
+// Implement loadView to create a view hierarchy programmatically, without using a nib.
+- (void)loadView {
+}
+*/
+
+-(void)ShowReport
+{
+	NSAutoreleasePool *Pool=[[NSAutoreleasePool alloc]init];
+	appDelegate.ReportField=@"";
+	appDelegate.SelectedReportField=@""; 
+	if(!arr1)
+	{
+		arr1=[[NSMutableArray alloc]init];
+	}
+	else
+		[arr1 removeAllObjects];
+	if(!arr2)
+	{
+		//arr1=[[NSMutableArray alloc]init];
+		arr2=[[NSMutableArray alloc]init];
+	}
+	else
+		[arr2 removeAllObjects];
+	
+	for(int i=0;i<[Field_Array count];i++)
+	{
+		if([[selectedArray objectAtIndex:i]intValue]==1)
+		{
+			[arr2 addObject:[Field_Table_Array  objectAtIndex:i]];
+			[arr1 addObject:[Field_Array objectAtIndex:i]];
+		}
+	}
+	if([arr2 count]>0)
+	{
+		if([arr1 count]>0)
+		{
+			for(int i=0;i<[arr1 count];i++)
+			{
+				if(i==([arr1 count]-1))
+				{
+					appDelegate.ReportField=[appDelegate.ReportField stringByAppendingString:[NSString stringWithFormat:@"%@",[arr1 objectAtIndex:i]]];
+					appDelegate.SelectedReportField=[appDelegate.SelectedReportField stringByAppendingString:[NSString stringWithFormat:@"%@",[arr2 objectAtIndex:i]]];
+				}
+				else
+				{
+					appDelegate.ReportField=[appDelegate.ReportField stringByAppendingString:[NSString stringWithFormat:@"%@, ",[arr1 objectAtIndex:i]]];
+					appDelegate.SelectedReportField=[appDelegate.SelectedReportField stringByAppendingString:[NSString stringWithFormat:@"%@, ",[arr2 objectAtIndex:i]]];
+				}
+			}
+		}
+		[self performSelectorOnMainThread:@selector(PushReport)  withObject:nil waitUntilDone:YES];
+	}
+	else
+	{
+		UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Select at least one field to be displayed in report!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+		alert.tag=5;
+		[alert show];
+		[alert release];
+		Activity.hidden=TRUE;
+		[Activity stopAnimating];
+		tblView.userInteractionEnabled=TRUE;
+	}
+	[Pool release];	
+}
+
+-(void)PushReport
+{
+
+	if(objAddUser ==nil)
+		objAddUser=[[ShowReportViewController alloc]initWithNibName:@"ShowCalendar" bundle:nil];
+	appDelegate.isFromReport=TRUE;
+	appDelegate.isDailyReport=TRUE;
+	[self.navigationController pushViewController:objAddUser animated:YES];
+	
+}
+
+-(IBAction)btnReport_Click:(id)sender
+{	
+	Activity.hidden=FALSE;
+	[Activity startAnimating];
+	tblView.userInteractionEnabled=FALSE; 
+	[NSThread detachNewThreadSelector:@selector(ShowReport) toTarget:self withObject:nil];
+}
+
+
+// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+- (void)viewDidLoad {
+	
+//	self.navigationItem.title=@"Reports";
+	appDelegate=[[UIApplication sharedApplication]delegate];
+	tblView.delegate=self;
+	tblView.dataSource=self;
+	tblView.rowHeight=45;
+	self.navigationItem.rightBarButtonItem=btnReport;
+	[appDelegate.DateFormatter setDateFormat:@"MM-dd-yyyy HH:mm"];
+	[DatePicker setDate:[NSDate date] animated:YES];
+	ToolBar.tintColor=[UIColor blackColor];
+	lblData=[[UILabel alloc]init];
+	lblData.frame=CGRectMake(10,15 , 250, 20);
+	lblData.textColor=[UIColor whiteColor];
+	lblData.backgroundColor=[UIColor clearColor];
+	DatePicker.frame=CGRectMake(0, 200, 320, 216);
+	ToolBar.frame=CGRectMake(0, 200, 320, 44);
+	[ToolBar addSubview:lblData];
+	[DatePicker setMaximumDate:[NSDate date]];
+	PickerView.delegate=self;
+	PickerView.frame=CGRectMake(0, 200, 320, 216);
+	selectedImage = [UIImage imageNamed:@"checked.png"];
+	unselectedImage = [UIImage imageNamed:@"unchecked.png"];
+	DatePicker.maximumDate=[NSDate date];
+	UIBarButtonItem *temporaryBarButtonItem = [[UIBarButtonItem alloc] init];
+	temporaryBarButtonItem.title = @"Back";
+	self.navigationItem.backBarButtonItem = temporaryBarButtonItem;
+	[temporaryBarButtonItem release];
+
+	UIView *view=[[UIView alloc]init];
+	view.frame=CGRectMake(50,0, 230, 30);
+	UILabel *label1 = [[UILabel alloc] initWithFrame:CGRectMake(23, 0, 130, 30)];
+	[label1 setFont:[UIFont boldSystemFontOfSize:18.0]];
+	[label1 setBackgroundColor:[UIColor clearColor]];
+	[label1 setTextAlignment:UITextAlignmentCenter];
+ 	[label1 setTextColor:[UIColor whiteColor]];
+	[label1 setText:@"Reports"];
+	[view addSubview:label1];
+	Activity=[[UIActivityIndicatorView alloc]init];
+	Activity.frame=CGRectMake(5, 0, 30, 30);
+	[view addSubview:Activity];
+	
+	self.navigationItem.titleView=view;
+	[view release];
+	[label1 release];
+	
+    [super viewDidLoad];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+	
+	[[UIDevice currentDevice] setOrientation:UIInterfaceOrientationPortrait];
+	
+	DatePicker.hidden=TRUE;
+	ToolBar.hidden=TRUE; 
+	PickerView.hidden=TRUE;
+	Activity.hidden=TRUE;
+	[Activity stopAnimating];
+	[self populateSelectedArray];
+	tblView.userInteractionEnabled=TRUE;
+	[tblView reloadData];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+	self.view.frame=CGRectMake(0, 0, 320, 416);
+}
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 2;
+}
+
+// Customize the number of rows in the table view.
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+	if(section==0)
+	{
+		return 2;
+	}
+	else
+		return [Field_Array count];
+}
+
+
+// Customize the appearance of table view cells.
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+
+	if(indexPath.section==1)
+	{
+		static NSString *CellIdentifier1 = @"Cell1";
+		
+		SettingTableViewCell  *cell1;
+		cell1 = (SettingTableViewCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier1];
+		if (cell1 == nil) {
+			cell1 = [[[SettingTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier1] autorelease];
+		}
+		
+		NSNumber *selected = [selectedArray objectAtIndex:[indexPath row]];
+		cell1.btnDelete.image = ([selected boolValue]) ? selectedImage : unselectedImage;
+		cell1.txtAmount.hidden=TRUE;
+		cell1.lblName.text=[Field_Array objectAtIndex:indexPath.row]; 
+		return cell1;
+	}
+	else
+	{
+		static NSString *CellIdentifier = @"Cell";
+		AddUserButtonTableViewCell *cell;
+		cell = (AddUserButtonTableViewCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+		if (cell == nil) {
+			cell = [[[AddUserButtonTableViewCell alloc] initWithFrame:CGRectZero reuseIdentifier:CellIdentifier] autorelease];
+		}
+		[cell.BtnSelect addTarget:self action:@selector(ClickButton:) forControlEvents:UIControlEventTouchUpInside];
+		
+		switch(indexPath.row)
+		{
+			case 0:
+				cell.lblName.text=@"Start Date";
+				cell.BtnSelect.tag=0;
+				if([appDelegate.ReportStartDate length]>0)
+				{
+					[cell.BtnSelect setTitle:[NSString stringWithFormat:@"  %@",appDelegate.ReportStartDate]  forState:UIControlStateNormal];
+				}
+				else
+				{
+					[cell.BtnSelect setTitle:[NSString stringWithFormat:@"  %@",@"Select Start Date"]  forState:UIControlStateNormal];
+				}
+				return cell;
+			case 1:
+				cell.lblName.text=@"End Date";
+				cell.BtnSelect.tag=1;
+				if([appDelegate.ReportEndDate length]>0)
+				{
+					[cell.BtnSelect setTitle:[NSString stringWithFormat:@"  %@",appDelegate.ReportEndDate]  forState:UIControlStateNormal];
+				}
+				else
+				{
+					[cell.BtnSelect setTitle:[NSString stringWithFormat:@"  %@",@"Select End Date"]  forState:UIControlStateNormal];
+				}
+				return cell;
+		}	
+	}
+	return @"";	
+}
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{
+	PickerView.hidden=TRUE;
+	DatePicker.hidden=TRUE;
+	ToolBar.hidden=TRUE;
+}
+
+- (void)populateSelectedArray
+{
+	if(!selectedArray)
+		selectedArray=[[NSMutableArray alloc ]init];
+	if([selectedArray count]>0)
+	{
+		[selectedArray removeAllObjects];
+	}
+	if([appDelegate.ReportField isEqualToString:@""])
+	{
+		for (int i=0; i < [Field_Array count]; i++)
+		{
+			[selectedArray addObject:[NSNumber numberWithBool:NO]];
+		}
+	}
+	else
+	{
+		NSArray *arr5=[appDelegate.ReportField componentsSeparatedByString:@", "];
+		for(int i=0;i<[Field_Array count];i++)
+		{
+			NSString *Str=[Field_Array objectAtIndex:i];
+			BOOL result = [arr5 containsObject:Str];
+			
+			if(result==TRUE)
+			{
+				[selectedArray addObject:[NSNumber numberWithBool:YES]];
+			}
+			else
+			{
+				[selectedArray addObject:[NSNumber numberWithBool:NO]];
+			}
+		}
+	//	[selectedArray addObject:[NSNumber numberWithBool:NO]];
+	//	[selectedArray addObject:[NSNumber numberWithBool:NO]];
+	}
+}
+
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+
+	if(indexPath.section==1)
+	{
+		[tblView deselectRowAtIndexPath:indexPath animated:YES];		
+		BOOL selected = [[selectedArray objectAtIndex:[indexPath row]] boolValue];
+		[selectedArray replaceObjectAtIndex:[indexPath row] withObject:[NSNumber numberWithBool:!selected]];
+		[tblView reloadData];
+	}
+	else
+	{
+		if(indexPath.row==0)
+		{
+			PickerView.hidden=TRUE;
+			DatePicker.hidden=FALSE;
+			ToolBar.hidden=FALSE;
+			if([appDelegate.ReportStartDate length]==0)
+			{
+				[DatePicker setDate:[NSDate date] animated:YES];
+			}
+			else
+			{
+				[DatePicker setDate:[appDelegate.DateFormatter dateFromString:appDelegate.ReportStartDate]];
+			}
+			lblData.text=@"Select Start Date";
+			SelectedTag=0;
+		}
+		if(indexPath.row==1)
+		{
+			PickerView.hidden=TRUE;
+			if([appDelegate.ReportStartDate length]==0)
+			{
+				DatePicker.hidden=TRUE;
+				ToolBar.hidden=TRUE;
+				UIAlertView *Alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Select the start date first!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+				[Alert show];
+				[Alert release];
+				return;
+			}
+			else
+			{
+				DatePicker.hidden=FALSE;
+				ToolBar.hidden=FALSE;
+				if([appDelegate.ReportEndDate length]==0)
+				{
+					[DatePicker setDate:[NSDate date] animated:YES];
+				}
+				else
+				{
+					[DatePicker setDate:[appDelegate.DateFormatter dateFromString:appDelegate.ReportEndDate]];
+				}
+				lblData.text=@"Select End Date";
+			}
+			SelectedTag=1;
+		}
+	}
+}
+
+-(IBAction)ClickButton:(id)sender
+{
+	UIButton *btn=(UIButton*)sender;
+	if(btn.tag==0)
+	{
+		PickerView.hidden=TRUE;
+		DatePicker.hidden=FALSE;
+		ToolBar.hidden=FALSE;
+		if([appDelegate.ReportStartDate length]==0)
+		{
+			[DatePicker setDate:[NSDate date] animated:YES];
+		}
+		else
+		{
+			[DatePicker setDate:[appDelegate.DateFormatter dateFromString:appDelegate.ReportStartDate]];
+		}
+		lblData.text=@"Select Start Date";
+		SelectedTag=0;
+	}
+	else if(btn.tag==1)
+	{
+		PickerView.hidden=TRUE;
+		if([appDelegate.ReportStartDate length]==0)
+		{
+			DatePicker.hidden=TRUE;
+			ToolBar.hidden=TRUE;
+			UIAlertView *Alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Select the start date first!" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+			[Alert show];
+			[Alert release];
+			return;
+		}
+		else
+		{
+			DatePicker.hidden=FALSE;
+			ToolBar.hidden=FALSE;
+			if([appDelegate.ReportEndDate length]==0)
+			{
+				[DatePicker setDate:[NSDate date] animated:YES];
+			}
+			else
+			{
+				[DatePicker setDate:[appDelegate.DateFormatter dateFromString:appDelegate.ReportEndDate]];
+			}
+			lblData.text=@"Select End Date";
+		}
+		SelectedTag=1;
+	}
+}
+
+-(IBAction)btnDone_click:(id)sender
+{
+	PickerView.hidden=TRUE;
+	ToolBar.hidden=TRUE;
+	DatePicker.hidden=TRUE;
+	[appDelegate.DateFormatter setDateFormat:@"MM-dd-yyyy HH:mm"];
+	if(SelectedTag==0)
+	{
+		if([appDelegate.ReportEndDate isEqualToString:@""])
+		{
+			appDelegate.ReportStartDate=[appDelegate.DateFormatter stringFromDate:DatePicker.date];
+			appDelegate.ReportStartDate=appDelegate.ReportStartDate;
+
+		}
+		else
+		{
+			NSDate *date=[appDelegate.DateFormatter dateFromString:appDelegate.ReportEndDate];
+			if([DatePicker.date timeIntervalSinceDate:date]>0)
+			{
+				UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"Start date must be \n less than or equal to end date" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+				[alert show];
+				[alert release];
+			}
+			else
+			{
+				appDelegate.ReportStartDate=[appDelegate.DateFormatter stringFromDate:DatePicker.date];
+				appDelegate.ReportStartDate=[NSString stringWithFormat:@"%@",appDelegate.ReportStartDate];
+			}
+		}
+	}
+	else if(SelectedTag==1)
+	{
+		if([appDelegate.ReportStartDate isEqualToString:@""])
+		{
+			
+		}
+		else
+		{
+			NSDate *date=[appDelegate.DateFormatter dateFromString:appDelegate.ReportStartDate];
+			if([DatePicker.date timeIntervalSinceDate:date]<0)
+			{
+				UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"" message:@"End date must be \n greater than or equal to start date" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+				[alert show];
+				[alert release];
+			}
+			else
+			{
+				appDelegate.ReportEndDate=[appDelegate.DateFormatter stringFromDate:DatePicker.date];
+				appDelegate.ReportEndDate=[NSString stringWithFormat:@"%@",appDelegate.ReportEndDate];
+			}
+		}
+	}
+	[tblView reloadData];
+}
+
+#pragma mark pickerView
+
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pV
+{
+	return 1;
+}
+
+- (NSInteger)pickerView:(UIPickerView *)pV numberOfRowsInComponent:(NSInteger)component
+{	
+	return [Field_Array count];
+	
+}
+
+- (NSString *)pickerView:(UIPickerView *)pV titleForRow:(NSInteger)row forComponent:(NSInteger)component
+{
+	NSString *strRestaurantType=(NSString *)[Field_Array objectAtIndex:row];
+	return strRestaurantType;
+}
+
+/*
+// Override to allow orientations other than the default portrait orientation.
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+    // Return YES for supported orientations
+    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+*/
+
+- (void)didReceiveMemoryWarning {
+	// Releases the view if it doesn't have a superview.
+    [super didReceiveMemoryWarning];
+	
+	// Release any cached data, images, etc that aren't in use.
+}
+
+- (void)viewDidUnload {
+	// Release any retained subviews of the main view.0
+	// e.g. self.myOutlet = nil;
+}
+
+
+- (void)dealloc {
+	[tblView release];
+	[btnReport release];
+	[selectedLabel release];
+	[DatePicker release];
+	[PickerView release];
+	[ToolBar release];
+	[lblData release];
+	[btnDone release];
+	//[DateFormatter release];
+	[ShowReportView release];
+    [super dealloc];
+}
+
+
+@end

@@ -1,0 +1,54 @@
+//
+//  Vitals_Detail.h
+//  HealthTracker
+//
+//  Created by MAC02 on 3/30/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+
+@interface Vitals_Detail : NSObject {
+
+	NSString *EntryDate;
+	NSString *BP;
+	NSString *BloodSugar;
+	NSString *Fasting;
+	NSString *Other;
+	NSString *Pulse;
+	NSString *Respiration;
+	NSString *TempF;
+	NSString *TempC;
+	
+	NSString *EntryTime;
+
+	NSInteger Vitals_ID;
+	NSInteger User_ID1;
+	NSString *WeightKgs;
+	NSString *WeightLbs;
+	
+	NSString *HeightInch;
+	NSString *HeightCms;
+}
+@property(nonatomic,retain ) NSString *HeightInch;
+@property(nonatomic,retain ) NSString *HeightCms;
+@property(nonatomic,retain )NSString *EntryDate;
+@property(nonatomic,retain )NSString *EntryTime;
+@property(nonatomic,retain )NSString *BP;
+@property(nonatomic,retain )NSString *BloodSugar;
+@property(nonatomic,retain )NSString *Fasting;
+@property(nonatomic,retain )NSString *Other;
+@property(nonatomic,retain )NSString *Pulse;
+@property(nonatomic,retain )NSString *Respiration;
+@property(nonatomic,retain )NSString *TempC;
+@property(nonatomic,retain )NSString *TempF; 
+@property(nonatomic,retain )NSString *WeightKgs;
+@property(nonatomic,retain )NSString *WeightLbs;
+@property(nonatomic,readwrite) NSInteger Vitals_ID;
+
+@property(nonatomic,readwrite) NSInteger User_ID1;
+
+
+-(void)ClearData;
+@end

@@ -1,0 +1,27 @@
+//
+//  PasscodeSettingsViewController.h
+//  HealthTracker
+//
+//  Created by MAC02 on 3/17/09.
+//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+#import "HealthTrackerAppDelegate.h"
+#import "EnterPasscodeViewController.h"
+
+@interface PasscodeSettingsViewController : UIViewController <UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate>
+{
+
+	IBOutlet UITableView *tblView;
+	IBOutlet UIBarButtonItem *btnSave;
+	HealthTrackerAppDelegate *appDelegate;
+	EnterPasscodeViewController *PasscodeSettingsView;
+	UITextField *tf;
+	UIAlertView *alert1;
+	IBOutlet UIBarButtonItem *btnCancel;
+}
+
+-(IBAction)btnSave_click:(id)Sender;
+-(void)termCondition;
+@end

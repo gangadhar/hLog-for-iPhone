@@ -1,0 +1,234 @@
+//
+//  DailyHourlyTextEntryViewController.m
+//  HealthTracker
+//  Created by Bhoomi on 3/10/09.
+//  Copyright 2009 Elan. All rights reserved.
+//
+
+
+#import "DailyHourlyTextEntryViewController.h"
+
+// Import All needed header files bellow.
+@implementation DailyHourlyTextEntryViewController
+
+// Fields or variables or tools whose property has been declared must be Synthesize here...
+@synthesize selectedName,selectedIndex,TextData,Vitals_Detailref,Routine_Detailref; 
+
+
+
+// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+- (void)viewDidLoad
+{
+	txtView.text=@"";
+	appDelegate=[[UIApplication sharedApplication]delegate];
+	self.view.backgroundColor=[UIColor groupTableViewBackgroundColor];
+	self.navigationItem.leftBarButtonItem=btnCancel;
+	self.navigationItem.rightBarButtonItem=btnDone;
+	txtView.delegate=self;
+	txtView.returnKeyType=UIReturnKeyDone;
+	txtView.autocorrectionType=UITextAutocorrectionTypeNo;	
+	label1 = [[UILabel alloc] initWithFrame:CGRectMake(50, 0, 220, 30)];
+	[label1 setFont:[UIFont boldSystemFontOfSize:15.0]];
+	[label1 setBackgroundColor:[UIColor clearColor]];
+	[label1 setTextAlignment:UITextAlignmentCenter];
+ 	[label1 setTextColor:[UIColor whiteColor]];
+    [super viewDidLoad];
+}
+
+-(void)viewDidAppear:(BOOL)animated
+{
+	//txtView.editable=YES;
+	[txtView becomeFirstResponder];
+}
+-(void)viewWillDisappear:(BOOL)animated
+{
+	[txtView resignFirstResponder];
+}
+- (void)viewWillAppear:(BOOL)animated
+{
+	if(selectedIndex==17 || selectedIndex== 20 || selectedIndex ==21)
+	{
+		txtView.keyboardType=UIKeyboardTypePhonePad;
+	}
+	else
+	{
+		txtView.keyboardType=UIKeyboardTypeDefault;
+	}
+	//self.navigationItem.title=selectedName;
+	
+	
+	[label1 setText:selectedName];
+	self.navigationItem.titleView=label1;
+	//[self.navigationController.navigationBar.topItem setTitleView:label1];
+//	[label1 release];
+	txtView.text=TextData;
+}
+
+-(BOOL)keyboardInput:(id)k shouldInsertText:(id)i isMarkedText:(int)b 
+{
+	char s=[i characterAtIndex:0];
+	if(s!=10)
+	{
+		int len=[txtView.text length];
+		
+		if([appDelegate.SelectedStatus isEqualToString:@"Daily"])
+		{
+			if(selectedIndex==2 || selectedIndex==4 || selectedIndex==6 || selectedIndex==9)
+			{
+				if(len<100)
+				{	
+					return YES;
+				}
+				else
+				{
+					return NO;
+				}
+			}
+		}
+		else
+		{
+			if(selectedIndex==6 || selectedIndex==26 || selectedIndex==27)
+			{
+				if(len<50)
+				{	
+					return YES;
+				}
+				else
+				{
+					return NO;
+				}
+			}
+			else if(selectedIndex==7 || selectedIndex== 11 || selectedIndex ==9)
+			{
+				if(len<100)
+				{	
+					return YES;
+				}
+				else
+				{
+					return NO;
+				}
+			}
+		}
+	}
+	else
+	{
+		[self StoreData];
+		return NO;
+	}
+	return YES;
+}
+-(void)StoreData
+{
+	NSAutoreleasePool *POOL=[[NSAutoreleasePool alloc]init];
+	NSCharacterSet *set = [NSCharacterSet characterSetWithCharactersInString:@" "];
+	txtView.text =[txtView.text stringByTrimmingCharactersInSet:set];
+	//[appDelegate.AddNewUserDict retain];
+	
+	if([appDelegate.SelectedStatus isEqualToString:@"Daily"])
+	{
+		if(selectedIndex==2)
+		{
+			self.Vitals_Detailref.BloodSugar=txtView.text;
+		}
+		else if(selectedIndex==4)
+		{
+			self.Vitals_Detailref.Fasting=txtView.text;
+		}
+		else if(selectedIndex==6)
+		{
+			self.Vitals_Detailref.Respiration=txtView.text;
+		}
+		else if(selectedIndex==9)
+		{
+			self.Vitals_Detailref.Other=txtView.text;
+		}
+	}
+	else
+	{
+		if(selectedIndex==6)
+		{
+			self.Routine_Detailref.Feeding=txtView.text;
+		}
+		else if(selectedIndex==7)
+		{
+			self.Routine_Detailref.Alcohol=txtView.text;
+		}
+		else if(selectedIndex==9)
+		{
+			self.Routine_Detailref.Drugs=txtView.text;
+		}
+		else if(selectedIndex==11)
+		{
+			self.Routine_Detailref.Other=txtView.text;
+		}
+		else if(selectedIndex==26)
+		{
+			self.Routine_Detailref.Activity=txtView.text;
+			if(appDelegate.isFromEditReport==TRUE)
+				[self.navigationController popToViewController: [self.navigationController.viewControllers objectAtIndex:3] animated:YES];
+				else
+			[self.navigationController popToViewController: [self.navigationController.viewControllers objectAtIndex:1] animated:YES];
+				[POOL release];
+			return;
+
+		}
+		else if(selectedIndex==27)
+		{
+			self.Routine_Detailref.Mood=txtView.text;
+			if(appDelegate.isFromEditReport==TRUE)
+				[self.navigationController popToViewController: [self.navigationController.viewControllers objectAtIndex:3] animated:YES];
+			else
+				[self.navigationController popToViewController: [self.navigationController.viewControllers objectAtIndex:1] animated:YES];
+			
+				[POOL release];
+			return;
+			
+		}
+	}
+	[self.navigationController popViewControllerAnimated:YES];
+	[POOL release];
+}
+
+/*
+// Override to allow orientations other than the default portrait orientation.
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+    // Return YES for supported orientations
+    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+*/
+
+//An event when user clicks on Done button.
+-(IBAction)Done:(id)sender
+{
+	[self StoreData];
+}
+
+//An event when user clicks on Cancel button.
+-(IBAction)Cancel:(id)sender
+{
+	[self.navigationController popViewControllerAnimated:YES];
+}
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning]; // Releases the view if it doesn't have a superview
+    // Release anything that's not essential, such as cached data
+}
+
+
+- (void)dealloc {
+	[txtView release];
+	[btnCancel release];
+	[btnDone release];
+	[selectedName release];
+
+	[TextData release];
+	
+	[Vitals_Detailref release];
+	[Routine_Detailref release];
+	[label1 release];
+	
+    [super dealloc];
+}
+
+
+@end
