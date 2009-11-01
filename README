@@ -1,1 +1,17 @@
 hLog is an open sourced health log application for smartphones. The first version available in github is for iPhones.
+
+I created this application since I wanted to help in finding a cure for cancer. I feel that patients collaborating with other patients will help in finding a cure for this dreadful disease which is expected to strike 1 in 2 men and 1 in 3 women according to the American Cancer Society.
+
+Plans for hLog:
+a. Integrate with HleathVault, Google Health.
+b. Migrate app to Android and other smartphone platforms.
+c. Let the users collaborate with each others.
+
+License:
+This code is provided to the developer community with a GNU-GPL license.
+
+Instructions (or Basics):
+a) What do you need to compile this app:
+i) an intel based Mac running Mac OS/X (Leopard or higher)
+ii) The iPhone SDK downloaded from the Apple iPhone Development Center. (iPhone Dev Center).
+iii) A test email address to test the sending the logs by email feature (you can use your own or create a test one at gmail.com). The fields where you need to replace the email address is marked with "REPLACETHIS" in HealthTrackerAppDelegate.m.
